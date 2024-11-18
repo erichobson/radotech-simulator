@@ -1,1 +1,7 @@
+# Build files
+/build
+.qmake.stash
+
+# Other temp files
 .DS_Store
+

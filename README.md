@@ -2,8 +2,6 @@
 
 ### Team 38 (5):
 - Eric Hobson
-- Shane Williams
 - Andrew Wallace
 - Olu Ogunmeru
 - Abdulmalik Umar
-

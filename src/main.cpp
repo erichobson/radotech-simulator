@@ -1,11 +1,11 @@
 /**
- * @file main.cpp
+ * @file src/main.cpp
  * @brief Entry point for the RaDoTech simulation application.
  */
 
 #include <QApplication>
 
-#include "MainWindow.h"
+#include "ui/MainWindow.h"
 
 /**
  * @brief Main function of the application.
