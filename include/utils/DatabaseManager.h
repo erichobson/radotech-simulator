@@ -24,10 +24,10 @@ class DatabaseManager {
         void execute(const QString&, const QList<QVariant>&);
         void query(const QString&, const QList<QVariant>&, QList<QMap<QString, QVariant>>&);
         bool isConnectionOpen();
+        void testCRUD();
 
     private:
         QSqlDatabase dbConnection;
         void handleError(const QSqlError&);
         void executeSqlScript(const QString&, QSqlDatabase&);
-        bool isDataPresent(const QList<QString>&);
 };
