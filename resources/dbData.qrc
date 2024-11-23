@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>sql/dummy_data.sql</file>
+    </qresource>
+</RCC>
