@@ -92,3 +92,73 @@ void DatabaseManager::init() {
 bool DatabaseManager::isConnectionOpen() {
     return dbConnection.isOpen();
 }
+
+void DatabaseManager::testCRUD() {
+    const QString userQuery = "SELECT * FROM users;";
+    const QString profileQuery = "SELECT * FROM profile;";
+    const QString scanQuery = "SELECT * FROM scan;";
+
+    QList<QMap<QString, QVariant>> userRes;
+    QList<QMap<QString, QVariant>> profileRes;
+    QList<QMap<QString, QVariant>> scanRes;
+
+    // Create
+    qDebug() << "\nCREATING USER " << "testuser2" <<" ******************";
+    execute("INSERT INTO users (name, username, email, password_hash) VALUES(?,?,?,?);", {"Test user 2", "testuser2", "testuser2@mail.com", "password"});
+
+    query(userQuery, {}, userRes);
+    query(profileQuery, {}, profileRes);
+    query(scanQuery, {}, scanRes);
+
+    // Read
+    qDebug() << "\nPRINTING USERS ******************";
+    for (int i = 0; i < userRes.size(); ++i) {
+        qDebug() << "Row" << i + 1 << ":";
+        const QMap<QString, QVariant>& row = userRes[i];
+        for (auto it = row.begin(); it != row.end(); ++it) {
+            qDebug() << "  " << it.key() << "=" << it.value();
+        }
+    }
+    
+    qDebug() << "\nPRINTING PROFILES ******************";
+    for (int i = 0; i < profileRes.size(); ++i) {
+        qDebug() << "Row" << i + 1 << ":";
+        const QMap<QString, QVariant>& row = profileRes[i];
+        for (auto it = row.begin(); it != row.end(); ++it) {
+            qDebug() << "  " << it.key() << "=" << it.value();
+        }
+    }
+
+    qDebug() << "\nPRINTING SCANS ******************";
+    for (int i = 0; i < scanRes.size(); ++i) {
+        qDebug() << "Row" << i + 1 << ":";
+        const QMap<QString, QVariant>& row = scanRes[i];
+        for (auto it = row.begin(); it != row.end(); ++it) {
+            qDebug() << "  " << it.key() << "=" << it.value();
+        }
+    }
+
+    // Update
+    qDebug() << "\nUPDATING USERS ******************";
+    execute("UPDATE users SET name=?, username=?  WHERE email=?;", {"update test 2", "updatedtestuser", "testuser2@mail.com"});
+    query(userQuery, {}, userRes);
+    for (int i = 0; i < userRes.size(); ++i) {
+        qDebug() << "Row" << i + 1 << ":";
+        const QMap<QString, QVariant>& row = userRes[i];
+        for (auto it = row.begin(); it != row.end(); ++it) {
+            qDebug() << "  " << it.key() << "=" << it.value();
+        }
+    }
+
+    // Delete
+    qDebug() << "\nDELETING FROM USERS ******************";
+    execute("DELETE FROM users WHERE email=?;", {"testuser2@mail.com"});
+    query(userQuery, {}, userRes);
+    for (int i = 0; i < userRes.size(); ++i) {
+        qDebug() << "Row" << i + 1 << ":";
+        const QMap<QString, QVariant>& row = userRes[i];
+        for (auto it = row.begin(); it != row.end(); ++it) {
+            qDebug() << "  " << it.key() << "=" << it.value();
+        }
+    }
+}
