@@ -103,7 +103,7 @@ void LoginWidget::createInitialPage() {
     }
 
     // Create "Create profile" and "Enter" buttons
-    createProfileButton = new QPushButton("Create Profile");
+    createProfileButton = new QPushButton("Create profile");
     enterButton = new QPushButton("Enter");
 
     // Set button sizes
