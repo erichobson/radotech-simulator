@@ -20,7 +20,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/include/utils
 )
 
-file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE SOURCES "src/*.cpp" "resources/resources.qrc")
 file(GLOB_RECURSE HEADERS "include/*.h")
 
 add_executable(RaDoTech ${SOURCES} ${HEADERS})
