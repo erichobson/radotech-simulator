@@ -1,6 +1,6 @@
 .PHONY: all qmake cmake clean clean-qmake clean-cmake run run-qmake run-cmake
 
-all: qmake
+all: cmake
 
 qmake:
 	mkdir -p build/qmake
@@ -28,7 +28,7 @@ run-cmake:
 		echo "Executable not found. Build the project using 'make cmake' first."; \
 	fi
 
-run: run-qmake
+run: run-cmake
 
 clean: clean-qmake clean-cmake
 
