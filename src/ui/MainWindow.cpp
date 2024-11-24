@@ -4,10 +4,8 @@
  */
 
 #include "MainWindow.h"
-
 #include <QStackedWidget>
 #include <QVBoxLayout>
-
 #include "DatabaseManager.h"
 #include "LoginWidget.h"
 
@@ -21,7 +19,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Initialize DatabaseManager
     DatabaseManager db;
-    db.testCRUD();
 
     // Set title and initial size
     setWindowTitle("RaDoTech");
