@@ -10,7 +10,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Charts Sql)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Sql)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/include
@@ -24,4 +24,4 @@ file(GLOB_RECURSE SOURCES "src/*.cpp" "resources/resources.qrc")
 file(GLOB_RECURSE HEADERS "include/*.h")
 
 add_executable(RaDoTech ${SOURCES} ${HEADERS})
-target_link_libraries(RaDoTech PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Charts Qt6::Sql)
+target_link_libraries(RaDoTech PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Sql)
