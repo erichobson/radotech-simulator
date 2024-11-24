@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
+        <file>sql/dummy_data.sql</file>
+        <file>sql/schema.sql</file>
         <file>images/radotech_logo.png</file>
         <file>images/dr.yoshio_nakatani.png</file>
     </qresource>

@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Initialize DatabaseManager
     DatabaseManager db;
+    db.testCRUD();
 
     // Set title and initial size
     setWindowTitle("RaDoTech");

@@ -64,3 +64,4 @@ CONFIG += object_with_source
 
 OBJECTS_DIR = $$BUILD_DIR/obj
 MOC_DIR = $$BUILD_DIR/moc
+
