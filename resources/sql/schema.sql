@@ -1,7 +1,11 @@
 CREATE TABLE IF NOT EXISTS users (
     user_id	INTEGER NOT NULL UNIQUE,
-    name	TEXT NOT NULL,
-    username	TEXT NOT NULL,
+    first_name	TEXT NOT NULL,
+    last_name	TEXT NOT NULL,
+    sex TEXT NOT NULL,
+    weight INTEGER NOT NULL,
+    height INTEGER NOT NULL,
+    date_of_birth DATE NOT NULL,
     email	TEXT NOT NULL UNIQUE,
     password_hash	TEXT NOT NULL,
     created_on	DATE DEFAULT current_date,
@@ -21,7 +25,7 @@ CREATE TABLE IF NOT EXISTS profile (
 CREATE TABLE IF NOT EXISTS scan (
     scan_id	INTEGER NOT NULL,
     profile_id	INTEGER NOT NULL,
-    name	BLOB,
+    name	TEXT,
     h1_lung	INTEGER NOT NULL,
     h2_heart_constrictor	INTEGER NOT NULL,
     h3_heart	INTEGER NOT NULL,

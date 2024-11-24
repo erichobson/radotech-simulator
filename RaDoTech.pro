@@ -59,10 +59,6 @@ HEADERS += \
     $$PWD/include/controllers/UserInputController.h \
     $$PWD/include/controllers/UserProfileController.h
 
-RESOURCES += \
-    $$PWD/resources/dbData.qrc \
-    $$PWD/resources/dbSchema.qrc
-
 QMAKE_CXXFLAGS += -Wall -Wextra
 CONFIG += object_with_source
 

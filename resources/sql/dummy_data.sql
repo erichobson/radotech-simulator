@@ -1,6 +1,6 @@
 -- Insert test user if it doesn't exist 
-INSERT INTO users (name, username, email, password_hash)
-SELECT 'Test', 'test', 'test@mail.com', 'password'
+INSERT INTO users (first_name, last_name, sex, weight, height, date_of_birth, email, password_hash)
+SELECT 'Test', 'User', 'male', 70, 175, '2000-01-01', 'test@mail.com', 'password'
 WHERE NOT EXISTS (SELECT 1 FROM users);
 
 -- Insert profiles for user if the user does not already have profiles

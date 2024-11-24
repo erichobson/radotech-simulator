@@ -7,8 +7,7 @@
 #include <QDebug>
 
 DatabaseManager::DatabaseManager() {
-    Q_INIT_RESOURCE(dbSchema);
-    Q_INIT_RESOURCE(dbData);
+    Q_INIT_RESOURCE(resources);
     init();
 }
 
@@ -103,8 +102,10 @@ void DatabaseManager::testCRUD() {
     QList<QMap<QString, QVariant>> scanRes;
 
     // Create
-    qDebug() << "\nCREATING USER " << "testuser2" <<" ******************";
-    execute("INSERT INTO users (name, username, email, password_hash) VALUES(?,?,?,?);", {"Test user 2", "testuser2", "testuser2@mail.com", "password"});
+    qDebug() << "\nCREATING USER " << "Test User 2" <<" ******************";
+    execute("INSERT INTO users (first_name, last_name, sex, weight, height, date_of_birth, email, password_hash) VALUES(?,?,?,?,?,?,?,?);", 
+        {"Test", "User2", "male", 75, 185, "2002-02-02", "testuser2@mail.com", "password"}
+    );
 
     query(userQuery, {}, userRes);
     query(profileQuery, {}, profileRes);
@@ -140,7 +141,10 @@ void DatabaseManager::testCRUD() {
 
     // Update
     qDebug() << "\nUPDATING USERS ******************";
-    execute("UPDATE users SET name=?, username=?  WHERE email=?;", {"update test 2", "updatedtestuser", "testuser2@mail.com"});
+    execute(
+        "UPDATE users SET first_name=?, last_name=?  WHERE email=?;", 
+        {"Updated", "User2", "testuser2@mail.com"}
+    );
     query(userQuery, {}, userRes);
     for (int i = 0; i < userRes.size(); ++i) {
         qDebug() << "Row" << i + 1 << ":";
