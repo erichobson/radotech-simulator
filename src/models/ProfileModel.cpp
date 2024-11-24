@@ -4,11 +4,13 @@
  */
 
 #include "ProfileModel.h"
+#include <QDebug>
 
 ProfileModel::ProfileModel() {}
 
 ProfileModel::ProfileModel(int id, int userId, const QString& name, const QString& desc): 
     id(id), 
+    userId(userId),
     name(name), 
     desc(desc) 
 {}
@@ -43,7 +45,7 @@ QString ProfileModel::getDesc() const {
     return desc;
 }
 
-QString ProfileModel::setDesc(const QString& desc) {
+void ProfileModel::setDesc(const QString& desc) {
     this->desc = desc;
 }
 
@@ -53,4 +55,27 @@ QString ProfileModel::toString() const {
         .arg(userId)
         .arg(name)
         .arg(desc);
+}
+
+void ProfileModel::test() {
+
+    int id = -1;
+    int userId = 3;
+    QString name = "Test Profile";
+    QString desc = "Test desc";
+
+    ProfileModel prof(id, userId, name, desc);
+    qDebug() << "\nTesting Profile Model";
+    qDebug() << prof.toString();
+    if(
+        (prof.getId() == id) &&
+        (prof.getUserId() == userId) &&
+        (prof.getName() == name) &&
+        (prof.getDesc() == desc)
+    ) {
+        qDebug() << "All Tests Passed";
+    } else{
+        qDebug() << "Testing failed";
+    }
+
 }

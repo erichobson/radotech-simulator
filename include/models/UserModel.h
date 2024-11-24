@@ -11,6 +11,7 @@
 class UserModel {
 
     public:
+        UserModel();
         UserModel(int, const QString&, const QString&, const QString&, int, int, const QDate&, const QString&, const QString&);
         ~UserModel();
 
@@ -42,6 +43,7 @@ class UserModel {
         void setPasswordHash(const QString&);
 
         QString toString() const;
+        void test();
 
     private:
         int id;

@@ -4,9 +4,13 @@
  */
 
 #include "ScanModel.h"
+#include <QDebug>
+
+ScanModel::ScanModel() {}
 
 ScanModel::ScanModel(
     int id, 
+    int profileId, 
     int h1Lung, 
     int h2HeartConstrictor, 
     int h3Heart, 
@@ -18,7 +22,7 @@ ScanModel::ScanModel(
     int f3Kidney, 
     int f4UrinaryBladder, 
     int f5GallBladder, 
-    int f6Stomac,
+    int f6Stomach,
     int bodyTemp, 
     int bloodPressure, 
     int heartRate, 
@@ -28,12 +32,29 @@ ScanModel::ScanModel(
     int overallFeeling, 
     const QString& name, 
     const QString& notes) : 
-    id(id), name(name), h1Lung(h1Lung), h2HeartConstrictor(h2HeartConstrictor), h3Heart(h3Heart),
-    h4SmallIntestine(h4SmallIntestine), h5TripleHeater(h5TripleHeater), h6LargeIntestine(h6LargeIntestine),
-    f1Spleen(f1Spleen), f2Liver(f2Liver), f3Kidney(f3Kidney), f4UrinaryBladder(f4UrinaryBladder),
-    f5GallBladder(f5GallBladder), f6Stomach(f6Stomach), bodyTemp(bodyTemp), bloodPressure(bloodPressure),
-    heartRate(heartRate), sleepingTime(sleepingTime), currentWeight(currentWeight), emotionalState(emotionalState),
-    overallFeeling(overallFeeling), notes(notes) 
+    id(id), 
+    profileId(profileId), 
+    h1Lung(h1Lung), 
+    h2HeartConstrictor(h2HeartConstrictor), 
+    h3Heart(h3Heart),
+    h4SmallIntestine(h4SmallIntestine), 
+    h5TripleHeater(h5TripleHeater), 
+    h6LargeIntestine(h6LargeIntestine),
+    f1Spleen(f1Spleen), 
+    f2Liver(f2Liver), 
+    f3Kidney(f3Kidney), 
+    f4UrinaryBladder(f4UrinaryBladder),
+    f5GallBladder(f5GallBladder), 
+    f6Stomach(f6Stomach), 
+    bodyTemp(bodyTemp), 
+    bloodPressure(bloodPressure),
+    heartRate(heartRate), 
+    sleepingTime(sleepingTime), 
+    currentWeight(currentWeight), 
+    emotionalState(emotionalState),
+    overallFeeling(overallFeeling), 
+    name(name),
+    notes(notes) 
 {}
 
 ScanModel::~ScanModel() {}
@@ -46,12 +67,12 @@ void ScanModel::setId(int id) {
     this->id = id;
 }
 
-QString ScanModel::getName() const {
-    return name;
+int ScanModel::getProfileId() const {
+    return profileId;
 }
 
-void ScanModel::setName(const QString& name) {
-    this->name = name;
+void ScanModel::setProfileId(int id) {
+    this->profileId = id;
 }
 
 int ScanModel::getH1Lung() const {
@@ -206,6 +227,14 @@ void ScanModel::setOverallFeeling(int overallFeeling) {
     this->overallFeeling = overallFeeling;
 }
 
+QString ScanModel::getName() const {
+    return name;
+}
+
+void ScanModel::setName(const QString& name) {
+    this->name = name;
+}
+
 QString ScanModel::getNotes() const {
     return notes;
 }
@@ -259,4 +288,70 @@ QString ScanModel::toString() const {
             .arg(emotionalState)
             .arg(overallFeeling)
             .arg(notes);
+}
+
+void ScanModel::test() {
+    int id = -1;
+    int profileId = 2;
+
+    int h1 = 155;
+    int h2 = 156;
+    int h3 = 157;
+    int h4 = 158;
+    int h5 = 159;
+    int h6 = 155;
+    
+    int f1 = 155;
+    int f2 = 22;
+    int f3 = -157;
+    int f4 = 158;
+    int f5 = 200;
+    int f6 = 2000;
+
+    int bt = 37;
+    int bp = 22;
+    int hr = 188;
+    int st = 2232;
+    int cw = 185;
+    int em = 1;
+    int ofeel = 2;
+    QString name = "Andrew scan";
+    QString notes = "Test note";
+
+    ScanModel scan(id,profileId,h1,h2,h3,h4,h5,h6,f1,f2,f3,f4,f5,f6,bt,bp,hr,st,cw,em,ofeel,name,notes);
+
+    qDebug() << "\nTesting Scan";
+    qDebug() << scan.toString();
+    if(
+        (scan.getId() == id) &&
+        (scan.getProfileId() == profileId) &&
+        (scan.getH1Lung() == h1) &&
+        (scan.getH2HeartConstrictor() == h2) &&
+        (scan.getH3Heart() == h3) &&
+        (scan.getH4SmallIntestine() == h4) &&
+        (scan.getH5TripleHeater() == h5) &&
+        (scan.getH6LargeIntestine() == h6) &&
+
+        (scan.getF1Spleen() == f1) &&
+        (scan.getF2Liver() == f2) &&
+        (scan.getF3Kidney() == f3) &&
+        (scan.getF4UrinaryBladder() == f4) &&
+        (scan.getF5GallBladder() == f5) &&
+        (scan.getF6Stomach() == f6) &&
+
+        (scan.getBodyTemp() == bt) &&
+        (scan.getBloodPressure() == bp) &&
+        (scan.getHeartRate() == hr) &&
+        (scan.getSleepingTime() == st) &&
+        (scan.getCurrentWeight() == cw) &&
+        (scan.getEmotionalState() == em) &&
+        (scan.getOverallFeeling() == ofeel) &&
+        (scan.getName() == name) &&
+        (scan.getNotes() == notes)
+    ) {
+        qDebug() << "All Tests Passed";
+    } else{
+        qDebug() << "Tests Failed";
+    }
+
 }

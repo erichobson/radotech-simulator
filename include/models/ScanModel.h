@@ -11,8 +11,10 @@
 class ScanModel {
 
     public:
+        ScanModel();
         ScanModel(
             int id, 
+            int profileId,
             int h1Lung, 
             int h2HeartConstrictor, 
             int h3Heart, 
@@ -41,6 +43,9 @@ class ScanModel {
 
         int getId() const;
         void setId(int id);
+        
+        int getProfileId() const;
+        void setProfileId(int id);
 
         QString getName() const;
         void setName(const QString& name);
@@ -107,9 +112,11 @@ class ScanModel {
        
         QString toString() const;
 
+        void test();
+
     private:
-       int id;
-        QString name;
+        int id;
+        int profileId;
         int h1Lung;
         int h2HeartConstrictor;
         int h3Heart;
@@ -129,6 +136,7 @@ class ScanModel {
         int currentWeight;
         int emotionalState;
         int overallFeeling;
+        QString name;
         QString notes;
 };
 
