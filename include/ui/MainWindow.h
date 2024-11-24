@@ -11,10 +11,6 @@
 class LoginWidget;
 class QStackedWidget;
 
-/**
- * @class MainWindow
- * @brief The MainWindow class represents the main application window.
- */
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
