@@ -9,7 +9,12 @@
 #include <QMainWindow>
 #include <QVector>
 
+#include "ClickableLabel.h"
+#include "DeviceController.h"
+
 class QStackedWidget;
+class QVBoxLayout;
+class QLabel;
 class LoginWidget;
 class QListWidget;
 
@@ -19,13 +24,10 @@ class MainWindow : public QMainWindow {
    public:
     explicit MainWindow(QWidget *parent = nullptr);
 
-   private slots:
-    /**
-     * @brief Handles the resize event to update the background gradient.
-     * @param event The resize event.
-     */
+   protected:
     void resizeEvent(QResizeEvent *event) override;
 
+   private slots:
     /**
      * @brief Slot called when a login is requested.
      * @param username The username entered.
@@ -43,21 +45,49 @@ class MainWindow : public QMainWindow {
      */
     void logout();
 
+    /**
+     * @brief Updates the connection status label.
+     * @param isConnected True if connected, false otherwise.
+     */
+    void updateConnectionStatus(bool isConnected);
+
+    /**
+     * @brief Updates the battery percentage label.
+     * @param batteryLevel The current battery level.
+     */
+    void updateBatteryPercentage(int batteryLevel);
+
+    /**
+     * @brief Slot called when the battery percentage label is clicked.
+     */
+    void onBatteryPercentageClicked();
+
    private:
+    /**
+     * @brief Sets up the battery information widget.
+     */
+    void setupBatteryInfoWidget();
+
+    DeviceController *deviceController;
+
     QStackedWidget *stackedWidget;
     LoginWidget *loginWidget;
     QWidget *mainWidget;
 
+    QVBoxLayout *sidebarLayout;
     QListWidget *sidebarMenu;
+
     QStackedWidget *contentStackedWidget;
     QVector<QWidget *> contentWidgets;
+
+    QLabel *connectionStatusLabel;
+    ClickableLabel *batteryPercentageLabel;
 
     struct ItemInfo {
         QString iconPathUnselected;
         QString iconPathSelected;
         QString title;
     };
-
     QVector<ItemInfo> items;
 };
 
