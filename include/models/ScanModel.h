@@ -8,6 +8,7 @@
 
 #include <QString>
 #include <QDate>
+#include <QVector>
 class ScanModel {
 
     public:
@@ -112,6 +113,9 @@ class ScanModel {
        
         QString toString() const;
 
+        const QVector<int>& getMeasurements() const;
+        void setMeasurements(const QVector<int>&);
+
         void test();
 
     private:
@@ -138,6 +142,7 @@ class ScanModel {
         int overallFeeling;
         QString name;
         QString notes;
+        QVector<int> measurements;
 };
 
 #endif

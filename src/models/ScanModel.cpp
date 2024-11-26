@@ -8,6 +8,35 @@
 
 ScanModel::ScanModel() {}
 
+/*
+ScanModel::ScanModel(
+    int id, 
+    int profileId,
+    const QVector<int>& measurements,
+    int bodyTemp, 
+    int bloodPressure, 
+    int heartRate, 
+    int sleepingTime, 
+    int currentWeight,
+    int emotionalState, 
+    int overallFeeling, 
+    const QString& name, 
+    const QString& notes
+): 
+    id(id), 
+    profileId(profileId), 
+    measurements(measurements)
+    bodyTemp(bodyTemp), 
+    bloodPressure(bloodPressure),
+    heartRate(heartRate), 
+    sleepingTime(sleepingTime), 
+    currentWeight(currentWeight), 
+    emotionalState(emotionalState),
+    overallFeeling(overallFeeling), 
+    name(name),
+    notes(notes) 
+{}*/
+
 ScanModel::ScanModel(
     int id, 
     int profileId, 
@@ -55,7 +84,9 @@ ScanModel::ScanModel(
     overallFeeling(overallFeeling), 
     name(name),
     notes(notes) 
-{}
+{
+    measurements = {h1Lung, h2HeartConstrictor, h3Heart, h4SmallIntestine, h5TripleHeater, h6LargeIntestine, f1Spleen, f2Liver, f3Kidney, f4UrinaryBladder, f5GallBladder, f6Stomach};
+}
 
 ScanModel::~ScanModel() {}
 
@@ -243,6 +274,14 @@ void ScanModel::setNotes(const QString& notes) {
     this->notes = notes;
 }
 
+const QVector<int>& ScanModel::getMeasurements() const {
+    return measurements;
+}
+
+void ScanModel::setMeasurements(const QVector<int>& newMeasurements) {
+    measurements = newMeasurements;
+}
+
 QString ScanModel::toString() const {
     return QString("ID: %1\n"
                    "Name: %2\n"
@@ -289,6 +328,8 @@ QString ScanModel::toString() const {
             .arg(overallFeeling)
             .arg(notes);
 }
+
+
 
 void ScanModel::test() {
     int id = -1;
@@ -350,6 +391,8 @@ void ScanModel::test() {
         (scan.getNotes() == notes)
     ) {
         qDebug() << "All Tests Passed";
+        qDebug() << "Printing measurements";
+        for(int m : scan.getMeasurements()) qDebug() << QString("%1").arg(m);
     } else{
         qDebug() << "Tests Failed";
     }
