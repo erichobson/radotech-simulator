@@ -95,6 +95,12 @@ class DeviceController : public QObject {
      */
     void chargingStateChanged(bool isCharging);
 
+    /**
+     * @brief Signal emitted when the device's on/off state changes.
+     * @param isOn The new state of the device.
+     */
+    void deviceStateChanged(bool isOn);
+
    private slots:
     void updateBatteryLevel();
     void onConnectionTimerTimeout();

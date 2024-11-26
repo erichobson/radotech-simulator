@@ -30,6 +30,10 @@ DeviceImageWidget::DeviceImageWidget(const QPixmap &pixmap, QWidget *parent)
 void DeviceImageWidget::setDeviceController(DeviceController *controller) {
     deviceController = controller;
     if (deviceController) {
+        // Connect to the deviceStateChanged signal to update the widget
+        connect(deviceController, &DeviceController::deviceStateChanged, this,
+                &DeviceImageWidget::onDeviceStateChanged);
+
         // Initialize the powerButtonOn state from the DeviceController
         powerButtonOn = deviceController->isDeviceOn();
         update();
@@ -103,4 +107,9 @@ void DeviceImageWidget::mousePressEvent(QMouseEvent *event) {
         DEBUG("Click not on power button");
         QLabel::mousePressEvent(event);
     }
+}
+
+void DeviceImageWidget::onDeviceStateChanged(bool isOn) {
+    powerButtonOn = isOn;
+    update();
 }

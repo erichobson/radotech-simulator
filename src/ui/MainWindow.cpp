@@ -258,6 +258,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     // Set the DeviceController
     deviceImageLabel->setDeviceController(deviceController);
 
+    // Connect device state changed signal
+    connect(deviceController, &DeviceController::deviceStateChanged, this,
+            [](bool isOn) {
+                DEBUG("Device turned" << (isOn ? "on" : "off"));
+            });
+
     // Create a card widget for the device image
     QWidget *deviceCardWidget = new QWidget;
     deviceCardWidget->setStyleSheet(

@@ -43,8 +43,7 @@ void DeviceController::setDeviceOn(bool isOn) {
     // Otherwise continue with operation
     if (deviceOn != isOn) {
         deviceOn = isOn;
-
-        DEBUG("Device turned" << (isOn ? "on" : "off"));
+        emit deviceStateChanged(deviceOn);
         if (deviceOn) {
             DEBUG("Starting connection");
             startConnection();
