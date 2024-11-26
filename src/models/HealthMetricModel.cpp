@@ -21,3 +21,11 @@ void HealthMetricModel::setDesc(QString desc) { this->desc = desc; }
 int HealthMetricModel::getLevel() const { return level; }
 void HealthMetricModel::setLevel(int level) { this->level = level; }
 
+QString HealthMetricModel::toString() {
+    return QString("Name: %1\nValue: %2\nDesc: %3\nLevel:%4")
+        .arg(name)
+        .arg(value)
+        .arg(desc)
+        .arg(level);
+}
+

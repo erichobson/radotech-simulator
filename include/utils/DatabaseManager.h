@@ -3,6 +3,9 @@
  * @brief
  */
 
+#ifndef DATABASE_MANAGER_H
+#define DATABASE_MANAGER_H
+
 #include <QtSql>
 #include <QString>
 #include <QList>
@@ -31,3 +34,5 @@ class DatabaseManager {
         void handleError(const QSqlError&);
         void executeSqlScript(const QString&, QSqlDatabase&);
 };
+
+#endif 

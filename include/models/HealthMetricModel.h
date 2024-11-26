@@ -26,6 +26,8 @@ class HealthMetricModel {
         int getLevel() const;
         void setLevel(int);
 
+        QString toString();
+
     private:
         QString name;
         float value;

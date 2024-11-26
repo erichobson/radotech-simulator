@@ -115,6 +115,8 @@ class ScanModel {
 
         const QVector<int>& getMeasurements() const;
         void setMeasurements(const QVector<int>&);
+        
+        static const QVector<QString>& getOrganNames();
 
         void test();
 
@@ -143,6 +145,7 @@ class ScanModel {
         QString name;
         QString notes;
         QVector<int> measurements;
+        static const QVector<QString> organNames;
 };
 
 #endif

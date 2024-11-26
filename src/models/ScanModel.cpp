@@ -6,36 +6,13 @@
 #include "ScanModel.h"
 #include <QDebug>
 
-ScanModel::ScanModel() {}
+const QVector<QString> ScanModel::organNames = {
+    "Lung", "Heart Constrictor", "Heart", "Small Intestine", "Triple Heater", 
+    "Large Intestine", "Spleen", "Liver", "Kidney", "Urinary Bladder", 
+    "Gall Bladder", "Stomach"
+};
 
-/*
-ScanModel::ScanModel(
-    int id, 
-    int profileId,
-    const QVector<int>& measurements,
-    int bodyTemp, 
-    int bloodPressure, 
-    int heartRate, 
-    int sleepingTime, 
-    int currentWeight,
-    int emotionalState, 
-    int overallFeeling, 
-    const QString& name, 
-    const QString& notes
-): 
-    id(id), 
-    profileId(profileId), 
-    measurements(measurements)
-    bodyTemp(bodyTemp), 
-    bloodPressure(bloodPressure),
-    heartRate(heartRate), 
-    sleepingTime(sleepingTime), 
-    currentWeight(currentWeight), 
-    emotionalState(emotionalState),
-    overallFeeling(overallFeeling), 
-    name(name),
-    notes(notes) 
-{}*/
+ScanModel::ScanModel() {}
 
 ScanModel::ScanModel(
     int id, 
@@ -280,6 +257,10 @@ const QVector<int>& ScanModel::getMeasurements() const {
 
 void ScanModel::setMeasurements(const QVector<int>& newMeasurements) {
     measurements = newMeasurements;
+}
+
+const QVector<QString>& ScanModel::getOrganNames() {
+    return organNames;
 }
 
 QString ScanModel::toString() const {
