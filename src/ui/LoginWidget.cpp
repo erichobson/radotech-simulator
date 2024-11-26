@@ -602,18 +602,18 @@ void LoginWidget::onStartButtonClicked() {
     QString password = passwordLineEdit->text();
 
     // Verify the format of the email
-    const QRegularExpression regex(R"(^[^\s@]+@[^\s@]+\.[^\s@]+$)");
-    QRegularExpressionMatch match = regex.match(email.trimmed());
-    if (email.isEmpty() || !match.hasMatch()) {
-        statusLabel->setText("Enter email");
-        return;
-    }
-
-    // Verify password is not empty
-    if (password.isEmpty()) {
-        statusLabel->setText("Enter password");
-        return;
-    }
+    // const QRegularExpression regex(R"(^[^\s@]+@[^\s@]+\.[^\s@]+$)");
+    // QRegularExpressionMatch match = regex.match(email.trimmed());
+    // if (email.isEmpty() || !match.hasMatch()) {
+    //     statusLabel->setText("Enter email");
+    //     return;
+    // }
+    //
+    // // Verify password is not empty
+    // if (password.isEmpty()) {
+    //     statusLabel->setText("Enter password");
+    //     return;
+    // }
 
     // Emit the loginRequested signal
     emit loginRequested(email, password);

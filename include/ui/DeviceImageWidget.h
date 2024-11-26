@@ -33,13 +33,6 @@ class DeviceImageWidget : public QLabel {
     void mousePressEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
 
-   private slots:
-    /**
-     * @brief Slot called when the device state changes.
-     * @param isOn True if the device is powered on, false otherwise.
-     */
-    void onDeviceStateChanged(bool isOn);
-
    private:
     bool powerButtonOn;
     QRect powerButtonRect;

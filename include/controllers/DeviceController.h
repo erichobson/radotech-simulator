@@ -78,12 +78,6 @@ class DeviceController : public QObject {
 
    signals:
     /**
-     * @brief Signal emitted when the device's on/off state changes.
-     * @param isOn The new state of the device.
-     */
-    void deviceStateChanged(bool isOn);
-
-    /**
      * @brief Signal emitted when the battery level changes.
      * @param level The new battery level percentage.
      */
