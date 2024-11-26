@@ -3,6 +3,21 @@
         <file>sql/dummy_data.sql</file>
         <file>sql/schema.sql</file>
         <file>images/radotech_logo.png</file>
+        <file>images/radotech_device.png</file>
         <file>images/dr.yoshio_nakatani.png</file>
+        <file>icons/buy_unselected.png</file>
+        <file>icons/history_unselected.png</file>
+        <file>icons/home_unselected.png</file>
+        <file>icons/learning_unselected.png</file>
+        <file>icons/measure_unselected.png</file>
+        <file>icons/profiles_unselected.png</file>
+        <file>icons/settings_unselected.png</file>
+        <file>icons/buy_selected.png</file>
+        <file>icons/history_selected.png</file>
+        <file>icons/home_selected.png</file>
+        <file>icons/learning_selected.png</file>
+        <file>icons/measure_selected.png</file>
+        <file>icons/profiles_selected.png</file>
+        <file>icons/settings_selected.png</file>
     </qresource>
 </RCC>
