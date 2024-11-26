@@ -44,7 +44,7 @@ void DeviceController::setDeviceOn(bool isOn) {
     if (deviceOn != isOn) {
         deviceOn = isOn;
 
-        DEBUG("Device turned " << (isOn ? "on" : "off"));
+        DEBUG("Device turned" << (isOn ? "on" : "off"));
         if (deviceOn) {
             DEBUG("Starting connection");
             startConnection();
@@ -78,6 +78,7 @@ void DeviceController::stopCharging() {
 
 void DeviceController::onConnectionTimerTimeout() {
     connected = true;
+    DEBUG("Connected");
     emit connectionStatusChanged(connected);
 }
 

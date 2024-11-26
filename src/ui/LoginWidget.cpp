@@ -602,6 +602,7 @@ void LoginWidget::onStartButtonClicked() {
     QString password = passwordLineEdit->text();
 
     // Verify the format of the email
+    // --------- UNCOMMENT AFTER IMPLEMENTATION ---------
     // const QRegularExpression regex(R"(^[^\s@]+@[^\s@]+\.[^\s@]+$)");
     // QRegularExpressionMatch match = regex.match(email.trimmed());
     // if (email.isEmpty() || !match.hasMatch()) {
@@ -614,6 +615,7 @@ void LoginWidget::onStartButtonClicked() {
     //     statusLabel->setText("Enter password");
     //     return;
     // }
+    // --------------------------------------------------
 
     // Emit the loginRequested signal
     emit loginRequested(email, password);
