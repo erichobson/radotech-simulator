@@ -29,6 +29,20 @@ ScanModel::ScanModel(
     int f4UrinaryBladder, 
     int f5GallBladder, 
     int f6Stomach,
+
+    int h1LungR, 
+    int h2HeartConstrictorR, 
+    int h3HeartR, 
+    int h4SmallIntestineR, 
+    int h5TripleHeaterR, 
+    int h6LargeIntestineR, 
+    int f1SpleenR, 
+    int f2LiverR, 
+    int f3KidneyR, 
+    int f4UrinaryBladderR, 
+    int f5GallBladderR, 
+    int f6StomachR,
+
     int bodyTemp, 
     int bloodPressure, 
     int heartRate, 
@@ -40,6 +54,7 @@ ScanModel::ScanModel(
     const QString& notes) : 
     id(id), 
     profileId(profileId), 
+
     h1Lung(h1Lung), 
     h2HeartConstrictor(h2HeartConstrictor), 
     h3Heart(h3Heart),
@@ -51,7 +66,21 @@ ScanModel::ScanModel(
     f3Kidney(f3Kidney), 
     f4UrinaryBladder(f4UrinaryBladder),
     f5GallBladder(f5GallBladder), 
-    f6Stomach(f6Stomach), 
+    f6Stomach(f6Stomach),
+
+    h1LungR(h1LungR), 
+    h2HeartConstrictorR(h2HeartConstrictorR), 
+    h3HeartR(h3HeartR),
+    h4SmallIntestineR(h4SmallIntestineR), 
+    h5TripleHeaterR(h5TripleHeaterR), 
+    h6LargeIntestineR(h6LargeIntestineR),
+    f1SpleenR(f1SpleenR), 
+    f2LiverR(f2LiverR), 
+    f3KidneyR(f3KidneyR), 
+    f4UrinaryBladderR(f4UrinaryBladderR)    
+    f5GallBladderR(f5GallBladderR), 
+    f6StomachR(f6StomachR),
+
     bodyTemp(bodyTemp), 
     bloodPressure(bloodPressure),
     heartRate(heartRate), 
@@ -62,7 +91,12 @@ ScanModel::ScanModel(
     name(name),
     notes(notes) 
 {
-    measurements = {h1Lung, h2HeartConstrictor, h3Heart, h4SmallIntestine, h5TripleHeater, h6LargeIntestine, f1Spleen, f2Liver, f3Kidney, f4UrinaryBladder, f5GallBladder, f6Stomach};
+    measurements = {
+        h1Lung, h2HeartConstrictor, h3Heart, h4SmallIntestine, h5TripleHeater, h6LargeIntestine, 
+        f1Spleen, f2Liver, f3Kidney, f4UrinaryBladder, f5GallBladder, f6Stomach
+        h1LungR, h2HeartConstrictorR, h3HeartR, h4SmallIntestineR, h5TripleHeaterR, h6LargeIntestineR, 
+        f1SpleenR, f2LiverR, f3KidneyR, f4UrinaryBladderR, f5GallBladderR, f6StomachR
+    };
 }
 
 ScanModel::~ScanModel() {}
@@ -83,6 +117,7 @@ void ScanModel::setProfileId(int id) {
     this->profileId = id;
 }
 
+// Meridian Points (Left)
 int ScanModel::getH1Lung() const {
     return h1Lung;
 }
@@ -177,6 +212,103 @@ int ScanModel::getF6Stomach() const {
 
 void ScanModel::setF6Stomach(int f6Stomach) {
     this->f6Stomach = f6Stomach;
+}
+
+// Meridian Points (Right)
+int ScanModel::getH1LungR() const {
+    return h1LungR;
+}
+
+void ScanModel::setH1LungR(int h1LungR) {
+    this->h1LungR = h1LungR;
+}
+
+int ScanModel::getH2HeartConstrictorR() const {
+    return h2HeartConstrictorR;
+}
+
+void ScanModel::setH2HeartConstrictorR(int h2HeartConstrictorR) {
+    this->h2HeartConstrictorR = h2HeartConstrictorR;
+}
+
+int ScanModel::getH3HeartR() const {
+    return h3HeartR;
+}
+
+void ScanModel::setH3HeartR(int h3HeartR) {
+    this->h3HeartR = h3HeartR;
+}
+
+int ScanModel::getH4SmallIntestineR() const {
+    return h4SmallIntestineR;
+}
+
+void ScanModel::setH4SmallIntestineR(int h4SmallIntestineR) {
+    this->h4SmallIntestineR = h4SmallIntestineR;
+}
+
+int ScanModel::getH5TripleHeaterR() const {
+    return h5TripleHeaterR;
+}
+
+void ScanModel::setH5TripleHeaterR(int h5TripleHeaterR) {
+    this->h5TripleHeaterR = h5TripleHeaterR;
+}
+
+int ScanModel::getH6LargeIntestineR() const {
+    return h6LargeIntestineR;
+}
+
+void ScanModel::setH6LargeIntestineR(int h6LargeIntestineR) {
+    this->h6LargeIntestineR = h6LargeIntestineR;
+}
+
+int ScanModel::getF1SpleenR() const {
+    return f1SpleenR;
+}
+
+void ScanModel::setF1SpleenR(int f1SpleenR) {
+    this->f1SpleenR = f1SpleenR;
+}
+
+int ScanModel::getF2LiverR() const {
+    return f2LiverR;
+}
+
+void ScanModel::setF2LiverR(int f2LiverR) {
+    this->f2LiverR = f2LiverR;
+}
+
+int ScanModel::getF3KidneyR() const {
+    return f3KidneyR;
+}
+
+void ScanModel::setF3KidneyR(int f3KidneyR) {
+    this->f3KidneyR = f3KidneyR;
+}
+
+int ScanModel::getF4UrinaryBladderR() const {
+    return f4UrinaryBladderR;
+}
+
+void ScanModel::setF4UrinaryBladderR(int f4UrinaryBladderR) {
+    this->f4UrinaryBladderR = f4UrinaryBladderR;
+}
+
+int ScanModel::getF5GallBladderR() const {
+    return f5GallBladderR;
+}
+
+void ScanModel::setF5GallBladderR(int f5GallBladderR) {
+    this->f5GallBladderR = f5GallBladderR;
+}
+
+int ScanModel::getF6StomachR() const {
+    return f6StomachR;
+}
+
+void ScanModel::setF6StomachR(int f6StomachR) {
+    this->f6StomachR = f6StomachR;
 }
 
 int ScanModel::getBodyTemp() const {
@@ -347,6 +479,7 @@ void ScanModel::test() {
     if(
         (scan.getId() == id) &&
         (scan.getProfileId() == profileId) &&
+
         (scan.getH1Lung() == h1) &&
         (scan.getH2HeartConstrictor() == h2) &&
         (scan.getH3Heart() == h3) &&

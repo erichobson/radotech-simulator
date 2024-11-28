@@ -14,78 +14,115 @@ class ScanModel {
     public:
         ScanModel();
         ScanModel(
-            int id, 
+            int id,
             int profileId,
-            int h1Lung, 
-            int h2HeartConstrictor, 
-            int h3Heart, 
+            int h1Lung,
+            int h2HeartConstrictor,
+            int h3Heart,
             int h4SmallIntestine,
-            int h5TripleHeater, 
-            int h6LargeIntestine, 
-            int f1Spleen, 
-            int f2Liver, 
-            int f3Kidney, 
+            int h5TripleHeater,
+            int h6LargeIntestine,
+            int f1Spleen,
+            int f2Liver,
+            int f3Kidney,
             int f4UrinaryBladder,
-            int f5GallBladder, 
-            int f6Stomach, 
+            int f5GallBladder,
+            int f6Stomach,
             // opt
-            int bodyTemp = -1, 
-            int bloodPressure = -1, 
-            int heartRate = -1, 
+            int bodyTemp = -1,
+            int bloodPressure = -1,
+            int heartRate = -1,
             int sleepingTime = -1,
             int currentWeight = -1,
-            int emotionalState = -1, 
-            int overallFeeling = -1, 
-            const QString& name = "", 
-            const QString& notes = ""
-        ); 
+            int emotionalState = -1,
+            int overallFeeling = -1,
+            const QString &name = "",
+            const QString &notes = "");
 
         ~ScanModel();
 
         int getId() const;
         void setId(int id);
-        
+
         int getProfileId() const;
         void setProfileId(int id);
 
         QString getName() const;
-        void setName(const QString& name);
+        void setName(const QString &name);
 
+        // Meridian Points (Left)
         int getH1Lung() const;
-        void setH1Lung(int h1Lung);
+        void setH1Lung(int);
 
         int getH2HeartConstrictor() const;
-        void setH2HeartConstrictor(int h2HeartConstrictor);
+        void setH2HeartConstrictor(int);
 
         int getH3Heart() const;
-        void setH3Heart(int h3Heart);
+        void setH3Heart(int);
 
         int getH4SmallIntestine() const;
-        void setH4SmallIntestine(int h4SmallIntestine);
+        void setH4SmallIntestine(int);
 
         int getH5TripleHeater() const;
-        void setH5TripleHeater(int h5TripleHeater);
+        void setH5TripleHeater(int);
 
         int getH6LargeIntestine() const;
-        void setH6LargeIntestine(int h6LargeIntestine);
+        void setH6LargeIntestine(int);
 
         int getF1Spleen() const;
-        void setF1Spleen(int f1Spleen);
+        void setF1Spleen(int);
 
         int getF2Liver() const;
-        void setF2Liver(int f2Liver);
+        void setF2Liver(int);
 
         int getF3Kidney() const;
-        void setF3Kidney(int f3Kidney);
+        void setF3Kidney(int);
 
         int getF4UrinaryBladder() const;
-        void setF4UrinaryBladder(int f4UrinaryBladder);
+        void setF4UrinaryBladder(int);
 
         int getF5GallBladder() const;
-        void setF5GallBladder(int f5GallBladder);
+        void setF5GallBladder(int);
 
         int getF6Stomach() const;
-        void setF6Stomach(int f6Stomach);
+        void setF6Stomach(int);
+
+        // Meridian Points (Right)
+        int getH1LungR() const;
+        void setH1LungR(int);
+
+        int getH2HeartConstrictorR() const;
+        void setH2HeartConstrictorR(int);
+
+        int getH3HeartR() const;
+        void setH3HeartR(int);
+
+        int getH4SmallIntestineR() const;
+        void setH4SmallIntestineR(int);
+
+        int getH5TripleHeaterR() const;
+        void setH5TripleHeaterR(int);
+
+        int getH6LargeIntestineR() const;
+        void setH6LargeIntestineR(int);
+
+        int getF1SpleenR() const;
+        void setF1SpleenR(int);
+
+        int getF2LiverR() const;
+        void setF2LiverR(int);
+
+        int getF3KidneyR() const;
+        void setF3KidneyR(int);
+
+        int getF4UrinaryBladderR() const;
+        void setF4UrinaryBladderR(int);
+
+        int getF5GallBladderR() const;
+        void setF5GallBladderR(int);
+
+        int getF6StomachR() const;
+        void setF6StomachR(int);
 
         int getBodyTemp() const;
         void setBodyTemp(int bodyTemp);
@@ -109,20 +146,21 @@ class ScanModel {
         void setOverallFeeling(int overallFeeling);
 
         QString getNotes() const;
-        void setNotes(const QString& notes);
-       
+        void setNotes(const QString &notes);
+
         QString toString() const;
 
-        const QVector<int>& getMeasurements() const;
-        void setMeasurements(const QVector<int>&);
-        
-        static const QVector<QString>& getOrganNames();
+        const QVector<int> &getMeasurements() const;
+        void setMeasurements(const QVector<int> &);
+
+        static const QVector<QString> &getOrganNames();
 
         void test();
 
     private:
         int id;
         int profileId;
+
         int h1Lung;
         int h2HeartConstrictor;
         int h3Heart;
@@ -135,6 +173,20 @@ class ScanModel {
         int f4UrinaryBladder;
         int f5GallBladder;
         int f6Stomach;
+
+        int h1LungR;
+        int h2HeartConstrictorR;
+        int h3HeartR;
+        int h4SmallIntestineR;
+        int h5TripleHeaterR;
+        int h6LargeIntestineR;
+        int f1SpleenR;
+        int f2LiverR;
+        int f3KidneyR;
+        int f4UrinaryBladderR;
+        int f5GallBladderR;
+        int f6StomachR;
+
         int bodyTemp;
         int bloodPressure;
         int heartRate;
