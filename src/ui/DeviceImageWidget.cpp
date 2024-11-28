@@ -5,6 +5,7 @@
 
 #include "DeviceImageWidget.h"
 
+#include <QDebug>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QResizeEvent>
