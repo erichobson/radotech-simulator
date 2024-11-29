@@ -5,6 +5,7 @@
 
 #include "MainWindow.h"
 
+#include <QFrame>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QLabel>
@@ -16,6 +17,7 @@
 #include <QWidget>
 
 #include "BuyWidget.h"
+#include "ClickableLabel.h"
 #include "DatabaseManager.h"
 #include "DeviceImageWidget.h"
 #include "HistoryWidget.h"
@@ -27,12 +29,24 @@
 #include "ProfilesWidget.h"
 #include "SettingsWidget.h"
 
+/* Logging Macros */
+#define DEBUG(msg) qDebug() << "[DEBUG]" << __FUNCTION__ << ":" << msg
+#define INFO(msg) qInfo() << "[INFO]" << __FUNCTION__ << ":" << msg
+#define ERROR(msg) qCritical() << "[ERROR]" << __FUNCTION__ << ":" << msg
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("RaDoTech");
-    resize(1200, 800);
+    setMinimumSize(1200, 800);
 
     // Initialize the database
     DatabaseManager db;
+
+    // Initialize controllers
+    deviceController = new DeviceController(this);
+    // ...
+    // ...
+    // ...
+    // Initialize other controllers
 
     // Create the main stacked widget
     stackedWidget = new QStackedWidget;
@@ -72,7 +86,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     sidebarWidget->setStyleSheet("background: transparent;");
 
     // Create the sidebar layout
-    QVBoxLayout *sidebarLayout = new QVBoxLayout(sidebarWidget);
+    sidebarLayout = new QVBoxLayout(sidebarWidget);
     sidebarLayout->setContentsMargins(0, 0, 0, 0);
     sidebarLayout->setSpacing(0);
 
@@ -80,6 +94,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     // Create the profile widget
     ProfileWidget *profileWidget =
         new ProfileWidget(":/images/dr.yoshio_nakatani.png", "User Name");
+    profileWidget->setFixedHeight(200);
     sidebarLayout->addWidget(profileWidget);
 
     // Create the sidebar menu
@@ -88,8 +103,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     sidebarMenu->setSpacing(5);
     sidebarMenu->setUniformItemSizes(false);
     sidebarMenu->setSelectionMode(QAbstractItemView::SingleSelection);
+    sidebarMenu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     sidebarMenu->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    sidebarMenu->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    sidebarMenu->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     sidebarMenu->setIconSize(QSize(24, 24));
     sidebarMenu->setStyleSheet(R"(
         QListWidget {
@@ -122,6 +138,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Add sidebar menu to sidebar layout
     sidebarLayout->addWidget(sidebarMenu);
+    sidebarLayout->addStretch();
+
+    setupBatteryInfoWidget();
 
     // Load icons and set title
     items = {
@@ -161,6 +180,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
         sidebarMenu->addItem(item);
     }
 
+    // Set the fixed height of the sidebar menu
+    sidebarMenu->setFixedHeight(525);
+
     // Create final logout item
     QListWidgetItem *logoutItem = new QListWidgetItem;
     logoutItem->setText("Log Out");
@@ -196,13 +218,26 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Create the content widgets
     MeasureNowWidget *measureNowWidget = new MeasureNowWidget;
+    // TODO: Implement measureNowWidget interface
+
     HomeWidget *homeWidget = new HomeWidget;
+    // TODO: Implement homeWidget interface
+
     ProfilesWidget *profilesWidget = new ProfilesWidget;
+    // TODO: Implement profilesWidget interface
+
     HistoryWidget *historyWidget = new HistoryWidget;
+    // TODO: Implement historyWidget interface
+
     BuyWidget *buyWidget = new BuyWidget;
+    // TODO: Implement buyWidget interface
+
     LearningMaterialsWidget *learningMaterialsWidget =
         new LearningMaterialsWidget;
+    // TODO: Implement learningMaterialsWidget interface
+
     SettingsWidget *settingsWidget = new SettingsWidget;
+    // TODO: Implement settingsWidget interface
 
     // Add the widgets to the contentStackedWidget
     contentStackedWidget->addWidget(measureNowWidget);         // Index 0
@@ -218,8 +253,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     QTransform tr;
     tr.rotate(270);
     devicePixmap = devicePixmap.transformed(tr, Qt::SmoothTransformation);
-
     DeviceImageWidget *deviceImageLabel = new DeviceImageWidget(devicePixmap);
+
+    // Set the DeviceController
+    deviceImageLabel->setDeviceController(deviceController);
+
+    // Connect device state changed signal
+    connect(deviceController, &DeviceController::deviceStateChanged, this,
+            [](bool isOn) {
+                DEBUG("Device turned" << (isOn ? "on" : "off"));
+            });
 
     // Create a card widget for the device image
     QWidget *deviceCardWidget = new QWidget;
@@ -268,18 +311,25 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
 void MainWindow::onLoginRequested(const QString &username,
                                   const QString &password) {
     // TODO: Replace this with proper authentication logic
-    if (username == "user@domain.tld" && password == "password") {
-        // Successful login: switch to mainWidget
-        sidebarMenu->setCurrentRow(1);
-        contentStackedWidget->setCurrentIndex(1);
-        stackedWidget->setCurrentWidget(mainWidget);
+    // if (username == "user@domain.tld" && password == "password") {
+    //     // Successful login: switch to mainWidget
+    //     sidebarMenu->setCurrentRow(1);
+    //     contentStackedWidget->setCurrentIndex(1);
+    //     stackedWidget->setCurrentWidget(mainWidget);
+    //
+    //     // Clear login fields
+    //     loginWidget->clearFields();
+    // } else {
+    //     // Show error message on LoginWidget
+    //     loginWidget->setStatusMessage("Invalid username or password");
+    // }
 
-        // Clear login fields
-        loginWidget->clearFields();
-    } else {
-        // Show error message on LoginWidget
-        loginWidget->setStatusMessage("Invalid username or password");
-    }
+    // -------- REMOVE AFTER TESTING --------
+    sidebarMenu->setCurrentRow(1);
+    contentStackedWidget->setCurrentIndex(1);
+    stackedWidget->setCurrentWidget(mainWidget);
+    loginWidget->clearFields();
+    // --------------------------------------
 }
 
 void MainWindow::onRegisterRequested() {
@@ -293,4 +343,110 @@ void MainWindow::logout() {
 
     // Return to login page
     stackedWidget->setCurrentWidget(loginWidget);
+}
+
+void MainWindow::setupBatteryInfoWidget() {
+    // Create the container widget
+    QFrame *batteryInfoFrame = new QFrame;
+    batteryInfoFrame->setFixedHeight(30);
+    batteryInfoFrame->setStyleSheet(
+        "background-color: white; border-radius: 15px;");
+
+    // Create the connection status label
+    connectionStatusLabel = new QLabel("Disconnected");
+    connectionStatusLabel->setStyleSheet(
+        "font-size: 12px; color: red; background-color: transparent;");
+    connectionStatusLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    connectionStatusLabel->setSizePolicy(QSizePolicy::Expanding,
+                                         QSizePolicy::Fixed);
+
+    // Create the battery percentage label
+    batteryPercentageLabel = new ClickableLabel();
+    batteryPercentageLabel->setText("100%");
+    batteryPercentageLabel->setStyleSheet(
+        "font-size: 12px; color: black; background-color: transparent;");
+    batteryPercentageLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    batteryPercentageLabel->setFixedWidth(40);
+    batteryPercentageLabel->setSizePolicy(QSizePolicy::Fixed,
+                                          QSizePolicy::Fixed);
+
+    // Create the layout for batteryInfoFrame
+    QHBoxLayout *batteryLayout = new QHBoxLayout(batteryInfoFrame);
+    batteryLayout->setContentsMargins(15, 5, 15, 5);
+    batteryLayout->setSpacing(10);
+
+    // Add widgets to the layout
+    batteryLayout->addWidget(connectionStatusLabel);
+    batteryLayout->addWidget(batteryPercentageLabel);
+
+    // Add the battery info frame to the sidebar layout
+    sidebarLayout->addWidget(batteryInfoFrame);
+
+    // Connect signals to update the battery percentage and connection status
+    connect(deviceController, &DeviceController::connectionStatusChanged, this,
+            &MainWindow::updateConnectionStatus);
+    connect(deviceController, &DeviceController::batteryLevelChanged, this,
+            &MainWindow::updateBatteryPercentage);
+    connect(batteryPercentageLabel, &ClickableLabel::clicked, this,
+            &MainWindow::onBatteryPercentageClicked);
+
+    // Initialize the labels with the current device state
+    updateConnectionStatus(deviceController->isConnected());
+    updateBatteryPercentage(deviceController->getBatteryLevel());
+}
+
+void MainWindow::updateConnectionStatus(bool isConnected) {
+    // Update the connection status label
+    if (isConnected) {
+        connectionStatusLabel->setText("Connected");
+        connectionStatusLabel->setStyleSheet(
+            "font-size: 12px; color: green; background-color: "
+            "transparent;");
+    } else {
+        connectionStatusLabel->setText("Disconnected");
+        connectionStatusLabel->setStyleSheet(
+            "font-size: 12px; color: red; background-color: transparent;");
+    }
+}
+
+void MainWindow::updateBatteryPercentage(int batteryLevel) {
+    // Update the battery percentage text
+    QString percentageText = QString("%1%").arg(batteryLevel);
+    batteryPercentageLabel->setText(percentageText);
+
+    // Update the battery percentage label and colours
+    QString color;
+    if (deviceController->isCharging()) {
+        // Update the connection status label to charging
+        connectionStatusLabel->setText("Charging");
+        connectionStatusLabel->setStyleSheet(
+            "font-size: 12px; color: green; background-color: transparent;");
+
+        // Set colour to green
+        color = "green";
+    } else {
+        // Update the connection status label when no longer charging
+        updateConnectionStatus(deviceController->isConnected());
+
+        // Set colour according to battery level
+        if (batteryLevel >= 21) {
+            color = "black";
+        } else {
+            color = "red";
+        }
+    }
+
+    // Update the stylesheet to change the text color
+    batteryPercentageLabel->setStyleSheet(
+        QString("font-size: 12px; color: %1; background-color: transparent;")
+            .arg(color));
+}
+
+void MainWindow::onBatteryPercentageClicked() {
+    // Change the charging state
+    if (deviceController->isCharging()) {
+        deviceController->stopCharging();
+    } else {
+        deviceController->startCharging();
+    }
 }
