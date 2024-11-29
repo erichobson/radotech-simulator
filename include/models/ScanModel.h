@@ -17,17 +17,29 @@ class ScanModel {
             int id,
             int profileId,
             int h1Lung,
+            int h1LungR,
             int h2HeartConstrictor,
+            int h2HeartConstrictorR,
             int h3Heart,
+            int h3HeartR,
             int h4SmallIntestine,
+            int h4SmallIntestineR,
             int h5TripleHeater,
+            int h5TripleHeaterR,
             int h6LargeIntestine,
+            int h6LargeIntestineR,
             int f1Spleen,
+            int f1SpleenR,
             int f2Liver,
+            int f2LiverR,
             int f3Kidney,
+            int f3KidneyR,
             int f4UrinaryBladder,
+            int f4UrinaryBladderR,
             int f5GallBladder,
+            int f5GallBladderR,
             int f6Stomach,
+            int f6StomachR,
             // opt
             int bodyTemp = -1,
             int bloodPressure = -1,
@@ -150,10 +162,16 @@ class ScanModel {
 
         QString toString() const;
 
-        const QVector<int> &getMeasurements() const;
+        const QVector<int>& getMeasurements() const;
         void setMeasurements(const QVector<int> &);
 
-        static const QVector<QString> &getOrganNames();
+        const QVector<int>& getUpperMeasurements() const;
+        const QVector<int>& getLowerMeasurements() const;
+
+        const QVector<int>& getRightMeasurements() const;
+        const QVector<int>& getLeftMeasurements() const;
+
+        static const QVector<QString>& getOrganNames();
 
         void test();
 
@@ -162,29 +180,28 @@ class ScanModel {
         int profileId;
 
         int h1Lung;
-        int h2HeartConstrictor;
-        int h3Heart;
-        int h4SmallIntestine;
-        int h5TripleHeater;
-        int h6LargeIntestine;
-        int f1Spleen;
-        int f2Liver;
-        int f3Kidney;
-        int f4UrinaryBladder;
-        int f5GallBladder;
-        int f6Stomach;
-
         int h1LungR;
+        int h2HeartConstrictor;
         int h2HeartConstrictorR;
+        int h3Heart;
         int h3HeartR;
+        int h4SmallIntestine;
         int h4SmallIntestineR;
+        int h5TripleHeater;
         int h5TripleHeaterR;
+        int h6LargeIntestine;
         int h6LargeIntestineR;
+        int f1Spleen;
         int f1SpleenR;
+        int f2Liver;
         int f2LiverR;
+        int f3Kidney;
         int f3KidneyR;
+        int f4UrinaryBladder;
         int f4UrinaryBladderR;
+        int f5GallBladder;
         int f5GallBladderR;
+        int f6Stomach;
         int f6StomachR;
 
         int bodyTemp;
@@ -197,6 +214,10 @@ class ScanModel {
         QString name;
         QString notes;
         QVector<int> measurements;
+        QVector<int> upperMeasurements;
+        QVector<int> lowerMeasurements;
+        QVector<int> rightMeasurements;
+        QVector<int> leftMeasurements;
         static const QVector<QString> organNames;
 };
 

@@ -6,7 +6,9 @@
 #include "HealthMetricModel.h"
 
 HealthMetricModel::HealthMetricModel() {}
-HealthMetricModel::HealthMetricModel(QString name, float value, QString desc, int level): name(name), value(value), desc(desc), level(level) {}
+HealthMetricModel::HealthMetricModel(QString name, float value, QString desc, int level): 
+    name(name), value(value), desc(desc), level(level) 
+{}
 HealthMetricModel::~HealthMetricModel() {}
 
 QString HealthMetricModel::getName() const { return name; }

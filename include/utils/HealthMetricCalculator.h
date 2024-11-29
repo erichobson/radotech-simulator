@@ -10,9 +10,17 @@
 #include <QString>
 #include <QDebug>
 #include <cmath>
+#include <random>
 
 #include "HealthMetricModel.h"
 #include "ScanModel.h"
+
+struct Range {
+    float min;
+    float max;
+    Range(float min, float max): min(min), max(max){}
+    int withinRange(float val) const;
+};
 
 class HealthMetricCalculator {
 
@@ -20,6 +28,15 @@ class HealthMetricCalculator {
         HealthMetricCalculator();
         ~HealthMetricCalculator();
         bool calculateOrganHealth(ScanModel*, QVector<HealthMetricModel*>&);
-        //QVector<HealthMetricModel*> calculateIndicatorHealth(ScanModel*);
+        bool calculateIndicatorHealth(ScanModel*, QVector<HealthMetricModel*>&);
+
+    private: 
+        Range energyLevelRange;
+        Range psychoStateRange;
+        Range skeletalSysRange;
+        Range immuneSysRange;
+        Range metabolismRange;
+
+        float random(float, float);
 };
 #endif

@@ -17,30 +17,41 @@ ScanModel::ScanModel() {}
 ScanModel::ScanModel(
     int id, 
     int profileId, 
-    int h1Lung, 
-    int h2HeartConstrictor, 
-    int h3Heart, 
-    int h4SmallIntestine, 
-    int h5TripleHeater, 
-    int h6LargeIntestine, 
-    int f1Spleen, 
-    int f2Liver, 
-    int f3Kidney, 
-    int f4UrinaryBladder, 
-    int f5GallBladder, 
-    int f6Stomach,
 
+    int h1Lung, 
     int h1LungR, 
+
+    int h2HeartConstrictor, 
     int h2HeartConstrictorR, 
+
+    int h3Heart, 
     int h3HeartR, 
+
+    int h4SmallIntestine, 
     int h4SmallIntestineR, 
+
+    int h5TripleHeater, 
     int h5TripleHeaterR, 
+
+    int h6LargeIntestine, 
     int h6LargeIntestineR, 
+
+    int f1Spleen, 
     int f1SpleenR, 
+
+    int f2Liver, 
     int f2LiverR, 
+
+    int f3Kidney, 
     int f3KidneyR, 
+
+    int f4UrinaryBladder, 
     int f4UrinaryBladderR, 
+
+    int f5GallBladder, 
     int f5GallBladderR, 
+
+    int f6Stomach,
     int f6StomachR,
 
     int bodyTemp, 
@@ -56,29 +67,29 @@ ScanModel::ScanModel(
     profileId(profileId), 
 
     h1Lung(h1Lung), 
-    h2HeartConstrictor(h2HeartConstrictor), 
-    h3Heart(h3Heart),
-    h4SmallIntestine(h4SmallIntestine), 
-    h5TripleHeater(h5TripleHeater), 
-    h6LargeIntestine(h6LargeIntestine),
-    f1Spleen(f1Spleen), 
-    f2Liver(f2Liver), 
-    f3Kidney(f3Kidney), 
-    f4UrinaryBladder(f4UrinaryBladder),
-    f5GallBladder(f5GallBladder), 
-    f6Stomach(f6Stomach),
-
     h1LungR(h1LungR), 
+    h2HeartConstrictor(h2HeartConstrictor), 
     h2HeartConstrictorR(h2HeartConstrictorR), 
+    h3Heart(h3Heart),
     h3HeartR(h3HeartR),
+    h4SmallIntestine(h4SmallIntestine), 
     h4SmallIntestineR(h4SmallIntestineR), 
+    h5TripleHeater(h5TripleHeater), 
     h5TripleHeaterR(h5TripleHeaterR), 
+    h6LargeIntestine(h6LargeIntestine),
     h6LargeIntestineR(h6LargeIntestineR),
+
+    f1Spleen(f1Spleen), 
     f1SpleenR(f1SpleenR), 
+    f2Liver(f2Liver), 
     f2LiverR(f2LiverR), 
+    f3Kidney(f3Kidney), 
     f3KidneyR(f3KidneyR), 
-    f4UrinaryBladderR(f4UrinaryBladderR)    
+    f4UrinaryBladder(f4UrinaryBladder),
+    f4UrinaryBladderR(f4UrinaryBladderR),
+    f5GallBladder(f5GallBladder), 
     f5GallBladderR(f5GallBladderR), 
+    f6Stomach(f6Stomach),
     f6StomachR(f6StomachR),
 
     bodyTemp(bodyTemp), 
@@ -92,10 +103,32 @@ ScanModel::ScanModel(
     notes(notes) 
 {
     measurements = {
-        h1Lung, h2HeartConstrictor, h3Heart, h4SmallIntestine, h5TripleHeater, h6LargeIntestine, 
-        f1Spleen, f2Liver, f3Kidney, f4UrinaryBladder, f5GallBladder, f6Stomach
-        h1LungR, h2HeartConstrictorR, h3HeartR, h4SmallIntestineR, h5TripleHeaterR, h6LargeIntestineR, 
+        h1Lung, h1LungR, h2HeartConstrictor, h2HeartConstrictorR, 
+        h3Heart, h3HeartR, h4SmallIntestine, h4SmallIntestineR,
+        h5TripleHeater, h5TripleHeaterR, h6LargeIntestine, h6LargeIntestineR,
+        f1Spleen, f1SpleenR, f2Liver, f2LiverR, 
+        f3Kidney, f3KidneyR, f4UrinaryBladder, f4UrinaryBladderR,
+        f5GallBladder, f5GallBladderR, f6Stomach, f6StomachR
+    };
+    
+    upperMeasurements = {
+        h1Lung, h2HeartConstrictor, h3Heart, h4SmallIntestine, h5TripleHeater, h6LargeIntestine,
+        h1LungR, h2HeartConstrictorR, h3HeartR, h4SmallIntestineR, h5TripleHeaterR, h6LargeIntestineR,
+    };
+
+    lowerMeasurements = {
+        f1Spleen, f2Liver, f3Kidney, f4UrinaryBladder, f5GallBladder, f6Stomach,
         f1SpleenR, f2LiverR, f3KidneyR, f4UrinaryBladderR, f5GallBladderR, f6StomachR
+    };
+
+    rightMeasurements = {
+        h1LungR, h2HeartConstrictorR, h3HeartR, h4SmallIntestineR, h5TripleHeaterR, h6LargeIntestineR,
+        f1SpleenR, f2LiverR, f3KidneyR, f4UrinaryBladderR, f5GallBladderR, f6StomachR
+    };
+    
+    leftMeasurements = {
+        h1Lung, h2HeartConstrictor, h3Heart, h4SmallIntestine, h5TripleHeater, h6LargeIntestine,
+        f1Spleen, f2Liver, f3Kidney, f4UrinaryBladder, f5GallBladder, f6Stomach
     };
 }
 
@@ -391,6 +424,22 @@ void ScanModel::setMeasurements(const QVector<int>& newMeasurements) {
     measurements = newMeasurements;
 }
 
+const QVector<int>& ScanModel::getUpperMeasurements() const {
+    return upperMeasurements;
+}
+
+const QVector<int>& ScanModel::getLowerMeasurements() const {
+    return lowerMeasurements;
+}
+
+const QVector<int>& ScanModel::getRightMeasurements() const {
+    return rightMeasurements;
+}
+
+const QVector<int>& ScanModel::getLeftMeasurements() const {
+    return leftMeasurements;
+}
+
 const QVector<QString>& ScanModel::getOrganNames() {
     return organNames;
 }
@@ -398,40 +447,64 @@ const QVector<QString>& ScanModel::getOrganNames() {
 QString ScanModel::toString() const {
     return QString("ID: %1\n"
                    "Name: %2\n"
-                   "Lung Health (H1): %3\n"
-                   "Heart Constrictor (H2): %4\n"
-                   "Heart Health (H3): %5\n"
-                   "Small Intestine (H4): %6\n"
-                   "Triple Heater (H5): %7\n"
-                   "Large Intestine (H6): %8\n"
-                   "Spleen (F1): %9\n"
-                   "Liver (F2): %10\n"
-                   "Kidney (F3): %11\n"
-                   "Urinary Bladder (F4): %12\n"
-                   "Gall Bladder (F5): %13\n"
-                   "Stomach (F6): %14\n"
-                   "Body Temperature: %15\n"
-                   "Blood Pressure: %16\n"
-                   "Heart Rate: %17\n"
-                   "Sleeping Time: %18\n"
-                   "Current Weight: %19\n"
-                   "Emotional State: %20\n"
-                   "Overall Feeling: %21\n"
-                   "Notes: %22")
+                   "Lung Health (H1 L): %3\n"
+                   "Lung Health (H1 R): %4\n"
+                   "Heart Constrictor (H2 L): %5\n"
+                   "Heart Constrictor (H2 R): %6n"
+                   "Heart Health (H3 L): %7\n"
+                   "Heart Health (H3 R): %8\n"
+                   "Small Intestine (H4 L): %9\n"
+                   "Small Intestine (H4 R): %10\n"
+                   "Triple Heater (H5 L): %11\n"
+                   "Triple Heater (H5 R): %12\n"
+                   "Large Intestine (H6 L): %13\n"
+                   "Large Intestine (H6 R): %14\n"
+                   "Spleen (F1 L): %15\n"
+                   "Spleen (F1 R): %16\n"
+                   "Liver (F2 L): %17\n"
+                   "Liver (F2 R): %18\n"
+                   "Kidney (F3 L): %19\n"
+                   "Kidney (F3 R): %20\n"
+                   "Urinary Bladder (F4 L): %21\n"
+                   "Urinary Bladder (F4 R): %22\n"
+                   "Gall Bladder (F5 L): %23\n"
+                   "Gall Bladder (F5 R): %24\n"
+                   "Stomach (F6 L): %25\n"
+                   "Stomach (F6 R): %26\n"
+                   "Body Temperature: %27\n"
+                   "Blood Pressure: %28\n"
+                   "Heart Rate: %29\n"
+                   "Sleeping Time: %30\n"
+                   "Current Weight: %31\n"
+                   "Emotional State: %32\n"
+                   "Overall Feeling: %33\n"
+                   "Notes: %34")
             .arg(id)
             .arg(name)
             .arg(h1Lung)
+            .arg(h1LungR)
             .arg(h2HeartConstrictor)
+            .arg(h2HeartConstrictorR)
             .arg(h3Heart)
+            .arg(h3HeartR)
             .arg(h4SmallIntestine)
+            .arg(h4SmallIntestineR)
             .arg(h5TripleHeater)
+            .arg(h5TripleHeaterR)
             .arg(h6LargeIntestine)
+            .arg(h6LargeIntestineR)
             .arg(f1Spleen)
+            .arg(f1SpleenR)
             .arg(f2Liver)
+            .arg(f2LiverR)
             .arg(f3Kidney)
+            .arg(f3KidneyR)
             .arg(f4UrinaryBladder)
+            .arg(f4UrinaryBladderR)
             .arg(f5GallBladder)
+            .arg(f5GallBladderR)
             .arg(f6Stomach)
+            .arg(f6StomachR)
             .arg(bodyTemp)
             .arg(bloodPressure)
             .arg(heartRate)
@@ -448,19 +521,33 @@ void ScanModel::test() {
     int id = -1;
     int profileId = 2;
 
-    int h1 = 155;
-    int h2 = 156;
-    int h3 = 157;
-    int h4 = 158;
-    int h5 = 159;
-    int h6 = 155;
+    int h1 = 55;
+    int h2 = 56;
+    int h3 = 57;
+    int h4 = 58;
+    int h5 = 59;
+    int h6 = 55;
     
-    int f1 = 155;
+    int h1r = 55;
+    int h2r = 56;
+    int h3r = 57;
+    int h4r = 58;
+    int h5r = 59;
+    int h6r = 55;
+    
+    int f1 = 55;
     int f2 = 22;
     int f3 = -157;
-    int f4 = 158;
-    int f5 = 200;
+    int f4 = 58;
+    int f5 = 25;
     int f6 = 2000;
+    
+    int f1r = 75;
+    int f2r = 52;
+    int f3r = 57;
+    int f4r = 58;
+    int f5r = 25;
+    int f6r = 200;
 
     int bt = 37;
     int bp = 22;
@@ -472,7 +559,12 @@ void ScanModel::test() {
     QString name = "Andrew scan";
     QString notes = "Test note";
 
-    ScanModel scan(id,profileId,h1,h2,h3,h4,h5,h6,f1,f2,f3,f4,f5,f6,bt,bp,hr,st,cw,em,ofeel,name,notes);
+    ScanModel scan(
+        id,profileId,
+        h1,h1r,h2,h2r,h3,h3r,h4,h4r,h5,h5r,h6,h6r,
+        f1,f1r,f2,f2r,f3,f3r,f4,f4r,f5,f5r,f6,f6r,
+        bt,bp,hr,st,cw,em,ofeel,name,notes
+    );
 
     qDebug() << "\nTesting Scan";
     qDebug() << scan.toString();
@@ -487,12 +579,26 @@ void ScanModel::test() {
         (scan.getH5TripleHeater() == h5) &&
         (scan.getH6LargeIntestine() == h6) &&
 
+        (scan.getH1LungR() == h1r) &&
+        (scan.getH2HeartConstrictorR() == h2r) &&
+        (scan.getH3HeartR() == h3r) &&
+        (scan.getH4SmallIntestineR() == h4r) &&
+        (scan.getH5TripleHeaterR() == h5r) &&
+        (scan.getH6LargeIntestineR() == h6r) &&
+
         (scan.getF1Spleen() == f1) &&
         (scan.getF2Liver() == f2) &&
         (scan.getF3Kidney() == f3) &&
         (scan.getF4UrinaryBladder() == f4) &&
         (scan.getF5GallBladder() == f5) &&
         (scan.getF6Stomach() == f6) &&
+
+        (scan.getF1SpleenR() == f1r) &&
+        (scan.getF2LiverR() == f2r) &&
+        (scan.getF3KidneyR() == f3r) &&
+        (scan.getF4UrinaryBladderR() == f4r) &&
+        (scan.getF5GallBladderR() == f5r) &&
+        (scan.getF6StomachR() == f6r) &&
 
         (scan.getBodyTemp() == bt) &&
         (scan.getBloodPressure() == bp) &&
