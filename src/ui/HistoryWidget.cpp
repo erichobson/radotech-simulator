@@ -7,7 +7,6 @@
 
 #include <QGridLayout>
 #include <QLabel>
-#include <QMessageBox>
 #include <QPushButton>
 // TODO: Remove after implementation
 #include <QRandomGenerator>
@@ -36,9 +35,8 @@ HistoryWidget::HistoryWidget(QWidget *parent) : QWidget(parent) {
     for (int i = 0; i < metricNames.size(); ++i) {
         QWidget *trendWidget = new QWidget;
         trendWidget->setStyleSheet("border-radius: 15px;");
-        trendWidget->setSizePolicy(
-            QSizePolicy::Expanding,
-            QSizePolicy::Expanding);  // Allow widgets to expand equally
+        trendWidget->setSizePolicy(QSizePolicy::Expanding,
+                                   QSizePolicy::Expanding);
 
         // TODO: Determine normal values for each trend
         // Determine the background color based on the trend value
