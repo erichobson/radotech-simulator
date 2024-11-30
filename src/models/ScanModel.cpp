@@ -54,6 +54,9 @@ ScanModel::ScanModel(
     int f6Stomach,
     int f6StomachR,
 
+    const QDate& createdOn,
+
+    // optional fields
     int bodyTemp, 
     int bloodPressure, 
     int heartRate, 
@@ -91,7 +94,9 @@ ScanModel::ScanModel(
     f5GallBladderR(f5GallBladderR), 
     f6Stomach(f6Stomach),
     f6StomachR(f6StomachR),
+    createdOn(createdOn),
 
+    // optional fields
     bodyTemp(bodyTemp), 
     bloodPressure(bloodPressure),
     heartRate(heartRate), 
@@ -416,6 +421,14 @@ void ScanModel::setNotes(const QString& notes) {
     this->notes = notes;
 }
 
+QDate ScanModel::getCreatedOn() const {
+    return createdOn;
+}
+
+void ScanModel::setCreatedOn(const QDate& createdOn) {
+    this->createdOn = createdOn;
+}
+
 const QVector<int>& ScanModel::getMeasurements() const {
     return measurements;
 }
@@ -556,6 +569,7 @@ void ScanModel::test() {
     int cw = 185;
     int em = 1;
     int ofeel = 2;
+    QDate createdOn(2000, 06, 06);
     QString name = "Andrew scan";
     QString notes = "Test note";
 
@@ -563,6 +577,7 @@ void ScanModel::test() {
         id,profileId,
         h1,h1r,h2,h2r,h3,h3r,h4,h4r,h5,h5r,h6,h6r,
         f1,f1r,f2,f2r,f3,f3r,f4,f4r,f5,f5r,f6,f6r,
+        createdOn,
         bt,bp,hr,st,cw,em,ofeel,name,notes
     );
 

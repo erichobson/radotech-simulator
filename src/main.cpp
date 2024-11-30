@@ -75,6 +75,7 @@ int main(int argc, char *argv[]) {
     int cw = 185;
     int em = 1;
     int ofeel = 2;
+    QDate createdOn(2000,6,6);
     QString name = "Andrew scan";
     QString notes = "Test note";
 
@@ -82,14 +83,37 @@ int main(int argc, char *argv[]) {
         id,profileId,
         h1,h1r,h2,h2r,h3,h3r,h4,h4r,h5,h5r,h6,h6r,
         f1,f1r,f2,f2r,f3,f3r,f4,f4r,f5,f5r,f6,f6r,
+        createdOn,
         bt,bp,hr,st,cw,em,ofeel,name,notes
     );
 
+    ScanModel newScan2(
+        (id + 1),profileId,
+        h1 + 1,h1r-1,h2-2,h2r+2,h3+3,h3r+2,h4-4,h4r+5,h5+6,h5r-7,h6-2,h6r+1,
+        f1 + 1,f1r-2,f2-3,f2r+3,f3+4,f3r+5,f4+3,f4r-2,f5+1,f5r+4,f6-2,f6r+3,
+        createdOn,
+        bt,bp,hr,st,cw,em,ofeel,name,notes
+    );
+
+    const QVector<ScanModel*> scans = {&newScan, &newScan2};
+
     qDebug() << "Calculating Organ Health";
     hmc.calculateOrganHealth(&newScan, hms);
+    for(auto* hm : hms){
+        qDebug() << hm->toString();
+    }
 
     qDebug() << "Calculating Indicator Health";
     hmc.calculateIndicatorHealth(&newScan, hms);
+    for(auto* hm : hms){
+        qDebug() << hm->toString();
+    }
+
+    qDebug() << "Calculating Trend Indicators";
+    hmc.calculateTrendHealth(scans, hms);
+    for(auto* hm : hms){
+        qDebug() << hm->toString();
+    }
 
     MainWindow mainWindow;
     mainWindow.show();

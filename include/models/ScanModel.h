@@ -40,6 +40,8 @@ class ScanModel {
             int f5GallBladderR,
             int f6Stomach,
             int f6StomachR,
+            
+            const QDate &createdOn,
             // opt
             int bodyTemp = -1,
             int bloodPressure = -1,
@@ -156,6 +158,9 @@ class ScanModel {
 
         int getOverallFeeling() const;
         void setOverallFeeling(int overallFeeling);
+        
+        QDate getCreatedOn() const;
+        void setCreatedOn(const QDate&);
 
         QString getNotes() const;
         void setNotes(const QString &notes);
@@ -203,6 +208,7 @@ class ScanModel {
         int f5GallBladderR;
         int f6Stomach;
         int f6StomachR;
+        QDate createdOn;
 
         int bodyTemp;
         int bloodPressure;
@@ -213,6 +219,8 @@ class ScanModel {
         int overallFeeling;
         QString name;
         QString notes;
+
+
         QVector<int> measurements;
         QVector<int> upperMeasurements;
         QVector<int> lowerMeasurements;

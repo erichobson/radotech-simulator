@@ -29,6 +29,13 @@ class HealthMetricCalculator {
         ~HealthMetricCalculator();
         bool calculateOrganHealth(ScanModel*, QVector<HealthMetricModel*>&);
         bool calculateIndicatorHealth(ScanModel*, QVector<HealthMetricModel*>&);
+        bool calculateTrendHealth(const QVector<ScanModel*>&, QVector<HealthMetricModel*>&);
+
+        float calculateEnergyHealth(ScanModel*);
+        float calculateImmuneHealth(ScanModel*);
+        float calculateSkeletalHealth(ScanModel*);
+        float calculateMetabolismHealth(ScanModel*);
+        float calculatePsychoHealth(ScanModel*); 
 
     private: 
         Range energyLevelRange;

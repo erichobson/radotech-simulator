@@ -73,10 +73,6 @@ bool HealthMetricCalculator::calculateOrganHealth(ScanModel* scan, QVector<Healt
         ++j;
     }
 
-    for (auto* hm : hms) {
-        qDebug () << hm->toString();
-    }
-
     return true;
 }
 
@@ -89,71 +85,24 @@ bool HealthMetricCalculator::calculateOrganHealth(ScanModel* scan, QVector<Healt
 bool HealthMetricCalculator::calculateIndicatorHealth(ScanModel* scan, QVector<HealthMetricModel*>& hms) {
     
     const QVector<int>& measurements = scan->getMeasurements();
-    const QVector<int>& upperMeasurements = scan->getUpperMeasurements();
-    const QVector<int>& lowerMeasurements = scan->getLowerMeasurements();
-    const QVector<int>& rightMeasurements = scan->getRightMeasurements();
-    const QVector<int>& leftMeasurements = scan->getLeftMeasurements();
 
     if(measurements.isEmpty() || measurements.size() <= 1) {
         qCritical() << "Error: Not enough measurements. Cannot calculate mean or standard deviation.";
         return false;
     }
 
-    // Energy: mean
-    float running = 0;
-    for(const auto& x : measurements) {
-        running += x;
-    }
-    float energy = running / measurements.size();
-
-    // Psycho-emotional state: upper/lower 
-    float upperSum = 0;
-    float lowerSum = 0;
-    for(auto& x : upperMeasurements) {
-        upperSum += x;
-    }
-    for(auto& x : lowerMeasurements) {
-        lowerSum += x;
-    }
-    float psycho = upperSum / lowerSum;
-
-    // Musculoskeletal system: left/right
-    float leftSum = 0;
-    float rightSum = 0;
-    for(const auto& x : leftMeasurements) {
-        leftSum += x;
-    }
-    for(const auto& x : rightMeasurements) {
-        rightSum += x;
-    }
-    float skeletal = leftSum / rightSum;
-
-    // Metabolism: left(weighted) / right(weighted)
-    QVector<int> lweights;
-    QVector<int> rweights;
-    lweights.clear();
-    rweights.clear();
-    for(const auto& _ : leftMeasurements) {
-        lweights.append(random(0.0, 0.5));
-    }
-    for(const auto& _ : rightMeasurements) {
-        rweights.append(random(0.0, 0.5));
-    }    
+    // Calcualate indicator metrics
+    float energy = calculateEnergyHealth(scan);
+    float psycho = calculatePsychoHealth(scan);
+    float skeletal = calculateSkeletalHealth(scan);
+    float metabolism = calculateMetabolismHealth(scan);
+    float immune = calculateImmuneHealth(scan);
     
-    float leftWeightedSum = 0;
-    float rightWeightedSum = 0;
-    for(int i = 0; i < leftMeasurements.size(); ++i) {
-        leftWeightedSum += leftMeasurements[i] + (leftMeasurements[i] * lweights[i]);
+    if(energy == -1 || metabolism == -1 || immune == -1 || skeletal == -1 || psycho == -1) { // one of the calculations invalid
+        qCritical() << "Error: could not calculate indicators";
+        return false;
     }
-    for(int i = 0; i < rightMeasurements.size(); ++i) {
-        rightWeightedSum += rightMeasurements[i] + (rightMeasurements[i] * rweights[i]);
-    }
-    float metabolism = leftWeightedSum / rightWeightedSum;
 
-    // Immune system: |upper-lower| / 2
-    float immune = std::abs(upperSum - lowerSum) / 2;
-
-    hms.clear();
     // Determine outliers and update hms
     int energyOutlier = energyLevelRange.withinRange(energy);
     int psychoOutlier = psychoStateRange.withinRange(psycho);
@@ -161,6 +110,7 @@ bool HealthMetricCalculator::calculateIndicatorHealth(ScanModel* scan, QVector<H
     int metabolismOutlier = metabolismRange.withinRange(metabolism);
     int immuneOutlier = immuneSysRange.withinRange(immune);
 
+    hms.clear();
     hms.append({
         new HealthMetricModel(
             "Energy Level", 
@@ -193,14 +143,219 @@ bool HealthMetricCalculator::calculateIndicatorHealth(ScanModel* scan, QVector<H
             skeletalOutlier
         )
     });
-    
-    for (auto* hm : hms) {
-        qDebug () << hm->toString();
-    }
 
     return true;
 }
 
+
+/**
+ * @brief Calculates the trends from the provided vector of scans.
+ * @param scan input parameter of the scans to calculate trends for. Expects scans to be in order of oldest to newest.
+ * @param hms output parameter used to store the calculated indicator health metrics. 
+     * Each health metric returns the trend name, the latest indicator value from the most recent scan, the trend type, and an integer representing trending up (+1), trending down(-1), or trending sideways(0).
+ * @returns true if the calculations were successfull, false otherwise.
+ */
+bool HealthMetricCalculator::calculateTrendHealth(const QVector<ScanModel*>& scans, QVector<HealthMetricModel*>& hms) {
+
+    if(scans.size() <= 1) {
+        qCritical() << "Error: Not enough scans. Cannot calculate scan trends.";
+        return false;
+    }
+
+    // get all the energy, metabolism, immune, skeletal, and psycho state indicators 
+    QVector<float> energys;
+    QVector<float> metabolisms;
+    QVector<float> immunes;
+    QVector<float> skeletals;
+    QVector<float> psychos;
+    
+    // get all indicators for each scan
+    for(int i = 0; i < scans.size(); ++i) { 
+        ScanModel* scan = scans[i];
+
+        energys.append(calculateEnergyHealth(scan));
+        metabolisms.append(calculateMetabolismHealth(scan));
+        immunes.append(calculateImmuneHealth(scan));
+        skeletals.append(calculateSkeletalHealth(scan));
+        psychos.append(calculatePsychoHealth(scan));
+
+        if(energys[i] == -1 || metabolisms[i] == -1 || immunes[i] == -1 || skeletals[i] == -1 || psychos[i] == -1) { // one of the calculations invalid
+            qCritical() << QString("Error: Scan: %1 (id = %2) does not have enough information to calculate trends").arg(scan->getName()).arg(scan->getId());
+            return false;
+        }
+    }
+
+    float newestEnergy = energys[energys.size() - 1];
+    float newestMetabolism = metabolisms[metabolisms.size() - 1];
+    float newestImmune = immunes[immunes.size() - 1];
+    float newestSkeletal = skeletals[skeletals.size() - 1];
+    float newestPsycho = psychos[psychos.size() - 1];
+
+    // find the slope of the line of best fit for each one
+    float energySlope = (newestEnergy - energys[0]) / (energys.size() - 1);
+    float metabolismSlope = (newestMetabolism - metabolisms[0]) / (metabolisms.size() - 1);
+    float immuneSlope = (newestImmune - immunes[0]) / (immunes.size() - 1);
+    float skeletalSlope = (newestSkeletal - skeletals[0]) / (skeletals.size() - 1);
+    float psychoSlope = (newestPsycho - psychos[0]) / (psychos.size() - 1);
+
+    // update hms with the trend analysis for each of the indicators
+    hms.clear();
+    hms.append({
+        new HealthMetricModel(
+            "Energy level trend", 
+            newestEnergy, 
+            energySlope > 0 ? "Trending Up" : (energySlope < 0 ? "Trending Down" : "Trending Sideways"),
+            energySlope > 0 ? 1 : (energySlope < 0 ? -1 : 0)
+        ),
+        new HealthMetricModel(
+            "Immune system trend", 
+            newestImmune, 
+            immuneSlope > 0 ? "Trending Up" : (immuneSlope < 0 ? "Trending Down" : "Trending Sideways"),
+            immuneSlope > 0 ? 1 : (immuneSlope < 0 ? -1 : 0)
+        ),
+        new HealthMetricModel(
+            "Metabolism trend", 
+            newestMetabolism, 
+            metabolismSlope > 0 ? "Trending Up" : (metabolismSlope < 0 ? "Trending Down" : "Trending Sideways"),
+            metabolismSlope > 0 ? 1 : (metabolismSlope< 0 ? -1 : 0)
+        ),
+        new HealthMetricModel(
+            "Psycho-emotional state trend", 
+            newestPsycho, 
+            psychoSlope > 0 ? "Trending Up" : (psychoSlope < 0 ? "Trending Down" : "Trending Sideways"),
+            psychoSlope > 0 ? 1 : (psychoSlope < 0 ? -1 : 0)
+        ),
+        new HealthMetricModel(
+            "Musculoskeletal system trend", 
+            newestSkeletal, 
+            skeletalSlope > 0 ? "Trending Up" : (skeletalSlope < 0 ? "Trending Down" : "Trending Sideways"),
+            skeletalSlope  > 0 ? 1 : (skeletalSlope < 0 ? -1 : 0)
+        )
+    });
+
+    return true;
+}
+
+float HealthMetricCalculator::calculateEnergyHealth(ScanModel* scan) {
+
+    const QVector<int>& measurements = scan->getMeasurements();
+
+    if(measurements.size() <= 0) {
+        qCritical() << "Error: not enough measurements to calculate energy indicator";
+        return -1;
+    }
+
+    float running = 0;
+    for(const auto& x : measurements) {
+        running += x;
+    }
+    // Energy: mean
+    return running / measurements.size();
+}
+
+float HealthMetricCalculator::calculateImmuneHealth(ScanModel* scan) {
+
+    const QVector<int>& upperMeasurements = scan->getUpperMeasurements();
+    const QVector<int>& lowerMeasurements = scan->getLowerMeasurements();
+
+    if(upperMeasurements.size() <= 0 || lowerMeasurements.size() <= 0) {
+        qCritical() << "Error: not enough measurements to calculate immune indicator";
+        return -1;
+    }
+
+    float upperSum = 0;
+    float lowerSum = 0;
+    for(auto& x : upperMeasurements) {
+        upperSum += x;
+    }
+    for(auto& x : lowerMeasurements) {
+        lowerSum += x;
+    }
+
+    // Immune system: |upper-lower| / 2
+    return std::abs(upperSum - lowerSum) / 2;
+}
+
+float HealthMetricCalculator::calculateMetabolismHealth(ScanModel* scan) {
+
+    const QVector<int>& rightMeasurements = scan->getRightMeasurements();
+    const QVector<int>& leftMeasurements = scan->getLeftMeasurements();
+
+    if(rightMeasurements.size() <= 0 || leftMeasurements.size() <= 0) {
+        qCritical() << "Error: not enough measurements to calculate metabolism indicator";
+        return -1;
+    }
+
+    QVector<int> lweights;
+    QVector<int> rweights;
+    lweights.clear();
+    rweights.clear();
+
+    for(const auto& _ : leftMeasurements) {
+        lweights.append(random(0.0, 0.5));
+    }
+    for(const auto& _ : rightMeasurements) {
+        rweights.append(random(0.0, 0.5));
+    }    
+
+    float leftWeightedSum = 0;
+    float rightWeightedSum = 0;
+    for(int i = 0; i < leftMeasurements.size(); ++i) {
+        leftWeightedSum += leftMeasurements[i] + (leftMeasurements[i] * lweights[i]);
+    }
+    for(int i = 0; i < rightMeasurements.size(); ++i) {
+        rightWeightedSum += rightMeasurements[i] + (rightMeasurements[i] * rweights[i]);
+    }
+
+    // Metabolism: left(weighted) / right(weighted)
+    return std::abs(leftWeightedSum / rightWeightedSum); 
+}
+
+float HealthMetricCalculator::calculateSkeletalHealth(ScanModel* scan) {
+
+    const QVector<int>& rightMeasurements = scan->getRightMeasurements();
+    const QVector<int>& leftMeasurements = scan->getLeftMeasurements();
+
+    if(rightMeasurements.size() <= 0 || leftMeasurements.size() <= 0) {
+        qCritical() << "Error: not enough measurements to calculate skeletal indicator";
+        return -1;
+    }
+
+    float leftSum = 0;
+    float rightSum = 0;
+    for(const auto& x : leftMeasurements) {
+        leftSum += x;
+    }
+    for(const auto& x : rightMeasurements) {
+        rightSum += x;
+    }
+
+    // Musculoskeletal system: left/right
+    return std::abs(leftSum / rightSum); 
+}
+
+float HealthMetricCalculator::calculatePsychoHealth(ScanModel* scan) {
+
+    const QVector<int>& upperMeasurements = scan->getUpperMeasurements();
+    const QVector<int>& lowerMeasurements = scan->getLowerMeasurements();
+
+    if(upperMeasurements.size() <= 0 || lowerMeasurements.size() <= 0) {
+        qCritical() << "Error: not enough measurements to calculate psycho-emotional indicator";
+        return -1;
+    }
+
+    float upperSum = 0;
+    float lowerSum = 0;
+    for(auto& x : upperMeasurements) {
+        upperSum += x;
+    }
+    for(auto& x : lowerMeasurements) {
+        lowerSum += x;
+    }
+    
+    // Psycho-emotional state: upper/lower 
+    return std::abs(upperSum / lowerSum);
+}
 
 float HealthMetricCalculator::random(float lower, float upper) {
     std::random_device rdev;
