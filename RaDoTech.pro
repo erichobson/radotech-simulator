@@ -8,10 +8,11 @@ CONFIG -= app_bundle
 
 INCLUDEPATH += \
     $$PWD/include \
+    $$PWD/include/tests \
     $$PWD/include/ui \
     $$PWD/include/controllers \
     $$PWD/include/models \
-    $$PWD/include/utils
+    $$PWD/include/utils \
 
 RESOURCES += resources/resources.qrc
 

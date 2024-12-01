@@ -1,5 +1,5 @@
 /**
- * @file src/models/HealthMetricModel.cpp
+ * @file HealthMetricModel.cpp
  * @brief A model for the health metrics
  */
 

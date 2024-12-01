@@ -1,6 +1,6 @@
 /**
- * @file include/utils/HealthMetricCalculator.h
- * @brief Utility class providing health metric calculations
+ * @file HealthMetricCalculator.h
+ * @brief Utility class providing health metric calculations.
  */
 
 #ifndef HEALTH_METRIC_CALCULATOR_H
@@ -38,11 +38,11 @@ class HealthMetricCalculator {
         float calculatePsychoHealth(ScanModel*); 
 
     private: 
-        Range energyLevelRange;
-        Range psychoStateRange;
-        Range skeletalSysRange;
-        Range immuneSysRange;
-        Range metabolismRange;
+        Range energyLevelRange{25.0f, 55.0f};
+        Range psychoStateRange{0.8f, 1.2f};
+        Range skeletalSysRange{0.9f, 1.2f};
+        Range immuneSysRange{47.0f, 57.0f};
+        Range metabolismRange{1.1f, 1.2f};
 
         float random(float, float);
 };

@@ -1,6 +1,6 @@
 /**
- * @file include/utils/DatabaseManager.h
- * @brief
+ * @file DatabaseManager.h
+ * @brief Declaration of the DatabaseManager class.
  */
 
 #ifndef DATABASE_MANAGER_H

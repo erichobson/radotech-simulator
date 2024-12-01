@@ -1,6 +1,6 @@
 /**
- * @file include/models/HealthMetrciModel.h
- * @brief A Model for the health metrics
+ * @file HealthMetricModel.h
+ * @brief A model for the health metrics.
  */
 
 #ifndef HEALTH_METRIC_MODEL_H

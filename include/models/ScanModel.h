@@ -1,5 +1,5 @@
 /**
- * @file include/models/ScanModel.h
+ * @file ScanModel.h
  * @brief A model of the scan.
  */
 
@@ -177,8 +177,6 @@ class ScanModel {
         const QVector<int>& getLeftMeasurements() const;
 
         static const QVector<QString>& getOrganNames();
-
-        void test();
 
     private:
         int id;

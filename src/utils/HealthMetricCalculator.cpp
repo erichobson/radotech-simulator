@@ -1,6 +1,6 @@
 /**
- * @file src/utils/HealthMetricCalculator.cpp
- * @brief Utility class that provides health metric calculations
+ * @file HealthMetricCalculator.cpp
+ * @brief Utility class that provides health metric calculations.
  */
 
 #include "HealthMetricCalculator.h"
@@ -15,11 +15,11 @@ int Range::withinRange(float val) const {
  * @brief Constructor for the HealthMetricCalculator class.
  */
 HealthMetricCalculator::HealthMetricCalculator():
-    energyLevelRange(25, 55),
-    psychoStateRange(0.8, 1.2),
-    skeletalSysRange(0.9, 1.2),
-    immuneSysRange(47, 57),
-    metabolismRange(1.1, 1.2)
+    energyLevelRange(25.0f, 55.0f),
+    psychoStateRange(0.8f, 1.2f),
+    skeletalSysRange(0.9f, 1.2f),
+    immuneSysRange(47.0f, 57.0f),
+    metabolismRange(1.1f, 1.2f)
 {}
 
 /**
@@ -278,33 +278,24 @@ float HealthMetricCalculator::calculateImmuneHealth(ScanModel* scan) {
 
 float HealthMetricCalculator::calculateMetabolismHealth(ScanModel* scan) {
 
-    const QVector<int>& rightMeasurements = scan->getRightMeasurements();
     const QVector<int>& leftMeasurements = scan->getLeftMeasurements();
+    const QVector<int>& rightMeasurements = scan->getRightMeasurements();
 
     if(rightMeasurements.size() <= 0 || leftMeasurements.size() <= 0) {
         qCritical() << "Error: not enough measurements to calculate metabolism indicator";
         return -1;
     }
 
-    QVector<int> lweights;
-    QVector<int> rweights;
-    lweights.clear();
-    rweights.clear();
-
-    for(const auto& _ : leftMeasurements) {
-        lweights.append(random(0.0, 0.5));
+    float leftWeightedSum = 0.0f;
+    for(const auto& measurement : leftMeasurements) {
+        float weight = random(0.0f, 0.5f);
+        leftWeightedSum += measurement + (measurement * weight);
     }
-    for(const auto& _ : rightMeasurements) {
-        rweights.append(random(0.0, 0.5));
-    }    
-
-    float leftWeightedSum = 0;
-    float rightWeightedSum = 0;
-    for(int i = 0; i < leftMeasurements.size(); ++i) {
-        leftWeightedSum += leftMeasurements[i] + (leftMeasurements[i] * lweights[i]);
-    }
-    for(int i = 0; i < rightMeasurements.size(); ++i) {
-        rightWeightedSum += rightMeasurements[i] + (rightMeasurements[i] * rweights[i]);
+    
+    float rightWeightedSum = 0.0f;
+    for(const auto& measurement : rightMeasurements) {
+        float weight = random(0.0f, 0.5f);
+        rightWeightedSum += measurement + (measurement * weight);
     }
 
     // Metabolism: left(weighted) / right(weighted)

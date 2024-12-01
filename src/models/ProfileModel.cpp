@@ -1,5 +1,5 @@
 /**
- * @file src/models/ProfileModel.cpp
+ * @file ProfileModel.cpp
  * @brief A model of the profile.
  */
 
@@ -57,25 +57,3 @@ QString ProfileModel::toString() const {
         .arg(desc);
 }
 
-void ProfileModel::test() {
-
-    int id = -1;
-    int userId = 3;
-    QString name = "Test Profile";
-    QString desc = "Test desc";
-
-    ProfileModel prof(id, userId, name, desc);
-    qDebug() << "\nTesting Profile Model";
-    qDebug() << prof.toString();
-    if(
-        (prof.getId() == id) &&
-        (prof.getUserId() == userId) &&
-        (prof.getName() == name) &&
-        (prof.getDesc() == desc)
-    ) {
-        qDebug() << "All Tests Passed";
-    } else{
-        qDebug() << "Testing failed";
-    }
-
-}
