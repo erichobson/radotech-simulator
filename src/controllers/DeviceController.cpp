@@ -6,6 +6,7 @@
 #include "DeviceController.h"
 
 #include <QDebug>
+#include <QRandomGenerator>
 
 /* Logging Macros */
 #define DEBUG(msg) qDebug() << "[DEBUG]" << __FUNCTION__ << ":" << msg
@@ -109,4 +110,10 @@ void DeviceController::updateBatteryLevel() {
         DEBUG("Device is off");
     }
     emit batteryLevelChanged(batteryLevel);
+}
+
+void DeviceController::transmitData() {
+    int randomData = QRandomGenerator::global()->bounded(
+        0, 100);  // Random data between 0 and 99
+    emit dataReceived(randomData);
 }

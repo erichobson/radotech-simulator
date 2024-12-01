@@ -218,6 +218,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Create the content widgets
     MeasureNowWidget *measureNowWidget = new MeasureNowWidget;
+    measureNowWidget->setDeviceController(deviceController);
     // TODO: Implement measureNowWidget interface
 
     HomeWidget *homeWidget = new HomeWidget;
@@ -260,9 +261,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Connect device state changed signal
     connect(deviceController, &DeviceController::deviceStateChanged, this,
-            [](bool isOn) {
-                DEBUG("Device turned" << (isOn ? "on" : "off"));
-            });
+            [](bool isOn) { DEBUG("Device turned" << (isOn ? "on" : "off")); });
 
     // Create a card widget for the device image
     QWidget *deviceCardWidget = new QWidget;
@@ -293,6 +292,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Show the login page initially
     stackedWidget->setCurrentIndex(0);
+
+    connect(deviceImageLabel, &DeviceImageWidget::imageTouchingEdge,
+            measureNowWidget, &MeasureNowWidget::startCountdown);
+    connect(deviceImageLabel, &DeviceImageWidget::imageReleased,
+            measureNowWidget, &MeasureNowWidget::onImageReleased);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
