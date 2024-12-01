@@ -1,5 +1,5 @@
 /**
- * @file include/models/UserModel.h
+ * @file UserModel.h
  * @brief A model of the user.
  */
 
@@ -43,7 +43,6 @@ class UserModel {
         void setPasswordHash(const QString&);
 
         QString toString() const;
-        void test();
 
     private:
         int id;

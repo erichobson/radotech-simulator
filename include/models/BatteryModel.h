@@ -1,4 +1,4 @@
 /**
- * @file include/models/BatteryModel.h
+ * @file BatteryModel.h
  * @brief
  */

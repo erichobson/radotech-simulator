@@ -6,10 +6,13 @@
 #include <QApplication>
 
 #include "ui/MainWindow.h"
-#include "DatabaseManager.h"
-#include "UserModel.h"
-#include "ProfileModel.h"
-#include "ScanModel.h"
+
+#include "Test.h"
+#include "DatabaseManagerTest.h"
+#include "UserModelTest.h"
+#include "ProfileModelTest.h"
+#include "ScanModelTest.h"
+#include "HealthMetricCalculatorTest.h"
 
 /**
  * @brief Main function of the application.
@@ -22,16 +25,20 @@
  */
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-    
-    DatabaseManager db;
-    UserModel user;
-    ProfileModel profile;
-    ScanModel scan;
+        
+    QVector<Test*> tests = {
+        new DatabaseManagerTest(),
+        new UserModelTest(),
+        new ProfileModelTest(),
+        new ScanModelTest(),
+        new HealthMetricCalculatorTest()
+    };
 
-    db.testCRUD();
-    user.test();
-    profile.test();
-    scan.test();
+    // Run & delete tests
+    for(const auto* test : tests){
+        test->test();
+        delete test;
+    }
 
     MainWindow mainWindow;
     mainWindow.show();

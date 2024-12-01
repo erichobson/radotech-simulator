@@ -1,4 +1,4 @@
 /**
- * @file src/models/BatteryModel.cpp
+ * @file BatteryModel.cpp
  * @brief
  */
