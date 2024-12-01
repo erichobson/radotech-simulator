@@ -35,7 +35,6 @@ DeviceController::DeviceController(QObject *parent)
 }
 
 void DeviceController::setDeviceOn(bool isOn) {
-    // Check if battery is depleted
     if (isOn && batteryLevel <= 0) {
         DEBUG("Cannot turn on device. Battery is depleted.");
         return;
@@ -112,8 +111,7 @@ void DeviceController::updateBatteryLevel() {
     emit batteryLevelChanged(batteryLevel);
 }
 
+// TODO: Update this to transmit proper data
 void DeviceController::transmitData() {
-    int randomData = QRandomGenerator::global()->bounded(
-        0, 100);  // Random data between 0 and 99
-    emit dataReceived(randomData);
+    emit dataReceived(QRandomGenerator::global()->bounded(0, 100));
 }
