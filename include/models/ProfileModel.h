@@ -1,6 +1,6 @@
 /**
- * @file include/models/ProfileModel.h
- * @brief A model of the profile
+ * @file ProfileModel.h
+ * @brief A model of the profile.
  */
 
 #ifndef PROFILE_MODEL_H
@@ -27,7 +27,6 @@ class ProfileModel {
         void setDesc(const QString&);
 
         QString toString() const;
-        void test();
 
     private:
         int id;

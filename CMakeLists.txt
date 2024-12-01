@@ -18,6 +18,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/include/controllers
     ${PROJECT_SOURCE_DIR}/include/models
     ${PROJECT_SOURCE_DIR}/include/utils
+    ${PROJECT_SOURCE_DIR}/include/tests
 )
 
 file(GLOB_RECURSE SOURCES "src/*.cpp" "resources/resources.qrc")

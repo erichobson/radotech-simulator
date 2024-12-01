@@ -1,5 +1,5 @@
 /**
- * @file src/utils/DatabaseManager.cpp
+ * @file DatabaseManager.cpp
  * @brief Responsible for managing the database connection and executing queries.
  */
 

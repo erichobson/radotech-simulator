@@ -1,7 +1,10 @@
 /**
- * @file include/utils/DatabaseManager.h
- * @brief
+ * @file DatabaseManager.h
+ * @brief Declaration of the DatabaseManager class.
  */
+
+#ifndef DATABASE_MANAGER_H
+#define DATABASE_MANAGER_H
 
 #include <QtSql>
 #include <QString>
@@ -31,3 +34,5 @@ class DatabaseManager {
         void handleError(const QSqlError&);
         void executeSqlScript(const QString&, QSqlDatabase&);
 };
+
+#endif 
