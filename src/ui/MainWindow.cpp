@@ -16,7 +16,6 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "BuyWidget.h"
 #include "ClickableLabel.h"
 #include "DatabaseManager.h"
 #include "DeviceImageWidget.h"
@@ -27,7 +26,6 @@
 #include "MeasureNowWidget.h"
 #include "ProfileWidget.h"
 #include "ProfilesWidget.h"
-#include "SettingsWidget.h"
 
 /* Logging Macros */
 #define DEBUG(msg) qDebug() << "[DEBUG]" << __FUNCTION__ << ":" << msg
@@ -54,12 +52,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Initialize the login widget
     loginWidget = new LoginWidget;
-
-    // Connect signals from LoginWidget to MainWindow slots
-    connect(loginWidget, &LoginWidget::loginRequested, this,
-            &MainWindow::onLoginRequested);
-    connect(loginWidget, &LoginWidget::registerRequested, this,
-            &MainWindow::onRegisterRequested);
 
     // Create the main application interface widget
     mainWidget = new QWidget;
@@ -151,11 +143,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
          "Profiles"},
         {":/icons/history_unselected.png", ":/icons/history_selected.png",
          "History"},
-        {":/icons/buy_unselected.png", ":/icons/buy_selected.png", "Buy"},
         {":/icons/learning_unselected.png", ":/icons/learning_selected.png",
-         "Learning Materials"},
-        {":/icons/settings_unselected.png", ":/icons/settings_selected.png",
-         "Settings"}};
+         "Learning Materials"}};
 
     // Set font size for sidebar items
     QFont normalFont;
@@ -194,16 +183,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     logoutItem->setTextAlignment(Qt::AlignCenter);
     sidebarMenu->addItem(logoutItem);
 
-    // Connect signals for navigation
-    connect(sidebarMenu, &QListWidget::currentRowChanged, this,
-            [this](int currentRow) {
-                if (currentRow >= 0 && currentRow < items.size()) {
-                    contentStackedWidget->setCurrentIndex(currentRow);
-                } else if (currentRow == items.size()) {
-                    logout();
-                }
-            });
-
     // Create a card widget for the content area
     QWidget *contentCardWidget = new QWidget;
     contentCardWidget->setStyleSheet(
@@ -218,6 +197,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Create the content widgets
     MeasureNowWidget *measureNowWidget = new MeasureNowWidget;
+    measureNowWidget->setDeviceController(deviceController);
     // TODO: Implement measureNowWidget interface
 
     HomeWidget *homeWidget = new HomeWidget;
@@ -229,24 +209,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     HistoryWidget *historyWidget = new HistoryWidget;
     // TODO: Implement historyWidget interface
 
-    BuyWidget *buyWidget = new BuyWidget;
-    // TODO: Implement buyWidget interface
-
     LearningMaterialsWidget *learningMaterialsWidget =
         new LearningMaterialsWidget;
     // TODO: Implement learningMaterialsWidget interface
-
-    SettingsWidget *settingsWidget = new SettingsWidget;
-    // TODO: Implement settingsWidget interface
 
     // Add the widgets to the contentStackedWidget
     contentStackedWidget->addWidget(measureNowWidget);         // Index 0
     contentStackedWidget->addWidget(homeWidget);               // Index 1
     contentStackedWidget->addWidget(profilesWidget);           // Index 2
     contentStackedWidget->addWidget(historyWidget);            // Index 3
-    contentStackedWidget->addWidget(buyWidget);                // Index 4
-    contentStackedWidget->addWidget(learningMaterialsWidget);  // Index 5
-    contentStackedWidget->addWidget(settingsWidget);           // Index 6
+    contentStackedWidget->addWidget(learningMaterialsWidget);  // Index 4
 
     // Create the device image widget
     QPixmap devicePixmap(":/images/radotech_device.png");
@@ -257,12 +229,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Set the DeviceController
     deviceImageLabel->setDeviceController(deviceController);
-
-    // Connect device state changed signal
-    connect(deviceController, &DeviceController::deviceStateChanged, this,
-            [](bool isOn) {
-                DEBUG("Device turned" << (isOn ? "on" : "off"));
-            });
 
     // Create a card widget for the device image
     QWidget *deviceCardWidget = new QWidget;
@@ -293,6 +259,31 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Show the login page initially
     stackedWidget->setCurrentIndex(0);
+
+    // Connect signals from LoginWidget to MainWindow slots
+    connect(loginWidget, &LoginWidget::loginRequested, this,
+            &MainWindow::onLoginRequested);
+    connect(loginWidget, &LoginWidget::registerRequested, this,
+            &MainWindow::onRegisterRequested);
+
+    // Connect signals for navigation
+    connect(sidebarMenu, &QListWidget::currentRowChanged, this,
+            [this](int currentRow) {
+                if (currentRow >= 0 && currentRow < items.size()) {
+                    contentStackedWidget->setCurrentIndex(currentRow);
+                } else if (currentRow == items.size()) {
+                    logout();
+                }
+            });
+
+    // Connect device state changed signal
+    connect(deviceController, &DeviceController::deviceStateChanged, this,
+            [](bool isOn) { DEBUG("Device turned" << (isOn ? "on" : "off")); });
+
+    connect(deviceImageLabel, &DeviceImageWidget::imageTouchingEdge,
+            measureNowWidget, &MeasureNowWidget::startCountdown);
+    connect(deviceImageLabel, &DeviceImageWidget::imageReleased,
+            measureNowWidget, &MeasureNowWidget::onImageReleased);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {

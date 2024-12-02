@@ -28,9 +28,14 @@ class DeviceImageWidget : public QLabel {
      */
     void setDeviceController(DeviceController *controller);
 
+   signals:
+    void imageTouchingEdge();
+    void imageReleased();
+
    protected:
     void resizeEvent(QResizeEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
 
    private slots:
@@ -41,6 +46,9 @@ class DeviceImageWidget : public QLabel {
     void onDeviceStateChanged(bool isOn);
 
    private:
+    QPoint originalPosition;
+    bool isMoving;
+    int maxMovement;  // Maximum pixels to move down
     bool powerButtonOn;
     QRect powerButtonRect;
 

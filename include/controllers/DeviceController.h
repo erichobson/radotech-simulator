@@ -76,6 +76,8 @@ class DeviceController : public QObject {
      */
     void stopCharging();
 
+    void transmitData();
+
    signals:
     /**
      * @brief Signal emitted when the battery level changes.
@@ -100,6 +102,8 @@ class DeviceController : public QObject {
      * @param isOn The new state of the device.
      */
     void deviceStateChanged(bool isOn);
+
+    void dataReceived(int data);
 
    private slots:
     void updateBatteryLevel();

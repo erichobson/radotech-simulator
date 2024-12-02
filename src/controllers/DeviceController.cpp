@@ -6,6 +6,7 @@
 #include "DeviceController.h"
 
 #include <QDebug>
+#include <QRandomGenerator>
 
 /* Logging Macros */
 #define DEBUG(msg) qDebug() << "[DEBUG]" << __FUNCTION__ << ":" << msg
@@ -34,7 +35,6 @@ DeviceController::DeviceController(QObject *parent)
 }
 
 void DeviceController::setDeviceOn(bool isOn) {
-    // Check if battery is depleted
     if (isOn && batteryLevel <= 0) {
         DEBUG("Cannot turn on device. Battery is depleted.");
         return;
@@ -109,4 +109,9 @@ void DeviceController::updateBatteryLevel() {
         DEBUG("Device is off");
     }
     emit batteryLevelChanged(batteryLevel);
+}
+
+// TODO: Update this to transmit proper data
+void DeviceController::transmitData() {
+    emit dataReceived(QRandomGenerator::global()->bounded(0, 100));
 }
