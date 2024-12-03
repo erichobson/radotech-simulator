@@ -73,21 +73,22 @@ bool HealthMetricCalculatorTest::test() const {
 
     const QVector<ScanModel*> scans = {&newScan, &newScan2};
 
-    qDebug() << "Calculating Organ Health";
+    qDebug() << "\nTesting HealthMetricCalculator";
+    qDebug() << "\nCalculating Organ Health";
     if(!(hmc->calculateOrganHealth(&newScan, hms))) return false;
     for(auto* hm : hms){
         qDebug() << hm->toString();
         delete hm;
     }
 
-    qDebug() << "Calculating Indicator Health";
+    qDebug() << "\nCalculating Indicator Health";
     if(!(hmc->calculateIndicatorHealth(&newScan, hms))) return false;
     for(auto* hm : hms){
         qDebug() << hm->toString();
         delete hm;
     }
 
-    qDebug() << "Calculating Trend Indicators";
+    qDebug() << "\nCalculating Trend Indicators";
     if(!(hmc->calculateTrendHealth(scans, hms))) return false;
     for(auto* hm : hms){
         qDebug() << hm->toString();

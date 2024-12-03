@@ -5,7 +5,7 @@
 
 #include "DatabaseManagerTest.h"
 
-DatabaseManagerTest::DatabaseManagerTest() {}
+DatabaseManagerTest::DatabaseManagerTest(DatabaseManager& db): db(db) {}
 DatabaseManagerTest::~DatabaseManagerTest() {}
 
 bool DatabaseManagerTest::test() const {
@@ -14,7 +14,6 @@ bool DatabaseManagerTest::test() const {
 
 bool DatabaseManagerTest::testCRUD() const {
 
-    DatabaseManager db;
     const QString userQuery = "SELECT * FROM users;";
     const QString profileQuery = "SELECT * FROM profile;";
     const QString scanQuery = "SELECT * FROM scan;";
