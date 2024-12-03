@@ -20,7 +20,6 @@ private:
     bool testCRUD() const;
     void cleanup(QVector<ProfileModel*>&) const;
     UserProfileController* upc;
-    DatabaseManager* db;
 };
 #endif
 

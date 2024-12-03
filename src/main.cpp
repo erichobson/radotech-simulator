@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 
     DatabaseManager db;
     QVector<Test*> tests = {
-        //new DatabaseManagerTest(),
+        new DatabaseManagerTest(db),
         new UserModelTest(),
         new ProfileModelTest(),
         new ScanModelTest(),

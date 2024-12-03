@@ -13,11 +13,12 @@
 class DatabaseManagerTest : public Test {
 
 public: 
-    DatabaseManagerTest();
+    DatabaseManagerTest(DatabaseManager&);
     ~DatabaseManagerTest();
     virtual bool test () const override;
 
 private:
+    DatabaseManager& db;
     bool testCRUD() const;
 };
 
