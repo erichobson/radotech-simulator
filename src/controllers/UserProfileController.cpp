@@ -5,9 +5,24 @@
 
 #include "UserProfileController.h"
 
+/**
+ * @brief Constructor for a UserProfileController 
+ * @param db a reference to the database manager
+ */
 UserProfileController::UserProfileController(DatabaseManager& db): db(db) {}
+
+/**
+ * @brief Destructor for a UserProfileController 
+ */
 UserProfileController::~UserProfileController() {}
 
+/**
+ * @brief Gets a profile by user id and name
+ * @param userId the user id 
+ * @param name the name of the profile 
+ * @param profile a reference to the profile object to be populated with the result
+ * @return true if the profile was found
+ */
 bool UserProfileController::getProfileByName(int userId, const QString& name, ProfileModel& profile) const {
 
     QList<QMap<QString, QVariant>> results;
@@ -31,7 +46,12 @@ bool UserProfileController::getProfileByName(int userId, const QString& name, Pr
     }
 }
 
-
+/**
+ * @brief Gets all profiles associated with a user
+ * @param userId the user id 
+ * @param profiles reference to a vector that will be populated with the results
+ * @return true if the operation was successful
+ */
 bool UserProfileController::getProfiles(int userId, QVector<ProfileModel*>& profiles) const {
 
     QList<QMap<QString, QVariant>> results;
@@ -55,6 +75,13 @@ bool UserProfileController::getProfiles(int userId, QVector<ProfileModel*>& prof
     }
 }
 
+/**
+ * @brief Creates a profile 
+ * @param userId the user id associated with the profile 
+ * @param name the name of the profile 
+ * @param desc the description of the profile 
+ * @return true if the operation was successful
+ */
 bool UserProfileController::createProfile(int userId, const QString& name, const QString& desc) {
     try {
         db.execute("INSERT INTO profile (user_id, name, description) VALUES (?,?,?);", {userId, name, desc});
@@ -65,6 +92,11 @@ bool UserProfileController::createProfile(int userId, const QString& name, const
     }
 }
 
+/**
+ * @brief Creates a profile 
+ * @param profile the profile model to create the profile with 
+ * @return true if the operation was successful
+ */
 bool UserProfileController::createProfile(ProfileModel* profile) {
     try {
         db.execute("INSERT INTO profile (user_id, name, description) VALUES (?,?,?);", {profile->getUserId(), profile->getName(), profile->getDesc()});
@@ -75,6 +107,14 @@ bool UserProfileController::createProfile(ProfileModel* profile) {
     }
 }
 
+/**
+ * @brief Updates a profile 
+ * @param profileId the profile id 
+ * @param userId the user id associated with the profile
+ * @param name the name to update the profile with 
+ * @param desc the description to update the profile with 
+ * @return true if the operation was successful
+ */
 bool UserProfileController::updateProfile(int profileId, int userId, const QString& name, const QString& desc) {
     try {
         db.execute(
@@ -89,6 +129,11 @@ bool UserProfileController::updateProfile(int profileId, int userId, const QStri
     }
 }
 
+/**
+ * @brief Updates a profile 
+ * @param profile the profile model to update the profile with 
+ * @return true if the operation was successful
+ */
 bool UserProfileController::updateProfile(ProfileModel* profile) {
     try {
         db.execute(
@@ -103,6 +148,11 @@ bool UserProfileController::updateProfile(ProfileModel* profile) {
     }
 }
 
+/**
+ * @brief Deletes a profile 
+ * @param profileId the profile id to delete 
+ * @return true if the operation was successful
+ */
 bool UserProfileController::deleteProfile(int profileId) {
     try{
         db.execute("DELETE FROM profile WHERE profile_id = ?;", {profileId});
@@ -113,6 +163,11 @@ bool UserProfileController::deleteProfile(int profileId) {
     }
 }
 
+/**
+ * @brief Deletes a profile 
+ * @param profile the profile model to delete with
+ * @return true if the operation was successful
+ */
 bool UserProfileController::deleteProfile(ProfileModel* profile) {
     try{
         db.execute("DELETE FROM profile WHERE profile_id = ?;", {profile->getId()});
@@ -123,6 +178,12 @@ bool UserProfileController::deleteProfile(ProfileModel* profile) {
     }
 }
 
+/**
+ * @brief Gets all the scans associated with a profile 
+ * @param profileId the profile id 
+ * @param scans a reference to a vector that will be populated with the results
+ * @return true if the operation was successful
+ */
 bool UserProfileController::getProfileScans(int profileId, QVector<ScanModel*>& scans) const {
 
     QList<QMap<QString, QVariant>> results;
@@ -183,5 +244,4 @@ bool UserProfileController::getProfileScans(int profileId, QVector<ScanModel*>& 
         return false;
     }
 }
-
 

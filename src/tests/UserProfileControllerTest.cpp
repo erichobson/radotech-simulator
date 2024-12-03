@@ -55,13 +55,32 @@ bool UserProfileControllerTest::testCRUD() const {
         return false;
     }
 
-
     if(!(upc->getProfileByName(1, "Test Profile x Updated", profile))){
-        qDebug() << "Could not find profile: " << "Test Profile x";
+        qDebug() << "Could not find profile: " << "Test Profile x Updated";
         cleanup(profiles);
         return false;
     } 
     qDebug() << profile.toString();
+
+
+    // Get profile scans
+    qDebug() << "\nGETTING PROFILE SCANS FOR: " << "Test Profile 1" << "******************";
+    if(!(upc->getProfileByName(1, "Test Profile 1", profile))){
+        qDebug() << "Could not find profile: " << "Test Profile 1";
+        cleanup(profiles);
+        return false;
+    }
+    QVector<ScanModel*> scans;
+    if(!(upc->getProfileScans(profile.getId(), scans))){
+        qDebug() << "Could not get scans for: " << "Test Profile x Updated";
+        cleanup(profiles);
+        return false;
+    }
+
+    for(const auto* scan : scans) {
+        qDebug() << scan->toString();
+        delete scan;
+    }
 
 
     // Delete
