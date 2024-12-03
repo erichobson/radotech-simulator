@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS profile (
     name	TEXT NOT NULL,
     description	TEXT,
     created_on	DATE DEFAULT current_date,
-    FOREIGN KEY(user_id) REFERENCES user(user_id),
+    FOREIGN KEY(user_id) REFERENCES users(user_id),
     PRIMARY KEY(profile_id AUTOINCREMENT)
 );
 

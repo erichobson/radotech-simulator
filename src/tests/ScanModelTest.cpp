@@ -59,7 +59,7 @@ bool ScanModelTest::test() const {
         bt,bp,hr,st,cw,em,ofeel,name,notes
     );
 
-    qDebug() << "\nTesting Scan";
+    qDebug() << "\nTesting Scan Model";
     qDebug() << scan.toString();
     if(
         (scan.getId() == id) &&

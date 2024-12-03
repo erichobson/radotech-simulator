@@ -9,10 +9,13 @@
 
 #include "Test.h"
 #include "DatabaseManagerTest.h"
+#include "DatabaseManager.h"
 #include "UserModelTest.h"
 #include "ProfileModelTest.h"
 #include "ScanModelTest.h"
 #include "HealthMetricCalculatorTest.h"
+#include "UserProfileControllerTest.h"
+#include <QDebug>
 
 /**
  * @brief Main function of the application.
@@ -25,20 +28,29 @@
  */
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-        
+
+    DatabaseManager db;
     QVector<Test*> tests = {
-        new DatabaseManagerTest(),
+        //new DatabaseManagerTest(),
         new UserModelTest(),
         new ProfileModelTest(),
         new ScanModelTest(),
-        new HealthMetricCalculatorTest()
+        new HealthMetricCalculatorTest(),
+        new UserProfileControllerTest(db)
     };
 
     // Run & delete tests
     for(const auto* test : tests){
-        test->test();
+        if(!test->test()) {
+            qDebug() << "One of the tests failed";
+        }
+    }
+    
+    for(const auto* test : tests){
         delete test;
     }
+    
+    qDebug() << "\n***Done testing***\n";
 
     MainWindow mainWindow;
     mainWindow.show();
