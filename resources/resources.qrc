@@ -34,5 +34,7 @@
         <file>images/bladder_point.png</file>
         <file>images/gallbladder_point.png</file>
         <file>images/stomach_point.png</file>
+        <file>icons/add_profile.png</file>
+        <file>images/default_profile.png</file>
     </qresource>
 </RCC>
