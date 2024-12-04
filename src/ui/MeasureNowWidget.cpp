@@ -10,6 +10,8 @@
 
 #include "DeviceController.h"
 #include "Logging.h"
+#include "ProfileModel.h"
+#include "UserProfileController.h"
 
 namespace {
 /**
@@ -204,6 +206,14 @@ void MeasureNowWidget::setDeviceController(DeviceController* controller) {
     }
 }
 
+void MeasureNowWidget::setUserId(int userId) {
+    DEBUG(QString("Setting user ID: %1").arg(userId));
+    currentUserId = userId;
+    if (profileComboBox && profileController) {
+        populateProfileList(profileComboBox);
+    }
+}
+
 /**
  * @brief Initializes all UI components and their layouts
  * @param mainLayout The main layout to add components to
@@ -322,6 +332,11 @@ void MeasureNowWidget::setupPages() {
     }
 }
 
+void MeasureNowWidget::setUserProfileController(
+    UserProfileController* controller) {
+    profileController = controller;
+}
+
 /**
  * @brief Creates the introduction page with setup instructions
  */
@@ -340,8 +355,7 @@ void MeasureNowWidget::createIntroPage() {
     contentContainer->setStyleSheet(
         "#contentContainer {"
         "    background-color: white;"
-        "    border-radius: 15px;"
-        "    border: 1px solid #E0E0E0;"
+        "    border-radius: 10px;"
         "}");
 
     auto* containerLayout = new QVBoxLayout(contentContainer);
@@ -365,11 +379,10 @@ void MeasureNowWidget::createIntroPage() {
     introContainer->setStyleSheet(
         "background-color: #F8F9FA;"
         "border-radius: 10px;"
-        "padding: 5px;");
+        "padding: 20px;");
 
     auto* introLayout = new QVBoxLayout(introContainer);
 
-    // Add introduction title and text
     auto* introTitle = new QLabel("Before You Begin:");
     introTitle->setStyleSheet(
         "font-size: 16px;"
@@ -398,15 +411,22 @@ void MeasureNowWidget::createIntroPage() {
     formLayout->setContentsMargins(0, 0, 0, 0);
 
     // Create and setup form controls
-    auto* profileComboBox = new QComboBox();
+    profileComboBox = new QComboBox();
     profileComboBox->setStyleSheet(COMBOBOX_STYLE);
     profileComboBox->setItemDelegate(new BackgroundDelegate(profileComboBox));
+
+    // Add profile selection changed handler
+    connect(
+        profileComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this, [this](int index) {
+            selectedProfileId = profileComboBox->itemData(index).toInt();
+            DEBUG(QString("Selected profile ID: %1").arg(selectedProfileId));
+        });
+
     populateProfileList(profileComboBox);
 
     dateEdit = new QDateEdit(QDate::currentDate());
-    timeEdit = new QTimeEdit(QTime::currentTime());
     dateEdit->setStyleSheet(INPUT_STYLE);
-    timeEdit->setStyleSheet(INPUT_STYLE);
 
     // Add form fields with styled labels
     QString labelStyle = "font-weight: bold; color: #333333; font-size: 14px;";
@@ -418,7 +438,6 @@ void MeasureNowWidget::createIntroPage() {
 
     addFormRow("Profile:", profileComboBox);
     addFormRow("Date:", dateEdit);
-    addFormRow("Time:", timeEdit);
 
     // Assemble all sections
     containerLayout->addWidget(headerContainer);
@@ -640,6 +659,11 @@ void MeasureNowWidget::receiveData(int data) {
  * TODO: Configure where the measurements are processed and stored to database
  */
 void MeasureNowWidget::processMeasurements() {
+    if (selectedProfileId == -1) {
+        WARNING("No profile selected");
+        return;
+    }
+
     DEBUG("Processing measurements");
     DEBUG("Total raw measurements: " << rawMeasurements.size());
     DEBUG("Number of measurement labels: " << measurementLabels.size());
@@ -863,15 +887,30 @@ void MeasureNowWidget::updateCountdown() {
  *
  * TODO: Incorporate the profile controller
  */
-void MeasureNowWidget::populateProfileList(QComboBox* profileComboBox) {
-    if (!profileComboBox) {
-        ERROR("Invalid profile combo box");
+void MeasureNowWidget::populateProfileList(QComboBox* comboBox) {
+    if (!comboBox || !profileController) {
+        ERROR("Invalid combo box or profile controller not set");
         return;
     }
 
-    QStringList profiles = {"Profile 1", "Profile 2", "Profile 3", "Profile 4",
-                            "Profile 5"};
-    profileComboBox->addItems(profiles);
+    DEBUG("Populating profile list");
+    comboBox->clear();
+
+    QVector<ProfileModel*> profiles;
+    if (profileController->getProfiles(currentUserId, profiles)) {
+        for (const ProfileModel* profile : profiles) {
+            if (profile) {
+                comboBox->addItem(profile->getName(), profile->getId());
+            }
+        }
+        DEBUG(QString("Added %1 profiles to combo box").arg(profiles.size()));
+    } else {
+        WARNING("Failed to load profiles");
+    }
+
+    // Clean up
+    qDeleteAll(profiles);
+    profiles.clear();
 }
 
 /**
@@ -1079,5 +1118,12 @@ void MeasureNowWidget::showAlert(const QString& message, bool autoHide) {
             alertLabel->clear();
             alertLabel->setVisible(false);
         });
+    }
+}
+
+void MeasureNowWidget::refreshProfiles() {
+    if (profileComboBox && profileController) {
+        DEBUG("Refreshing profile list");
+        populateProfileList(profileComboBox);
     }
 }

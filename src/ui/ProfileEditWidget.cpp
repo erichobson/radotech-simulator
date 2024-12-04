@@ -5,14 +5,18 @@
 
 #include "ProfileEditWidget.h"
 
+#include <QButtonGroup>
+#include <QDateEdit>
 #include <QDebug>
 #include <QFormLayout>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QVBoxLayout>
 
 #include "Logging.h"
@@ -39,7 +43,7 @@ void ProfileEditWidget::createLayout() {
     mainLayout->setSpacing(20);
     mainLayout->setContentsMargins(0, 20, 0, 20);
 
-    // Card Layout (container with white background)
+    // Card Layout
     QWidget *cardWidget = new QWidget;
     cardWidget->setStyleSheet("background-color: white; border-radius: 10px;");
     QVBoxLayout *cardLayout = new QVBoxLayout(cardWidget);
@@ -165,8 +169,7 @@ void ProfileEditWidget::createLayout() {
     // Delete Button to delete the profile
     deleteButton = new QPushButton("Delete Profile");
     deleteButton->setFixedSize(250, 40);
-    deleteButton->setEnabled(false);  // Disabled by default
-    // Always visible to maintain layout consistency
+    deleteButton->setEnabled(false);
 
     connect(deleteButton, &QPushButton::clicked, this, [this]() {
         QVariant profileId = property("editing_profile_id");
@@ -219,7 +222,7 @@ void ProfileEditWidget::createLayout() {
 
     // Assemble the layout
 
-    // Add delete button above the save button
+    // Add delete button
     cardLayout->addWidget(deleteButton, 0, Qt::AlignCenter);
 
     // Add save button
@@ -343,7 +346,6 @@ void ProfileEditWidget::setupStyles() {
             // Style for the save button
             btn->setStyleSheet(saveButtonStyle);
         }
-        // The delete button already has its style applied
     }
 
     DEBUG("Styles applied successfully");

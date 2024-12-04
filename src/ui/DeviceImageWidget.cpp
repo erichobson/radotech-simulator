@@ -12,11 +12,7 @@
 #include <QResizeEvent>
 
 #include "DeviceController.h"
-
-/* Logging Macros */
-#define DEBUG(msg) qDebug() << "[DEBUG]" << __FUNCTION__ << ":" << msg
-#define INFO(msg) qInfo() << "[INFO]" << __FUNCTION__ << ":" << msg
-#define ERROR(msg) qCritical() << "[ERROR]" << __FUNCTION__ << ":" << msg
+#include "Logging.h"
 
 DeviceImageWidget::DeviceImageWidget(const QPixmap &pixmap, QWidget *parent)
     : QLabel(parent),
