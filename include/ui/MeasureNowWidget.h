@@ -21,6 +21,9 @@ class QVBoxLayout;
 class QFormLayout;
 class DeviceController;
 
+class UserProfileController;
+class ProfileModel;
+
 /**
  * @brief Custom delegate for styling background in combo boxes
  */
@@ -47,6 +50,9 @@ class MeasureNowWidget : public QWidget {
    public:
     explicit MeasureNowWidget(QWidget* parent = nullptr);
     void setDeviceController(DeviceController* controller);
+    void setUserProfileController(UserProfileController* controller);
+    void setUserId(int userId);
+    void refreshProfiles();
 
    public slots:
     void startCountdown();
@@ -56,6 +62,11 @@ class MeasureNowWidget : public QWidget {
     void onStartStopButtonClicked();
 
    private:
+    UserProfileController* profileController;
+    QComboBox* profileComboBox;
+    int selectedProfileId;
+    int currentUserId;
+
     // Constants and Types
     static const int TOTAL_SCAN_PAGES = 24;
     static const int MEASUREMENTS_PER_SIDE = 12;
