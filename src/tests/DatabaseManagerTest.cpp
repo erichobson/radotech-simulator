@@ -5,15 +5,12 @@
 
 #include "DatabaseManagerTest.h"
 
-DatabaseManagerTest::DatabaseManagerTest(DatabaseManager& db): db(db) {}
+DatabaseManagerTest::DatabaseManagerTest(DatabaseManager& db) : db(db) {}
 DatabaseManagerTest::~DatabaseManagerTest() {}
 
-bool DatabaseManagerTest::test() const {
-    return testCRUD();
-}
+bool DatabaseManagerTest::test() const { return testCRUD(); }
 
 bool DatabaseManagerTest::testCRUD() const {
-
     const QString userQuery = "SELECT * FROM users;";
     const QString profileQuery = "SELECT * FROM profile;";
     const QString scanQuery = "SELECT * FROM scan;";
@@ -23,10 +20,16 @@ bool DatabaseManagerTest::testCRUD() const {
     QList<QMap<QString, QVariant>> scanRes;
 
     // Create
-    qDebug() << "\nCREATING USER " << "Test User 2" <<" ******************";
-    db.execute("INSERT INTO users (first_name, last_name, sex, weight, height, date_of_birth, email, password_hash) VALUES(?,?,?,?,?,?,?,?);", 
-        {"Test", "User2", "male", 75, 185, "2002-02-02", "testuser2@mail.com", "password"}
-    );
+    qDebug() << "\nCREATING USER " << "Test User 2" << " ******************";
+    // db.execute("INSERT INTO users (first_name, last_name, sex, weight,
+    // height, date_of_birth, email, password_hash) VALUES(?,?,?,?,?,?,?,?);",
+    //     {"Test", "User2", "male", 75, 185, "2002-02-02",
+    //     "testuser2@mail.com", "password"}
+    // );
+    db.execute(
+        "INSERT INTO users (first_name, last_name, email, password_hash) "
+        "VALUES(?,?,?,?);",
+        {"Test", "User2", "male", "testuser2@mail.com", "password"});
 
     db.query(userQuery, {}, userRes);
     db.query(profileQuery, {}, profileRes);
@@ -41,7 +44,7 @@ bool DatabaseManagerTest::testCRUD() const {
             qDebug() << "  " << it.key() << "=" << it.value();
         }
     }
-    
+
     qDebug() << "\nPRINTING PROFILES ******************";
     for (int i = 0; i < profileRes.size(); ++i) {
         qDebug() << "Row" << i + 1 << ":";
@@ -62,10 +65,8 @@ bool DatabaseManagerTest::testCRUD() const {
 
     // Update
     qDebug() << "\nUPDATING USERS ******************";
-    db.execute(
-        "UPDATE users SET first_name=?, last_name=?  WHERE email=?;", 
-        {"Updated", "User2", "testuser2@mail.com"}
-    );
+    db.execute("UPDATE users SET first_name=?, last_name=?  WHERE email=?;",
+               {"Updated", "User2", "testuser2@mail.com"});
     db.query(userQuery, {}, userRes);
     for (int i = 0; i < userRes.size(); ++i) {
         qDebug() << "Row" << i + 1 << ":";

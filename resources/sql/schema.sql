@@ -2,10 +2,6 @@ CREATE TABLE IF NOT EXISTS users (
     user_id	INTEGER NOT NULL UNIQUE,
     first_name	TEXT NOT NULL,
     last_name	TEXT NOT NULL,
-    sex TEXT NOT NULL,
-    weight INTEGER NOT NULL,
-    height INTEGER NOT NULL,
-    date_of_birth DATE NOT NULL,
     email	TEXT NOT NULL UNIQUE,
     password_hash	TEXT NOT NULL,
     created_on	DATE DEFAULT current_date,
@@ -16,7 +12,10 @@ CREATE TABLE IF NOT EXISTS profile (
     profile_id	INTEGER NOT NULL,
     user_id	INTEGER NOT NULL,
     name	TEXT NOT NULL,
-    description	TEXT,
+    sex TEXT NOT NULL,
+    weight INTEGER NOT NULL,
+    height INTEGER NOT NULL,
+    date_of_birth DATE NOT NULL,
     created_on	DATE DEFAULT current_date,
     FOREIGN KEY(user_id) REFERENCES users(user_id),
     PRIMARY KEY(profile_id AUTOINCREMENT)
@@ -25,7 +24,6 @@ CREATE TABLE IF NOT EXISTS profile (
 CREATE TABLE IF NOT EXISTS scan (
     scan_id	INTEGER NOT NULL,
     profile_id	INTEGER NOT NULL,
-    name	TEXT,
     h1_lung	REAL NOT NULL,
     h1_lung_r	REAL NOT NULL,
     h2_heart_constrictor	REAL NOT NULL,
@@ -62,6 +60,3 @@ CREATE TABLE IF NOT EXISTS scan (
     FOREIGN KEY(profile_id) REFERENCES profile(profile_id),
     PRIMARY KEY(scan_id AUTOINCREMENT)
 );
-
-
-
