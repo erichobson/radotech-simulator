@@ -7,12 +7,11 @@
 #define USER_MODEL_H
 
 #include <QString>
-#include <QDate>
 class UserModel {
 
     public:
         UserModel();
-        UserModel(int, const QString&, const QString&, const QString&, int, int, const QDate&, const QString&, const QString&);
+        UserModel(int, const QString&, const QString&, const QString&, const QString&);
         ~UserModel();
 
         int getId() const;
@@ -23,18 +22,6 @@ class UserModel {
 
         QString getLastName() const;
         void setLastName(const QString&);
-
-        QString getSex() const;
-        void setSex(const QString&);
-
-        int getWeight() const;
-        void setWeight(int);
-
-        int getHeight() const;
-        void setHeight(int);
-
-        QDate getDob() const;
-        void setDob(const QDate&);
 
         QString getEmail() const;
         void setEmail(const QString&);
@@ -48,10 +35,6 @@ class UserModel {
         int id;
         QString firstName;
         QString lastName;
-        QString sex;
-        int weight; // kg
-        int height; // cm
-        QDate dob;
         QString email;
         QString passwordHash;
 };

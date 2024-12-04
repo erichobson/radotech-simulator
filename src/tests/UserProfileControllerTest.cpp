@@ -25,7 +25,7 @@ bool UserProfileControllerTest::testCRUD() const {
     qDebug () << "\n\nTesting UserProfileController";
     // Create
     qDebug() << "\nCREATING PROFILE:" << "Test Profile x" <<" ******************";
-    if(!(upc->createProfile(1, "Test Profile x", "Test Profile x Description"))){
+    if(!(upc->createProfile(1, "Test Profile x", "Test Profile x Description", "Male", 55, 185, QDate(2024, 02, 02)))){
         cleanup(profiles);
         return false;
     }
@@ -50,7 +50,7 @@ bool UserProfileControllerTest::testCRUD() const {
         return false;
     } 
 
-    if(!upc->updateProfile(profile.getId(), profile.getUserId(), "Test Profile x Updated", "Test Profile x Description Updated")){
+    if(!upc->updateProfile(profile.getId(), profile.getUserId(), "Test Profile x Updated", "Test Profile x Description Updated", "female", 57, 175, QDate(1999, 03, 03))){
         cleanup(profiles);
         return false;
     }

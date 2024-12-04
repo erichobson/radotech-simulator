@@ -9,8 +9,6 @@
 #include "Test.h"
 #include "UserModel.h"
 #include <QDebug>
-#include <QString>
-#include <QDate>
 
 class UserModelTest : public Test {
 

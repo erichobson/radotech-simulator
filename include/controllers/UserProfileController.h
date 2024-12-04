@@ -23,9 +23,9 @@ public:
     ~UserProfileController();
     bool getProfileByName(int, const QString&, ProfileModel&) const;
     bool getProfiles(int, QVector<ProfileModel*>&) const;
-    bool createProfile(int, const QString&, const QString&);
+    bool createProfile(int, const QString&, const QString&, const QString&, int, int, const QDate&);
     bool createProfile(ProfileModel*);
-    bool updateProfile(int, int, const QString&, const QString&);
+    bool updateProfile(int, int, const QString&, const QString&, const QString&, int, int, const QDate&);
     bool updateProfile(ProfileModel*);
     bool deleteProfile(int);
     bool deleteProfile(ProfileModel*);
