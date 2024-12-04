@@ -24,8 +24,8 @@ bool DatabaseManagerTest::testCRUD() const {
 
     // Create
     qDebug() << "\nCREATING USER " << "Test User 2" <<" ******************";
-    db.execute("INSERT INTO users (first_name, last_name, sex, weight, height, date_of_birth, email, password_hash) VALUES(?,?,?,?,?,?,?,?);", 
-        {"Test", "User2", "male", 75, 185, "2002-02-02", "testuser2@mail.com", "password"}
+    db.execute("INSERT INTO users (first_name, last_name, email, password_hash) VALUES(?,?,?,?);", 
+        {"Test", "User2", "testuser2@mail.com", "password"}
     );
 
     db.query(userQuery, {}, userRes);

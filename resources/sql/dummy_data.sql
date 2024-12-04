@@ -1,27 +1,27 @@
 -- Insert test user if it doesn't exist 
-INSERT INTO users (first_name, last_name, sex, weight, height, date_of_birth, email, password_hash)
-SELECT 'Test', 'User', 'male', 70, 175, '2000-01-01', 'test@mail.com', 'password'
+INSERT INTO users (first_name, last_name, email, password_hash)
+SELECT 'Test', 'User', 'test@mail.com', 'password'
 WHERE NOT EXISTS (SELECT 1 FROM users);
 
 -- Insert profiles for user if the user does not already have profiles
-INSERT INTO profile (user_id, name, description)
-SELECT 1, 'Test Profile 1', 'Test profile 1 desc'
+INSERT INTO profile (user_id, name, description, sex, weight, height, date_of_birth)
+SELECT 1, 'Test Profile 1', 'Test profile 1 desc', 'female', 77, 125, '1999-09-09'
 WHERE NOT EXISTS (SELECT 1 FROM profile WHERE user_id = 1);
 
-INSERT INTO profile (user_id, name, description)
-SELECT 1, 'Test Profile 2', 'Test profile 2 desc'
+INSERT INTO profile (user_id, name, description, sex, weight, height, date_of_birth)
+SELECT 1, 'Test Profile 2', 'Test profile 2 desc', 'male', 55, 186, '2000-01-01'
 WHERE NOT EXISTS (SELECT 1 FROM profile WHERE user_id = 1 AND name = 'Test Profile 2');
 
-INSERT INTO profile (user_id, name, description)
-SELECT 1, 'Test Profile 3', 'Test profile 3 desc'
+INSERT INTO profile (user_id, name, description, sex, weight, height, date_of_birth)
+SELECT 1, 'Test Profile 3', 'Test profile 3 desc', 'male', 88, 144, '2002-02-02'
 WHERE NOT EXISTS (SELECT 1 FROM profile WHERE user_id = 1 AND name = 'Test Profile 3');
 
-INSERT INTO profile (user_id, name, description)
-SELECT 1, 'Test Profile 4', 'Test profile 4 desc'
+INSERT INTO profile (user_id, name, description, sex, weight, height, date_of_birth)
+SELECT 1, 'Test Profile 4', 'Test profile 4 desc', 'female', 65, 200, '1967-07-07'
 WHERE NOT EXISTS (SELECT 1 FROM profile WHERE user_id = 1 AND name = 'Test Profile 4');
 
-INSERT INTO profile (user_id, name, description)
-SELECT 1, 'Test Profile 5', 'Test profile 5 desc'
+INSERT INTO profile (user_id, name, description, sex, weight, height, date_of_birth)
+SELECT 1, 'Test Profile 5', 'Test profile 5 desc', 'male', 45, 100, '1901-03-03'
 WHERE NOT EXISTS (SELECT 1 FROM profile WHERE user_id = 1 AND name = 'Test Profile 5');
 
 -- Insert scan records only if they don't already exist for the given profile

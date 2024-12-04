@@ -7,11 +7,12 @@
 #define PROFILE_MODEL_H
 
 #include <QString>
+#include <QDate>
 class ProfileModel {
 
     public:
         ProfileModel();
-        ProfileModel(int, int, const QString&, const QString& = "");
+        ProfileModel(int, int, const QString&, const QString&, const QString&, int, int, const QDate&);
         ~ProfileModel();
 
         int getId() const;
@@ -25,6 +26,20 @@ class ProfileModel {
 
         QString getDesc() const;
         void setDesc(const QString&);
+        
+        QString getSex() const;
+        void setSex(const QString&);
+
+        int getWeight() const;
+        void setWeight(int);
+        
+        int getHeight() const;
+        void setHeight(int);
+        
+        QDate getDob() const;
+        QString getDobString() const;
+        void setDob(const QDate&);
+
 
         QString toString() const;
 
@@ -33,6 +48,12 @@ class ProfileModel {
         int userId;
         QString name;
         QString desc;
+        QString sex;
+        int weight; // kg
+        int height; // cm
+        QDate dob;
+        
+
 };
 
 #endif

@@ -37,6 +37,10 @@ bool UserProfileController::getProfileByName(int userId, const QString& name, Pr
         profile.setUserId(result.value("user_id").toInt());
         profile.setName(result.value("name").toString());
         profile.setDesc(result.value("description").toString());
+        profile.setSex(result.value("sex").toString());
+        profile.setWeight(result.value("weight").toInt());
+        profile.setHeight(result.value("height").toInt());
+        profile.setDob(result.value("date_of_birth").toDate());
 
         return true;
 
@@ -64,7 +68,11 @@ bool UserProfileController::getProfiles(int userId, QVector<ProfileModel*>& prof
                 result.value("profile_id").toInt(),
                 result.value("user_id").toInt(),
                 result.value("name").toString(),
-                result.value("description").toString()
+                result.value("description").toString(),
+                result.value("sex").toString(),
+                result.value("weight").toInt(),
+                result.value("height").toInt(),
+                result.value("date_of_birth").toDate()
             );
             profiles.append(profile);
         }
@@ -82,9 +90,13 @@ bool UserProfileController::getProfiles(int userId, QVector<ProfileModel*>& prof
  * @param desc the description of the profile 
  * @return true if the operation was successful
  */
-bool UserProfileController::createProfile(int userId, const QString& name, const QString& desc) {
+bool UserProfileController::createProfile(int userId, const QString& name, const QString& desc, const QString& sex, int weight, int height, const QDate& dob) {
     try {
-        db.execute("INSERT INTO profile (user_id, name, description) VALUES (?,?,?);", {userId, name, desc});
+        QString dobString = dob.toString("yyyy-MM-dd");
+        db.execute(
+            "INSERT INTO profile (user_id, name, description, sex, weight, height, date_of_birth) VALUES (?,?,?,?,?,?,?);", 
+            {userId, name, desc, sex, weight, height, dobString}
+        );
         return true;
     } catch(const std::exception& e) {
         qCritical() << "Failed to create profile: " << e.what();
@@ -99,7 +111,10 @@ bool UserProfileController::createProfile(int userId, const QString& name, const
  */
 bool UserProfileController::createProfile(ProfileModel* profile) {
     try {
-        db.execute("INSERT INTO profile (user_id, name, description) VALUES (?,?,?);", {profile->getUserId(), profile->getName(), profile->getDesc()});
+        db.execute(
+            "INSERT INTO profile (user_id, name, description, sex, weight, height, date_of_birth) VALUES (?,?,?,?,?,?,?);", 
+            {profile->getUserId(), profile->getName(), profile->getDesc(), profile->getSex(), profile->getWeight(), profile->getHeight(), profile->getDobString()}
+        );
         return true;
     } catch(const std::exception& e) {
         qCritical() << "Failed to createe profile: " << e.what();
@@ -115,11 +130,12 @@ bool UserProfileController::createProfile(ProfileModel* profile) {
  * @param desc the description to update the profile with 
  * @return true if the operation was successful
  */
-bool UserProfileController::updateProfile(int profileId, int userId, const QString& name, const QString& desc) {
+bool UserProfileController::updateProfile(int profileId, int userId, const QString& name, const QString& desc, const QString& sex, int weight, int height, const QDate& dob) {
     try {
+        QString dobString = dob.toString("yyyy-MM-dd");
         db.execute(
-            "UPDATE profile SET user_id = ?, name = ?, description = ? WHERE profile_id = ?;", 
-            {userId, name, desc, profileId}
+            "UPDATE profile SET user_id = ?, name = ?, description = ?, sex = ?, weight = ?, height = ?, date_of_birth = ? WHERE profile_id = ?;", 
+            {userId, name, desc, sex, weight, height, dobString, profileId}
         );
 
         return true;
@@ -137,8 +153,8 @@ bool UserProfileController::updateProfile(int profileId, int userId, const QStri
 bool UserProfileController::updateProfile(ProfileModel* profile) {
     try {
         db.execute(
-            "UPDATE profile SET user_id = ?, name = ?, description = ? WHERE profile_id = ?;", 
-            {profile->getUserId(), profile->getName(), profile->getDesc(), profile->getId()}
+            "UPDATE profile SET user_id = ?, name = ?, description = ?, sex = ?, weight = ?, height = ?, date_of_birth = ? WHERE profile_id = ?;", 
+            {profile->getUserId(), profile->getName(), profile->getDesc(), profile->getSex(), profile->getWeight(), profile->getHeight(), profile->getDobString(), profile->getId()}
         );
 
         return true;
