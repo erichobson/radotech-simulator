@@ -6,6 +6,9 @@ QT += core gui widgets sql
 CONFIG += c++17
 CONFIG -= app_bundle
 
+CONFIG += debug
+DEFINES += QT_DEBUG
+
 INCLUDEPATH += \
     $$PWD/include \
     $$PWD/include/tests \
