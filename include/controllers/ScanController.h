@@ -17,12 +17,11 @@
 class ScanController {
     public:
         ScanController(DatabaseManager&);
-        void createScan(const QVector<int>&, ProfileModel&, QDate& date);
+        void createScan(const QVector<int>&, ProfileModel&);
         int generateMeasurement(int, int);
         bool storeScan(ScanModel&);
 
     private:
-        static int nextScanID;
         DatabaseManager& db;
 };
 #endif // SCANCONTROLLER_H

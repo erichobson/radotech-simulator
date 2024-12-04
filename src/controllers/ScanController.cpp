@@ -6,48 +6,44 @@
 #include "ScanController.h"
 #include <QRandomGenerator>
 
-int ScanController::nextScanID = 1; // Initialize static variable
 ScanController::ScanController(DatabaseManager& db_) : db(db_) {}
 
-void ScanController::createScan(const QVector<int>& measurements, ProfileModel& profile, QDate& date){
+void ScanController::createScan(const QVector<int>& measurements, ProfileModel& profile){
     ScanModel scan;
 
-    scan.setId(nextScanID++),
-    scan.setProfileId(profile.getId()),
-    scan.setName(profile.getName()),
-    scan.setH1Lung(measurements[0]),
-    scan.setH1LungR(measurements[1]),
-    scan.setH2HeartConstrictor(measurements[2]),
-    scan.setH2HeartConstrictorR(measurements[3]),
-    scan.setH3Heart(measurements[4]),
-    scan.setH3HeartR(measurements[5]),
-    scan.setH4SmallIntestine(measurements[6]),
-    scan.setH4SmallIntestineR(measurements[7]),
-    scan.setH5TripleHeater(measurements[8]),
-    scan.setH5TripleHeaterR(measurements[9]),
-    scan.setH6LargeIntestine(measurements[10]),
-    scan.setH6LargeIntestineR(measurements[11]),
-    scan.setF1Spleen(measurements[12]),
-    scan.setF1SpleenR(measurements[13]),
-    scan.setF2Liver(measurements[14]),
-    scan.setF2LiverR(measurements[15]),
-    scan.setF3Kidney(measurements[16]),
-    scan.setF3KidneyR(measurements[17]),
-    scan.setF4UrinaryBladder(measurements[18]),
-    scan.setF4UrinaryBladderR(measurements[19]),
-    scan.setF5GallBladder(measurements[20]),
-    scan.setF5GallBladderR(measurements[21]),
-    scan.setF6Stomach(measurements[22]),
-    scan.setF6StomachR(measurements[23]),
-    scan.setBodyTemp(measurements[24]),
-    scan.setBloodPressure(measurements[25]),
-    scan.setHeartRate(measurements[26]),
-    scan.setSleepingTime(measurements[27]),
-    scan.setCurrentWeight(measurements[28]),
-    scan.setEmotionalState(measurements[29]),
-    scan.setOverallFeeling(measurements[30]),
-    scan.setCreatedOn(date);
-    //scan.setNotes(); low priority
+    scan.setProfileId(profile.getId());
+    scan.setName(profile.getName());
+    scan.setH1Lung(measurements[0]);
+    scan.setH1LungR(measurements[1]);
+    scan.setH2HeartConstrictor(measurements[2]);
+    scan.setH2HeartConstrictorR(measurements[3]);
+    scan.setH3Heart(measurements[4]);
+    scan.setH3HeartR(measurements[5]);
+    scan.setH4SmallIntestine(measurements[6]);
+    scan.setH4SmallIntestineR(measurements[7]);
+    scan.setH5TripleHeater(measurements[8]);
+    scan.setH5TripleHeaterR(measurements[9]);
+    scan.setH6LargeIntestine(measurements[10]);
+    scan.setH6LargeIntestineR(measurements[11]);
+    scan.setF1Spleen(measurements[12]);
+    scan.setF1SpleenR(measurements[13]);
+    scan.setF2Liver(measurements[14]);
+    scan.setF2LiverR(measurements[15]);
+    scan.setF3Kidney(measurements[16]);
+    scan.setF3KidneyR(measurements[17]);
+    scan.setF4UrinaryBladder(measurements[18]);
+    scan.setF4UrinaryBladderR(measurements[19]);
+    scan.setF5GallBladder(measurements[20]);
+    scan.setF5GallBladderR(measurements[21]);
+    scan.setF6Stomach(measurements[22]);
+    scan.setF6StomachR(measurements[23]);
+    scan.setBodyTemp(measurements[24]);
+    scan.setBloodPressure(measurements[25]);
+    scan.setHeartRate(measurements[26]);
+    scan.setSleepingTime(measurements[27]);
+    scan.setCurrentWeight(measurements[28]);
+    scan.setEmotionalState(measurements[29]);
+    scan.setOverallFeeling(measurements[30]);
 
     this->storeScan(scan);
 }
@@ -60,7 +56,6 @@ bool ScanController::storeScan(ScanModel& scan) {
    try{
         db.execute("INSERT INTO scan VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                   {
-                       scan.getId(),
                        scan.getProfileId(),
                        scan.getName(),
                        scan.getH1Lung(),
@@ -94,8 +89,6 @@ bool ScanController::storeScan(ScanModel& scan) {
                        scan.getCurrentWeight(),
                        scan.getEmotionalState(),
                        scan.getOverallFeeling(),
-                       scan.getCreatedOn(),
-                       scan.getNotes()
                    }
             );
         return true;
