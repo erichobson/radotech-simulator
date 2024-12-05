@@ -17,6 +17,7 @@
 #include "Test.h"
 #include "UserModelTest.h"
 #include "UserProfileControllerTest.h"
+#include "UserControllerTest.h"
 #endif
 
 /**
@@ -37,7 +38,9 @@ int main(int argc, char* argv[]) {
     QVector<Test*> tests = {
         new DatabaseManagerTest(db),      new UserModelTest(),
         new ProfileModelTest(),           new ScanModelTest(),
-        new HealthMetricCalculatorTest(), new UserProfileControllerTest(db)};
+        new HealthMetricCalculatorTest(), new UserProfileControllerTest(db),
+        new UserControllerTest(db)
+    };
 
     // Run & delete tests
     for (const auto* test : tests) {
