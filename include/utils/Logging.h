@@ -17,16 +17,18 @@
  * @brief Logging macros with file, line, and function information
  *
  * These macros provide different levels of logging with consistent formatting:
- * - DEBUG:   Development-time debugging information
+ * - DEBUG:   Development-time debugging information (only in debug builds)
  * - INFO:    General information about program execution
  * - WARNING: Potentially harmful situations
  * - ERROR:   Error conditions but program can continue
  * - FATAL:   Severe errors that prevent program continuation
  */
 
+#ifdef QT_DEBUG
 #define DEBUG(msg)                                                      \
     qDebug().nospace() << "[DEBUG] " << __FILENAME__ << ":" << __LINE__ \
                        << " - " << __FUNCTION__ << ": " << msg
+#endif
 
 #define INFO(msg)                                                              \
     qInfo().nospace() << "[INFO] " << __FILENAME__ << ":" << __LINE__ << " - " \

@@ -17,7 +17,6 @@
 #include <QWidget>
 
 #include "ClickableLabel.h"
-#include "DatabaseManager.h"
 #include "DeviceImageWidget.h"
 #include "HistoryWidget.h"
 #include "HomeWidget.h"
@@ -37,11 +36,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setMinimumSize(1200, 800);
 
     // Initialize the database
-    DatabaseManager db;
+    loggedInUserId = 1;
 
     // Initialize controllers
+    databaseManager = new DatabaseManager();
     deviceController = new DeviceController(this);
-    // ...
+    userProfileController = new UserProfileController(*databaseManager);
     // ...
     // ...
     // Initialize other controllers
@@ -196,22 +196,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     contentCardLayout->addWidget(contentStackedWidget);
 
     // Create the content widgets
-    MeasureNowWidget *measureNowWidget = new MeasureNowWidget;
-    measureNowWidget->setDeviceController(deviceController);
-    // TODO: Implement measureNowWidget interface
+    MeasureNowWidget *measureNowWidget = new MeasureNowWidget(
+        this, deviceController, userProfileController, loggedInUserId);
 
     HomeWidget *homeWidget = new HomeWidget;
-    // TODO: Implement homeWidget interface
 
     ProfilesWidget *profilesWidget = new ProfilesWidget;
-    // TODO: Implement profilesWidget interface
+    profilesWidget->setUserProfileController(userProfileController);
+    profilesWidget->setStyleSheet("background-color: transparent;");
+    profilesWidget->setUserId(loggedInUserId);
 
     HistoryWidget *historyWidget = new HistoryWidget;
-    // TODO: Implement historyWidget interface
 
     LearningMaterialsWidget *learningMaterialsWidget =
         new LearningMaterialsWidget;
-    // TODO: Implement learningMaterialsWidget interface
 
     // Add the widgets to the contentStackedWidget
     contentStackedWidget->addWidget(measureNowWidget);         // Index 0
@@ -219,6 +217,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     contentStackedWidget->addWidget(profilesWidget);           // Index 2
     contentStackedWidget->addWidget(historyWidget);            // Index 3
     contentStackedWidget->addWidget(learningMaterialsWidget);  // Index 4
+
+    // Connect the stacked widget's current changed signal
+    connect(contentStackedWidget, &QStackedWidget::currentChanged,
+            [contentCardWidget](int index) {
+                if (index == 2) {  // ProfilesWidget
+                    contentCardWidget->setStyleSheet(
+                        "background-color: transparent; border-radius: 10px;");
+                } else {
+                    contentCardWidget->setStyleSheet(
+                        "background-color: white; border-radius: 10px;");
+                }
+            });
 
     // Create the device image widget
     QPixmap devicePixmap(":/images/radotech_device.png");
@@ -284,6 +294,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
             measureNowWidget, &MeasureNowWidget::startCountdown);
     connect(deviceImageLabel, &DeviceImageWidget::imageReleased,
             measureNowWidget, &MeasureNowWidget::onImageReleased);
+    connect(profilesWidget, &ProfilesWidget::profilesChanged, measureNowWidget,
+            &MeasureNowWidget::refreshProfiles);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {

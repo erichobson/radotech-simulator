@@ -1,4 +1,0 @@
-/**
- * @file BatteryModel.cpp
- * @brief
- */
