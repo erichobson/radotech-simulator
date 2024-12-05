@@ -11,6 +11,8 @@
 #include "DeviceController.h"
 #include "Logging.h"
 #include "ProfileModel.h"
+#include "ResultsWidget.h"
+#include "ScanController.h"
 #include "UserProfileController.h"
 
 namespace {
@@ -20,13 +22,11 @@ namespace {
  * These constants define the CSS-style formatting for various UI elements
  * including buttons, input fields, and combo boxes.
  */
-
-// Button styling with hover and pressed states
 const QString BUTTON_STYLE = R"(
         QPushButton {
             background-color: #FF7009;
             color: white;
-            border-radius: 20px;
+            border-radius: 10px;
             padding: 5px 20px;
             font-size: 16px;
         }
@@ -38,29 +38,29 @@ const QString BUTTON_STYLE = R"(
         }
     )";
 
-// Input field styling for date and time editors
 const QString INPUT_STYLE =
-    "QDateEdit, QTimeEdit {"
+    "QDateEdit, QTimeEdit, QDoubleSpinBox, QSpinBox {"
     "    background-color: white;"
+    "    color: #333333;"
     "    border: 2px solid #E0E0E0;"
     "    border-radius: 6px;"
     "    padding: 8px;"
     "    font-size: 14px;"
     "    min-width: 100px;"
-    "    color: #333333;"
     "}"
-    "QDateEdit:hover, QTimeEdit:hover {"
+    "QDateEdit:hover, QTimeEdit:hover, QDoubleSpinBox:hover, QSpinBox:hover {"
     "    border-color: #FF7009;"
     "}"
     "QDateEdit::up-button, QDateEdit::down-button,"
-    "QTimeEdit::up-button, QTimeEdit::down-button {"
+    "QTimeEdit::up-button, QTimeEdit::down-button,"
+    "QDoubleSpinBox::up-button, QDoubleSpinBox::down-button,"
+    "QSpinBox::up-button, QSpinBox::down-button {"
     "    width: 0px;"
     "    height: 0px;"
     "    border: none;"
     "    image: none;"
     "}";
 
-// Combo box styling with custom dropdown appearance
 const QString COMBOBOX_STYLE =
     "QComboBox {"
     "    background-color: white;"
@@ -111,7 +111,6 @@ void BackgroundDelegate::paint(QPainter* painter,
     QStyleOptionViewItem opt = option;
     initStyleOption(&opt, index);
 
-    // Set custom colors for hover and selection states
     if (opt.state & QStyle::State_MouseOver ||
         opt.state & QStyle::State_Selected) {
         opt.backgroundBrush = QBrush(QColor("#FF7009"));
@@ -131,9 +130,10 @@ void BackgroundDelegate::paint(QPainter* painter,
 MeasureNowWidget::MeasureNowWidget(QWidget* parent,
                                    DeviceController* deviceController,
                                    UserProfileController* userProfileController,
-                                   int userId)
+                                   ScanController* scanController, int userId)
     : QWidget(parent),
       profileController(userProfileController),
+      scanController(scanController),
       currentUserId(userId),
       deviceController(deviceController),
       countdownTimer(nullptr),
@@ -144,13 +144,11 @@ MeasureNowWidget::MeasureNowWidget(QWidget* parent,
     INFO("Initializing MeasureNowWidget");
 
     try {
-        // Create and validate main layout
         auto* mainLayout = new QVBoxLayout(this);
         if (!mainLayout) {
             throw std::runtime_error("Failed to create main layout");
         }
 
-        // Initialize and configure stacked widget
         stackedWidget = new QStackedWidget(this);
         if (!stackedWidget) {
             throw std::runtime_error("Failed to create stacked widget");
@@ -167,7 +165,7 @@ MeasureNowWidget::MeasureNowWidget(QWidget* parent,
         if (!countdownTimer) {
             throw std::runtime_error("Failed to create countdown timer");
         }
-        countdownTimer->setInterval(1000);  // 1 second interval
+        countdownTimer->setInterval(1000);
         connect(countdownTimer, &QTimer::timeout, this,
                 &MeasureNowWidget::updateCountdown);
 
@@ -211,6 +209,35 @@ MeasureNowWidget::MeasureNowWidget(QWidget* parent,
 }
 
 /**
+ * @brief Creates the results page placeholder
+ */
+void MeasureNowWidget::createResultsPage() {
+    DEBUG("Creating results page");
+
+    resultsWidget = new ResultsWidget(this);
+
+    stackedWidget->addWidget(resultsWidget);
+    DEBUG("Results page created successfully");
+}
+
+/**
+ * @brief Displays the measurement results in the results page
+ */
+void MeasureNowWidget::displayResults() {
+    DEBUG("Displaying results");
+    DEBUG("Number of calculated results: " << calculatedResults.size());
+
+    updateButtonState();
+
+    if (!resultsWidget) {
+        ERROR("ResultsWidget is not initialized");
+        return;
+    }
+
+    stackedWidget->setCurrentWidget(resultsWidget);
+}
+
+/**
  * @brief Initializes all UI components and their layouts
  * @param mainLayout The main layout to add components to
  */
@@ -223,49 +250,47 @@ void MeasureNowWidget::initializeUIComponents(QVBoxLayout* mainLayout) {
     DEBUG("Beginning UI components initialization");
 
     try {
-        // Initialize and configure start/stop button
-        startStopButton = new QPushButton("Start Measurement");
-        if (!startStopButton) {
-            throw std::runtime_error("Failed to create start/stop button");
-        }
-        startStopButton->setStyleSheet(BUTTON_STYLE);
-        startStopButton->setMinimumHeight(40);
-        startStopButton->setFixedWidth(200);
+        QWidget* bottomContainer = new QWidget;
+        QVBoxLayout* bottomLayout = new QVBoxLayout(bottomContainer);
+        bottomLayout->setContentsMargins(0, 0, 0, 10);
+        bottomLayout->setSpacing(5);
 
-        if (!connect(startStopButton, &QPushButton::clicked, this,
-                     &MeasureNowWidget::onStartStopButtonClicked)) {
-            WARNING("Failed to connect start/stop button signal");
-        }
-
-        // Initialize alert container and layout
         auto* alertContainer = new QWidget;
-        alertContainer->setFixedHeight(45);
+        alertContainer->setFixedHeight(30);
         auto* alertLayout = new QHBoxLayout(alertContainer);
         alertLayout->setContentsMargins(0, 0, 0, 0);
 
-        // Configure alert label with styling
         alertLabel = new QLabel("");
         alertLabel->setStyleSheet(
             "QLabel { "
             "    font-size: 11px; "
             "    color: white; "
             "    background-color: #FF4444; "
-            "    border-radius: 15px; "
-            "    padding: 8px 25px; "
-            "    height: 30px; "
+            "    border-radius: 10px; "
+            "    padding: 5px 20px; "
             "    margin: 0px; "
             "}");
         alertLabel->setAlignment(Qt::AlignCenter);
         alertLabel->setWordWrap(false);
-        alertLabel->setFixedHeight(30);
+        alertLabel->setFixedHeight(25);
         alertLabel->setVisible(false);
 
         alertLayout->addWidget(alertLabel, 0, Qt::AlignCenter);
 
-        // Add components to main layout
+        startStopButton = new QPushButton("Start Measurement");
+        startStopButton->setStyleSheet(BUTTON_STYLE);
+        startStopButton->setFixedSize(200, 35);
+
+        if (!connect(startStopButton, &QPushButton::clicked, this,
+                     &MeasureNowWidget::onStartStopButtonClicked)) {
+            WARNING("Failed to connect start/stop button signal");
+        }
+
+        bottomLayout->addWidget(alertContainer, 0, Qt::AlignCenter);
+        bottomLayout->addWidget(startStopButton, 0, Qt::AlignCenter);
+
         mainLayout->addStretch(1);
-        mainLayout->addWidget(alertContainer, 0, Qt::AlignCenter);
-        mainLayout->addWidget(startStopButton, 0, Qt::AlignCenter);
+        mainLayout->addWidget(bottomContainer);
 
         DEBUG("UI components initialized successfully");
     } catch (const std::exception& e) {
@@ -310,19 +335,17 @@ void MeasureNowWidget::setupPages() {
     DEBUG("Setting up pages");
 
     try {
-        // Create intro page
         createIntroPage();
 
-        // Create measurement pages
         for (int i = 1; i <= TOTAL_SCAN_PAGES; ++i) {
             createScanPage(i);
             DEBUG("Created scan page " << i);
         }
 
-        // Create results page
+        createPostScanInputPage();
         createResultsPage();
-
         INFO("Successfully set up all pages");
+
     } catch (const std::exception& e) {
         ERROR("Failed to setup pages: " << e.what());
     }
@@ -334,107 +357,97 @@ void MeasureNowWidget::setupPages() {
 void MeasureNowWidget::createIntroPage() {
     DEBUG("Creating intro page");
 
-    // Setup main page layout
     auto* introPage = new QWidget;
     auto* layout = new QVBoxLayout(introPage);
     layout->setContentsMargins(40, 40, 40, 40);
     layout->setSpacing(30);
 
-    // Create main container with styling
     auto* contentContainer = new QWidget;
     contentContainer->setObjectName("contentContainer");
     contentContainer->setStyleSheet(
         "#contentContainer {"
         "    background-color: white;"
         "    border-radius: 10px;"
+        "    border: 1px solid #E0E0E0;"
         "}");
 
     auto* containerLayout = new QVBoxLayout(contentContainer);
-    containerLayout->setSpacing(25);
-    containerLayout->setContentsMargins(30, 30, 30, 30);
+    containerLayout->setSpacing(30);
+    containerLayout->setContentsMargins(40, 40, 40, 40);
 
-    // Setup header section
-    auto* headerContainer = new QWidget;
-    auto* headerLayout = new QHBoxLayout(headerContainer);
-    headerLayout->setContentsMargins(0, 0, 0, 0);
-
-    auto* headerLabel = new QLabel("RaDoTech Simulation");
+    auto* headerLabel = new QLabel("New Measurement");
     headerLabel->setStyleSheet(
-        "font-size: 28px;"
+        "font-size: 32px;"
         "font-weight: bold;"
         "color: #333333;");
-    headerLayout->addWidget(headerLabel, 0, Qt::AlignCenter);
+    headerLabel->setAlignment(Qt::AlignCenter);
 
-    // Setup introduction section
     auto* introContainer = new QWidget;
     introContainer->setStyleSheet(
         "background-color: #F8F9FA;"
-        "border-radius: 10px;"
-        "padding: 20px;");
+        "border-radius: 15px;"
+        "padding: 30px;");
 
     auto* introLayout = new QVBoxLayout(introContainer);
+    introLayout->setSpacing(20);
 
-    auto* introTitle = new QLabel("Before You Begin:");
-    introTitle->setStyleSheet(
-        "font-size: 16px;"
+    QVector<QString> instructions = {
+        "Ensure your device is powered on and connected",
+        "Hold the device steady at each measurement point",
+        "Wait for the measurement to complete",
+        "Complete all 24 measurement points in sequence",
+        "Follow the on-screen instructions carefully"};
+
+    for (const auto& instruction : instructions) {
+        auto* stepLabel = new QLabel("• " + instruction);
+        stepLabel->setStyleSheet(
+            "font-size: 16px;"
+            "color: #555555;"
+            "padding: 0px 0px;");
+        introLayout->addWidget(stepLabel);
+    }
+
+    auto* profileContainer = new QWidget;
+    auto* profileLayout = new QVBoxLayout(profileContainer);
+    profileLayout->setSpacing(15);
+
+    auto* profileLabel = new QLabel("Select Profile:");
+    profileLabel->setStyleSheet(
+        "font-size: 18px;"
         "font-weight: bold;"
-        "color: #FF7009;");
+        "color: #333333;");
 
-    auto* introText = new QLabel(
-        "• Ensure your device is powered on and connected\n"
-        "• Hold the device steady at each measurement point\n"
-        "• Wait for the measurement to complete\n"
-        "• Complete all 24 measurement points in sequence\n"
-        "• Tap the battery percentage to recharge if needed");
-    introText->setStyleSheet(
-        "font-size: 15px;"
-        "color: #555555;"
-        "line-height: 1.8;");
-    introText->setWordWrap(true);
-
-    introLayout->addWidget(introTitle);
-    introLayout->addWidget(introText);
-
-    // Setup form section
-    auto* formContainer = new QWidget;
-    auto* formLayout = new QFormLayout(formContainer);
-    formLayout->setSpacing(15);
-    formLayout->setContentsMargins(0, 0, 0, 0);
-
-    // Create and setup form controls
     profileComboBox = new QComboBox();
     profileComboBox->setStyleSheet(COMBOBOX_STYLE);
     profileComboBox->setItemDelegate(new BackgroundDelegate(profileComboBox));
+    profileComboBox->setMinimumHeight(45);
 
-    // Add profile selection changed handler
     connect(
         profileComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
         this, [this](int index) {
             selectedProfileId = profileComboBox->itemData(index).toInt();
+            emit profileSelected(selectedProfileId, "Name");
             DEBUG(QString("Selected profile ID: %1").arg(selectedProfileId));
         });
 
     populateProfileList(profileComboBox);
 
-    dateEdit = new QDateEdit(QDate::currentDate());
-    dateEdit->setStyleSheet(INPUT_STYLE);
+    profileLayout->addWidget(profileLabel);
+    profileLayout->addWidget(profileComboBox);
 
-    // Add form fields with styled labels
-    QString labelStyle = "font-weight: bold; color: #333333; font-size: 14px;";
-    auto addFormRow = [&](const QString& labelText, QWidget* widget) {
-        auto* label = new QLabel(labelText);
-        label->setStyleSheet(labelStyle);
-        formLayout->addRow(label, widget);
-    };
-
-    addFormRow("Profile:", profileComboBox);
-    addFormRow("Date:", dateEdit);
-
-    // Assemble all sections
-    containerLayout->addWidget(headerContainer);
+    containerLayout->addWidget(headerLabel);
     containerLayout->addWidget(introContainer);
-    containerLayout->addWidget(formContainer);
+    containerLayout->addWidget(profileContainer);
     containerLayout->addStretch();
+
+    auto* noteLabel =
+        new QLabel("Make sure to hold the device until scan is complete");
+    noteLabel->setStyleSheet(
+        "font-size: 14px;"
+        "color: #666666;"
+        "font-style: italic;");
+    noteLabel->setAlignment(Qt::AlignCenter);
+    containerLayout->addWidget(noteLabel);
 
     layout->addWidget(contentContainer);
     stackedWidget->addWidget(introPage);
@@ -450,133 +463,125 @@ void MeasureNowWidget::createScanPage(int pageNum) {
     DEBUG("Creating scan page " << pageNum);
 
     auto* scanPage = new QWidget;
+    scanPage->setStyleSheet("background-color: white;");
     auto* layout = new QVBoxLayout(scanPage);
-    layout->setContentsMargins(10, 10, 10, 10);
-    layout->setSpacing(10);
+    layout->setContentsMargins(40, 40, 40, 40);
+    layout->setSpacing(30);
 
-    // Calculate side and image index
+    auto* contentContainer = new QWidget;
+    contentContainer->setObjectName("contentContainer");
+    contentContainer->setStyleSheet(
+        "#contentContainer {"
+        "    background-color: white;"
+        "    border-radius: 10px;"
+        "    border: 1px solid #E0E0E0;"
+        "}");
+
+    auto* containerLayout = new QVBoxLayout(contentContainer);
+    containerLayout->setSpacing(25);
+    containerLayout->setContentsMargins(30, 30, 30, 30);
+
     bool isRightSide = pageNum > MEASUREMENTS_PER_SIDE;
     int imageIndex =
         isRightSide ? (pageNum - MEASUREMENTS_PER_SIDE - 1) : (pageNum - 1);
-
-    // Create and style page header
     QString sideText = isRightSide ? "Right" : "Left";
-    auto* pageLabel = new QLabel(
-        QString("Scan Point %1 of %2 (%3 Side)")
+
+    auto* headerContainer = new QWidget;
+    headerContainer->setFixedHeight(40);
+    auto* headerLayout = new QHBoxLayout(headerContainer);
+    headerLayout->setContentsMargins(0, 0, 0, 0);
+
+    QString progressText =
+        QString("Point %1 of %2")
             .arg(isRightSide ? pageNum - MEASUREMENTS_PER_SIDE : pageNum)
-            .arg(MEASUREMENTS_PER_SIDE)
-            .arg(sideText));
-    pageLabel->setStyleSheet(
-        "QLabel { "
-        "    font-size: 20px; "
-        "    color: #333333; "
-        "    font-weight: bold; "
-        "}");
-    pageLabel->setAlignment(Qt::AlignCenter);
+            .arg(MEASUREMENTS_PER_SIDE);
+    auto* progressLabel = new QLabel(progressText);
+    progressLabel->setStyleSheet(
+        "font-size: 16px;"
+        "color: #666666;");
 
-    // Create status indicator container
-    auto* statusContainer = new QWidget;
-    statusContainer->setStyleSheet(
-        "QWidget { "
-        "    background-color: #F5F5F5; "
-        "    border-radius: 15px; "
-        "    padding: 8px 20px; "
-        "}");
-    statusContainer->setFixedHeight(45);
+    auto* sideLabel = new QLabel(sideText + " Side");
+    sideLabel->setStyleSheet(
+        "font-size: 16px;"
+        "font-weight: bold;"
+        "color: #333333;");
 
-    auto* statusLayout = new QHBoxLayout(statusContainer);
-    statusLayout->setContentsMargins(15, 0, 15, 0);
+    headerLayout->addWidget(progressLabel);
+    headerLayout->addStretch();
+    headerLayout->addWidget(sideLabel);
 
-    // Create and style status label
-    auto* statusLabel = new QLabel("Place device on measurement point");
-    statusLabel->setStyleSheet(
-        "QLabel { "
-        "    font-size: 16px; "
-        "    color: #666666; "
-        "}");
-    statusLabel->setAlignment(Qt::AlignCenter);
-    countdownLabels.append(statusLabel);
+    QWidget* imageContainer = new QWidget;
+    QVBoxLayout* imageLayout = new QVBoxLayout(imageContainer);
+    imageLayout->setContentsMargins(0, 0, 0, 0);
+    imageLayout->setAlignment(Qt::AlignCenter);
 
-    statusLayout->addWidget(statusLabel);
-
-    // Custom image label class for handling resizing
-    class ResizableImageLabel : public QLabel {
-       public:
-        explicit ResizableImageLabel(QWidget* parent = nullptr)
-            : QLabel(parent) {
-            setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-            setMinimumSize(600, 400);
-            setAlignment(Qt::AlignCenter);
-        }
-
-        void setOriginalPixmap(const QPixmap& pixmap) {
-            originalPixmap = pixmap;
-            updatePixmap();
-        }
-
-       protected:
-        void resizeEvent(QResizeEvent* event) override {
-            QLabel::resizeEvent(event);
-            updatePixmap();
-        }
-
-       private:
-        QPixmap originalPixmap;
-        void updatePixmap() {
-            if (!originalPixmap.isNull()) {
-                setPixmap(originalPixmap.scaled(
-                    size() * 0.95,  // 95% of available space
-                    Qt::KeepAspectRatio, Qt::SmoothTransformation));
-            }
-        }
-    };
-
-    // Setup measurement point image
-    auto* imageLabel = new ResizableImageLabel();
+    auto* imageLabel = new QLabel();
+    imageLabel->setAlignment(Qt::AlignCenter);
+    imageLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    imageLabel->setObjectName("scanImageLabel");
+    imageLabel->setMinimumSize(200, 200);
 
     if (imageIndex >= 0 && imageIndex < imagePaths.size()) {
         QPixmap originalPixmap(imagePaths.at(imageIndex));
         if (!originalPixmap.isNull()) {
             if (isRightSide) {
-                // Mirror image for right side measurements
                 originalPixmap =
                     originalPixmap.transformed(QTransform().scale(-1, 1));
             }
-            imageLabel->setOriginalPixmap(originalPixmap);
-        } else {
-            WARNING("Failed to load image for scan page " << pageNum);
+            originalPixmaps[pageNum] = originalPixmap;
+
+            QSize initialSize(400, 400);
+            imageLabel->setPixmap(originalPixmap.scaled(
+                initialSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         }
     }
 
-    // Assemble page layout
-    layout->addWidget(pageLabel);
-    layout->addWidget(imageLabel, 1);
-    layout->addWidget(statusContainer);
+    imageLayout->addWidget(imageLabel, 0, Qt::AlignCenter);
 
+    auto* statusContainer = new QWidget;
+    statusContainer->setFixedHeight(100);
+    statusContainer->setStyleSheet(
+        "QWidget {"
+        "    background-color: #F8F9FA;"
+        "    border-radius: 10px;"
+        "}");
+
+    auto* statusLayout = new QVBoxLayout(statusContainer);
+    statusLayout->setContentsMargins(20, 15, 20, 15);
+
+    auto* instructionLabel = new QLabel("Place device on highlighted point");
+    instructionLabel->setStyleSheet(
+        "font-size: 15px;"
+        "color: #666666;");
+    instructionLabel->setAlignment(Qt::AlignCenter);
+
+    auto* statusLabel = new QLabel("Waiting for measurement...");
+    statusLabel->setStyleSheet(
+        "font-size: 16px;"
+        "font-weight: bold;"
+        "color: #333333;");
+    statusLabel->setAlignment(Qt::AlignCenter);
+    countdownLabels.append(statusLabel);
+
+    statusLayout->addWidget(instructionLabel);
+    statusLayout->addWidget(statusLabel);
+
+    containerLayout->addWidget(headerContainer);
+    containerLayout->addWidget(imageContainer, 1);
+    containerLayout->addWidget(statusContainer);
+
+    layout->addWidget(contentContainer);
     stackedWidget->addWidget(scanPage);
+
+    QTimer::singleShot(0, [this, pageNum]() { adjustImageSize(pageNum); });
+
     DEBUG("Scan page " << pageNum << " created successfully");
-}
-
-/**
- * @brief Creates the results page placeholder
- */
-void MeasureNowWidget::createResultsPage() {
-    DEBUG("Creating results page");
-
-    auto* resultsPage = new QWidget;
-    auto* layout = new QVBoxLayout(resultsPage);
-    layout->setContentsMargins(20, 20, 20, 20);
-    layout->setSpacing(15);
-
-    stackedWidget->addWidget(resultsPage);
-    DEBUG("Results page created successfully");
 }
 
 /**
  * @brief Initiates the measurement countdown process
  */
 void MeasureNowWidget::startCountdown() {
-    // Validate current page and state
     int currentIndex = stackedWidget->currentIndex();
     bool isOnScanPage =
         currentIndex > 0 && currentIndex < stackedWidget->count() - 1;
@@ -600,7 +605,6 @@ void MeasureNowWidget::startCountdown() {
     DEBUG("Starting new measurement");
     resetState();
 
-    // Update UI for measurement
     int scanPageIndex = currentIndex - 1;
     if (scanPageIndex >= 0 && scanPageIndex < countdownLabels.size()) {
         countdownLabels[scanPageIndex]->setText("Measuring...");
@@ -637,7 +641,6 @@ void MeasureNowWidget::receiveData(int data) {
     int currentPage = stackedWidget->currentIndex();
     DEBUG("Current page: " << currentPage);
 
-    // Store measurement data
     ScanPoint scanPoint{currentPage, data};
     rawMeasurements.append(scanPoint);
     DEBUG("Total measurements collected: " << rawMeasurements.size());
@@ -647,7 +650,6 @@ void MeasureNowWidget::receiveData(int data) {
 
 /**
  * @brief Processes all collected measurements and calculates final results
- * TODO: Configure where the measurements are processed and stored to database
  */
 void MeasureNowWidget::processMeasurements() {
     if (selectedProfileId == -1) {
@@ -656,47 +658,79 @@ void MeasureNowWidget::processMeasurements() {
     }
 
     DEBUG("Processing measurements");
-    DEBUG("Total raw measurements: " << rawMeasurements.size());
-    DEBUG("Number of measurement labels: " << measurementLabels.size());
 
-    calculatedResults.clear();
-
-    // Log raw measurements for debugging
-    for (const auto& scan : rawMeasurements) {
-        DEBUG("Raw measurement - Position: " << scan.position
-                                             << ", Value: " << scan.rawValue);
+    if (rawMeasurements.size() != TOTAL_SCAN_PAGES) {
+        ERROR("Not all measurements have been collected");
+        return;
     }
 
-    // Calculate results for each measurement area
-    for (int i = 0; i < MEASUREMENTS_PER_SIDE; ++i) {
-        int leftValue = -1;
-        int rightValue = -1;
+    ScanModel scanModel;
+    scanModel.setProfileId(selectedProfileId);
 
-        // Find corresponding left and right measurements
-        for (const auto& scan : rawMeasurements) {
-            if (scan.position == i + 1) {  // Left side (1-12)
-                leftValue = scan.rawValue;
-            }
-            if (scan.position ==
-                i + MEASUREMENTS_PER_SIDE + 1) {  // Right side (13-24)
-                rightValue = scan.rawValue;
-            }
-        }
+    QVector<int> measurements(TOTAL_SCAN_PAGES);  // 24 measurements
 
-        // TODO: Determine proper values using calculator
-        // Calculate and store mean value
-        if (leftValue != -1 && rightValue != -1) {
-            int meanValue = (leftValue + rightValue) / 2;
-            QString label = measurementLabels[i];
-            calculatedResults[label] = meanValue;
-            DEBUG("Processed " << label << ": Left=" << leftValue << ", Right="
-                               << rightValue << ", Mean=" << meanValue);
-        } else {
-            DEBUG("Missing measurement for point "
-                  << (i + 1) << " (Left=" << leftValue
-                  << ", Right=" << rightValue << ")");
-        }
+    std::sort(rawMeasurements.begin(), rawMeasurements.end(),
+              [](const ScanPoint& a, const ScanPoint& b) {
+                  return a.position < b.position;
+              });
+
+    for (int i = 0; i < rawMeasurements.size(); ++i) {
+        measurements[i] = rawMeasurements[i].rawValue;
     }
+
+    scanModel.setName("Name");
+
+    // Left Side Measurements (positions 1-12)
+    scanModel.setH1Lung(measurements[0]);              // Lungs (Left)
+    scanModel.setH2HeartConstrictor(measurements[1]);  // Pericardium (Left)
+    scanModel.setH3Heart(measurements[2]);             // Heart (Left)
+    scanModel.setH4SmallIntestine(measurements[3]);    // Small Intestine (Left)
+    scanModel.setH5TripleHeater(measurements[4]);      // Immune System (Left)
+    scanModel.setH6LargeIntestine(measurements[5]);    // Large Intestine (Left)
+    scanModel.setF1Spleen(measurements[6]);  // Pancreas and Spleen (Left)
+    scanModel.setF2Liver(measurements[7]);   // Liver (Left)
+    scanModel.setF3Kidney(measurements[8]);  // Kidney (Left)
+    scanModel.setF4UrinaryBladder(measurements[9]);  // Bladder (Left)
+    scanModel.setF5GallBladder(measurements[10]);    // Gallbladder (Left)
+    scanModel.setF6Stomach(measurements[11]);        // Stomach (Left)
+
+    // Right Side Measurements (positions 13-24)
+    scanModel.setH1LungR(measurements[12]);              // Lungs (Right)
+    scanModel.setH2HeartConstrictorR(measurements[13]);  // Pericardium (Right)
+    scanModel.setH3HeartR(measurements[14]);             // Heart (Right)
+    scanModel.setH4SmallIntestineR(
+        measurements[15]);                           // Small Intestine (Right)
+    scanModel.setH5TripleHeaterR(measurements[16]);  // Immune System (Right)
+    scanModel.setH6LargeIntestineR(
+        measurements[17]);                     // Large Intestine (Right)
+    scanModel.setF1SpleenR(measurements[18]);  // Pancreas and Spleen (Right)
+    scanModel.setF2LiverR(measurements[19]);   // Liver (Right)
+    scanModel.setF3KidneyR(measurements[20]);  // Kidney (Right)
+    scanModel.setF4UrinaryBladderR(measurements[21]);  // Bladder (Right)
+    scanModel.setF5GallBladderR(measurements[22]);     // Gallbladder (Right)
+    scanModel.setF6StomachR(measurements[23]);         // Stomach (Right)
+
+    scanModel.setMeasurements(measurements);
+
+    scanModel.setBodyTemp(bodyTemp);
+    scanModel.setBloodPressure(bloodPressure);
+    scanModel.setHeartRate(heartRate);
+    scanModel.setSleepingTime(sleepingTime);
+    scanModel.setCurrentWeight(currentWeight);
+    scanModel.setEmotionalState(emotionalState);
+    scanModel.setOverallFeeling(overallFeeling);
+
+    if (!scanController->storeScan(scanModel)) {
+        ERROR("Failed to store the scan");
+        return;
+    }
+
+    if (!resultsWidget) {
+        resultsWidget = new ResultsWidget(this);
+        stackedWidget->addWidget(resultsWidget);
+    }
+    resultsWidget->setShowBackButton(false);
+    resultsWidget->setScanModel(scanModel);
 
     displayResults();
 }
@@ -735,13 +769,12 @@ void MeasureNowWidget::onStartStopButtonClicked() {
             return;
         }
 
-        // Start connection monitoring when beginning measurements
         if (connectionTimer) {
             connectionTimer->start();
         }
         nextPage();
+
     } else {
-        // Stop monitoring when returning to intro page
         if (connectionTimer) {
             connectionTimer->stop();
         }
@@ -753,13 +786,11 @@ void MeasureNowWidget::onStartStopButtonClicked() {
  * @brief Handles the image release event during measurement
  */
 void MeasureNowWidget::onImageReleased() {
-    // Validate device state
     if (!deviceController || !deviceController->isDeviceOn() ||
         !deviceController->isConnected()) {
         return;
     }
 
-    // Verify current page is a scan page
     int currentIndex = stackedWidget->currentIndex();
     bool isOnScanPage =
         currentIndex > 0 && currentIndex < stackedWidget->count() - 1;
@@ -782,16 +813,160 @@ void MeasureNowWidget::onImageReleased() {
 void MeasureNowWidget::nextPage() {
     int nextIndex = stackedWidget->currentIndex() + 1;
     if (nextIndex < stackedWidget->count()) {
-        // Process measurements before showing results page
-        if (nextIndex == stackedWidget->count() - 1) {
-            DEBUG("About to show results page, processing measurements");
-            processMeasurements();
-        }
-
         stackedWidget->setCurrentIndex(nextIndex);
         currentScanPage++;
         updateButtonState();
+
+        if (nextIndex > 0 && nextIndex < stackedWidget->count() - 1) {
+            adjustImageSize(nextIndex);
+        }
+
+        if (nextIndex == stackedWidget->count() - 2) {
+            DEBUG("Reached post-scan input page");
+        } else if (nextIndex == stackedWidget->count() - 1) {
+            DEBUG("About to show results page, processing measurements");
+            processMeasurements();
+        }
     }
+}
+
+/**
+ * @brief
+ */
+void MeasureNowWidget::createPostScanInputPage() {
+    DEBUG("Creating post-scan input page");
+
+    QWidget* inputPage = new QWidget;
+    QVBoxLayout* layout = new QVBoxLayout(inputPage);
+    layout->setContentsMargins(40, 40, 40, 40);
+    layout->setSpacing(30);
+
+    QWidget* contentContainer = new QWidget;
+    contentContainer->setObjectName("contentContainer");
+    contentContainer->setStyleSheet(
+        "#contentContainer {"
+        "    background-color: white;"
+        "    border-radius: 10px;"
+        "    border: 1px solid #E0E0E0;"
+        "}");
+
+    QVBoxLayout* containerLayout = new QVBoxLayout(contentContainer);
+    containerLayout->setSpacing(25);
+    containerLayout->setContentsMargins(30, 30, 30, 30);
+
+    QFormLayout* formLayout = new QFormLayout;
+    formLayout->setSpacing(15);
+
+    bodyTempEdit = new QDoubleSpinBox;
+    bodyTempEdit->setRange(30.0, 40.0);
+    bodyTempEdit->setDecimals(1);
+    bodyTempEdit->setSuffix(" °C");
+    bodyTempEdit->setValue(36.5);
+    bodyTempEdit->setStyleSheet(INPUT_STYLE);
+
+    bloodPressureEdit = new QSpinBox;
+    bloodPressureEdit->setRange(80, 180);
+    bloodPressureEdit->setSuffix(" mmHg");
+    bloodPressureEdit->setValue(120);
+    bloodPressureEdit->setStyleSheet(INPUT_STYLE);
+
+    heartRateEdit = new QSpinBox;
+    heartRateEdit->setRange(40, 180);
+    heartRateEdit->setSuffix(" bpm");
+    heartRateEdit->setValue(70);
+    heartRateEdit->setStyleSheet(INPUT_STYLE);
+
+    sleepingTimeEdit = new QDoubleSpinBox;
+    sleepingTimeEdit->setRange(2.0, 12.0);
+    sleepingTimeEdit->setDecimals(1);
+    sleepingTimeEdit->setSuffix(" hours");
+    sleepingTimeEdit->setValue(7.0);
+    sleepingTimeEdit->setStyleSheet(INPUT_STYLE);
+
+    currentWeightEdit = new QDoubleSpinBox;
+    currentWeightEdit->setRange(20.0, 300.0);
+    currentWeightEdit->setDecimals(1);
+    currentWeightEdit->setSuffix(" kg");
+    currentWeightEdit->setValue(70.0);
+    currentWeightEdit->setStyleSheet(INPUT_STYLE);
+
+    emotionalStateEdit = new QComboBox;
+    emotionalStateEdit->addItems({"1", "2", "3", "4", "5"});
+    emotionalStateEdit->setCurrentIndex(2);
+    emotionalStateEdit->setStyleSheet(COMBOBOX_STYLE);
+    emotionalStateEdit->setItemDelegate(
+        new BackgroundDelegate(emotionalStateEdit));
+
+    overallFeelingEdit = new QComboBox;
+    overallFeelingEdit->addItems({"1", "2", "3", "4", "5"});
+    overallFeelingEdit->setCurrentIndex(2);
+    overallFeelingEdit->setStyleSheet(COMBOBOX_STYLE);
+    overallFeelingEdit->setItemDelegate(
+        new BackgroundDelegate(overallFeelingEdit));
+
+    QString labelStyle = "font-weight: bold; color: #333333; font-size: 14px;";
+    auto addFormRow = [&](const QString& labelText, QWidget* widget) {
+        QLabel* label = new QLabel(labelText);
+        label->setStyleSheet(labelStyle);
+        formLayout->addRow(label, widget);
+    };
+
+    addFormRow("Body Temperature:", bodyTempEdit);
+    addFormRow("Blood Pressure:", bloodPressureEdit);
+    addFormRow("Heart Rate:", heartRateEdit);
+    addFormRow("Sleeping Time:", sleepingTimeEdit);
+    addFormRow("Current Weight:", currentWeightEdit);
+    addFormRow("Emotional State (1-5):", emotionalStateEdit);
+    addFormRow("Overall Feeling (1-5):", overallFeelingEdit);
+
+    QLabel* instructionsLabel =
+        new QLabel("Please enter the following information:");
+    instructionsLabel->setStyleSheet(
+        "font-size: 20px; font-weight: bold; color: #333333;");
+    instructionsLabel->setAlignment(Qt::AlignCenter);
+
+    QPushButton* proceedButton = new QPushButton("Proceed to Results");
+    proceedButton->setStyleSheet(BUTTON_STYLE);
+    proceedButton->setMinimumHeight(40);
+    proceedButton->setFixedWidth(200);
+
+    connect(proceedButton, &QPushButton::clicked, this, [this]() {
+        collectUserInputs();
+        nextPage();
+    });
+
+    containerLayout->addWidget(instructionsLabel);
+    containerLayout->addLayout(formLayout);
+    containerLayout->addStretch();
+    containerLayout->addWidget(proceedButton, 0, Qt::AlignCenter);
+
+    layout->addWidget(contentContainer);
+    stackedWidget->addWidget(inputPage);
+    DEBUG("Post-scan input page created successfully");
+}
+
+/**
+ * @brief
+ */
+void MeasureNowWidget::collectUserInputs() {
+    bodyTemp = bodyTempEdit->value();
+    bloodPressure = bloodPressureEdit->value();
+    heartRate = heartRateEdit->value();
+    sleepingTime = sleepingTimeEdit->value();
+    currentWeight = currentWeightEdit->value();
+    emotionalState = emotionalStateEdit->currentText().toInt();
+    overallFeeling = overallFeelingEdit->currentText().toInt();
+
+    DEBUG(QString("Collected user inputs: Body Temp=%1°C, Blood Pressure=%2 "
+                  "mmHg, Heart Rate=%3 bpm, Sleeping Time=%4 hours, Current "
+                  "Weight=%5 kg, Emotional State=%6, Overall Feeling=%7")
+              .arg(bodyTemp)
+              .arg(bloodPressure)
+              .arg(heartRate)
+              .arg(sleepingTime)
+              .arg(currentWeight)
+              .arg(emotionalState)
+              .arg(overallFeeling));
 }
 
 /**
@@ -800,7 +975,6 @@ void MeasureNowWidget::nextPage() {
 void MeasureNowWidget::resetMeasurement() {
     DEBUG("Resetting measurement");
 
-    // Stop connection monitoring when resetting
     if (connectionTimer) {
         connectionTimer->stop();
     }
@@ -821,7 +995,6 @@ void MeasureNowWidget::resetState() {
     countdownTimer->stop();
     scanInProgress = false;
 
-    // Reset status label text
     int currentIndex = stackedWidget->currentIndex() - 1;
     if (currentIndex >= 0 && currentIndex < countdownLabels.size()) {
         countdownLabels[currentIndex]->setText(
@@ -853,7 +1026,6 @@ void MeasureNowWidget::updateButtonState() {
  * @brief Updates the countdown display during measurement
  */
 void MeasureNowWidget::updateCountdown() {
-    // Check if device disconnected during measurement
     if (!deviceController || !deviceController->isConnected()) {
         DEBUG("Device disconnected during measurement");
         showAlert("Device disconnected - measurement cancelled");
@@ -875,8 +1047,6 @@ void MeasureNowWidget::updateCountdown() {
 /**
  * @brief Populates the profile selection combo box
  * @param profileComboBox The combo box to populate
- *
- * TODO: Incorporate the profile controller
  */
 void MeasureNowWidget::populateProfileList(QComboBox* comboBox) {
     if (!comboBox || !profileController) {
@@ -899,7 +1069,6 @@ void MeasureNowWidget::populateProfileList(QComboBox* comboBox) {
         WARNING("Failed to load profiles");
     }
 
-    // Clean up
     qDeleteAll(profiles);
     profiles.clear();
 }
@@ -923,159 +1092,6 @@ void MeasureNowWidget::setErrorState(QLabel* label) {
 }
 
 /**
- * @brief Displays the measurement results in the results page
- * TODO: Possibly create a separate class for the results page
- */
-void MeasureNowWidget::displayResults() {
-    DEBUG("Displaying results");
-    DEBUG("Number of calculated results: " << calculatedResults.size());
-
-    // Log individual results for debugging
-    for (auto it = calculatedResults.begin(); it != calculatedResults.end();
-         ++it) {
-        DEBUG("Result - " << it.key() << ": " << it.value());
-    }
-
-    // Create debug string list for comprehensive logging
-    QStringList debugResults;
-    for (int i = 0; i < measurementLabels.size(); ++i) {
-        QString label = measurementLabels[i];
-        int value = calculatedResults.value(label, 0);
-        debugResults.append(QString("%1: %2").arg(label).arg(value));
-    }
-
-    updateButtonState();
-
-    // Get results page widget
-    auto* resultsPage = qobject_cast<QWidget*>(
-        stackedWidget->widget(stackedWidget->count() - 1));
-    if (!resultsPage) {
-        ERROR("Results page not found");
-        return;
-    }
-
-    // Get results layout
-    auto* layout = resultsPage->findChild<QVBoxLayout*>();
-    if (!layout) {
-        ERROR("Results layout not found");
-        return;
-    }
-
-    // Clear existing results
-    QLayoutItem* child;
-    while ((child = layout->takeAt(0)) != nullptr) {
-        delete child->widget();
-        delete child;
-    }
-
-    // Create results header
-    QLabel* resultsLabel = new QLabel("Scan Results");
-    resultsLabel->setStyleSheet(
-        "QLabel { "
-        "    font-size: 24px; "
-        "    color: #333333; "
-        "    font-weight: bold; "
-        "}");
-    resultsLabel->setAlignment(Qt::AlignCenter);
-
-    // Setup two-column layout
-    QHBoxLayout* columnsLayout = new QHBoxLayout;
-    QVBoxLayout* leftColumn = new QVBoxLayout;
-    QVBoxLayout* rightColumn = new QVBoxLayout;
-
-    int itemsPerColumn = (measurementLabels.size() + 1) / 2;
-
-    // Create result widgets for each measurement
-    for (int i = 0; i < measurementLabels.size(); ++i) {
-        QString label = measurementLabels[i];
-        int value = calculatedResults.value(label, 0);
-
-        // Create and style result widget
-        QWidget* resultWidget = new QWidget;
-
-        // Determine background color based on value
-        // TODO: Adjust colours based on scan results and normal point ranges
-        QString bgColor;
-        if (value > 70) {
-            bgColor = "#4CAF50";
-        } else if (value >= 31) {
-            bgColor = "#FF8001";
-        } else {
-            bgColor = "#D32F2F";
-        }
-
-        resultWidget->setStyleSheet(QString("QWidget { "
-                                            "    background-color: %1; "
-                                            "    border-radius: 8px; "
-                                            "}")
-                                        .arg(bgColor));
-
-        // Setup result layout
-        auto* resultLayout = new QHBoxLayout(resultWidget);
-        resultLayout->setContentsMargins(12, 8, 12, 8);
-        resultLayout->setSpacing(10);
-
-        // Create and style point name label
-        auto* pointLabel = new QLabel(label);
-        pointLabel->setStyleSheet(
-            "QLabel { "
-            "    font-size: 13px; "
-            "    color: white; "
-            "    font-weight: bold; "
-            "}");
-        pointLabel->setMinimumWidth(150);
-        pointLabel->setWordWrap(true);
-
-        // Create value display
-        auto* valueContainer = new QWidget;
-        valueContainer->setFixedWidth(40);
-        auto* valueLayout = new QHBoxLayout(valueContainer);
-        valueLayout->setContentsMargins(0, 0, 0, 0);
-
-        auto* valueLabel = new QLabel(QString::number(value));
-        valueLabel->setStyleSheet(
-            "QLabel { "
-            "    font-size: 15px; "
-            "    color: white; "
-            "    font-weight: bold; "
-            "}");
-        valueLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-
-        // Assemble result widget
-        valueLayout->addWidget(valueLabel);
-        resultLayout->addWidget(pointLabel);
-        resultLayout->addStretch();
-        resultLayout->addWidget(valueContainer);
-        resultWidget->setFixedHeight(40);
-
-        // Add to appropriate column
-        if (i < itemsPerColumn) {
-            leftColumn->addWidget(resultWidget);
-        } else {
-            rightColumn->addWidget(resultWidget);
-        }
-    }
-
-    columnsLayout->addLayout(leftColumn);
-    columnsLayout->addLayout(rightColumn);
-
-    // Add timestamp
-    auto* timestampLabel = new QLabel(
-        QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-    timestampLabel->setStyleSheet(
-        "QLabel { "
-        "    color: #999999; "
-        "    font-size: 12px; "
-        "}");
-    timestampLabel->setAlignment(Qt::AlignRight);
-
-    // Assemble final layout
-    layout->addWidget(resultsLabel);
-    layout->addLayout(columnsLayout);
-    layout->addWidget(timestampLabel);
-}
-
-/**
  * @brief Handles errors during the scanning process
  */
 void MeasureNowWidget::handleScanError() {
@@ -1083,7 +1099,6 @@ void MeasureNowWidget::handleScanError() {
 
     countdownTimer->stop();
 
-    // Reset status label
     int currentIndex = stackedWidget->currentIndex() - 1;
     if (currentIndex >= 0 && currentIndex < countdownLabels.size()) {
         countdownLabels[currentIndex]->setText(
@@ -1130,5 +1145,52 @@ void MeasureNowWidget::setUserId(int userId) {
     currentUserId = userId;
     if (profileComboBox && profileController) {
         populateProfileList(profileComboBox);
+    }
+}
+
+/**
+ * @brief
+ *
+ * @param pageIndex
+ */
+void MeasureNowWidget::adjustImageSize(int pageIndex) {
+    QWidget* page = stackedWidget->widget(pageIndex);
+    if (!page) return;
+
+    QLabel* imageLabel = page->findChild<QLabel*>("scanImageLabel");
+    if (!imageLabel) return;
+
+    if (originalPixmaps.contains(pageIndex)) {
+        QPixmap originalPixmap = originalPixmaps[pageIndex];
+
+        QWidget* container = imageLabel->parentWidget();
+        if (!container) return;
+
+        QSize containerSize = container->size();
+
+        int dimension = qMin(containerSize.width(), containerSize.height());
+        dimension = qMin(dimension, 600);
+        dimension = qMax(dimension, 200);
+
+        QSize targetSize(dimension, dimension);
+
+        if (!originalPixmap.isNull()) {
+            imageLabel->setPixmap(originalPixmap.scaled(
+                targetSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        }
+    }
+}
+
+/**
+ * @brief
+ *
+ * @param event
+ */
+void MeasureNowWidget::resizeEvent(QResizeEvent* event) {
+    QWidget::resizeEvent(event);
+
+    int currentIndex = stackedWidget->currentIndex();
+    if (currentIndex > 0 && currentIndex < stackedWidget->count() - 1) {
+        adjustImageSize(currentIndex);
     }
 }

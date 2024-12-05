@@ -4,11 +4,13 @@
  */
 
 #include "ScanController.h"
+
 #include <QRandomGenerator>
 
 ScanController::ScanController(DatabaseManager& db_) : db(db_) {}
 
-void ScanController::createScan(const QVector<int>& measurements, ProfileModel& profile){
+void ScanController::createScan(const QVector<int>& measurements,
+                                ProfileModel& profile) {
     ScanModel scan;
 
     scan.setProfileId(profile.getId());
@@ -48,49 +50,59 @@ void ScanController::createScan(const QVector<int>& measurements, ProfileModel& 
     this->storeScan(scan);
 }
 
-int ScanController::generateMeasurement(int range_start, int range_end){
+int ScanController::generateMeasurement(int range_start, int range_end) {
     return QRandomGenerator::global()->bounded(range_start, range_end);
 }
 
 bool ScanController::storeScan(ScanModel& scan) {
-   try{
-        db.execute("INSERT INTO scan VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                  {
-                       scan.getProfileId(),
-                       scan.getName(),
-                       scan.getH1Lung(),
-                       scan.getH1LungR(),
-                       scan.getH2HeartConstrictor(),
-                       scan.getH2HeartConstrictorR(),
-                       scan.getH3Heart(),
-                       scan.getH3HeartR(),
-                       scan.getH4SmallIntestine(),
-                       scan.getH4SmallIntestineR(),
-                       scan.getH5TripleHeater(),
-                       scan.getH5TripleHeaterR(),
-                       scan.getH6LargeIntestine(),
-                       scan.getH6LargeIntestineR(),
-                       scan.getF1Spleen(),
-                       scan.getF1SpleenR(),
-                       scan.getF2Liver(),
-                       scan.getF2LiverR(),
-                       scan.getF3Kidney(),
-                       scan.getF3KidneyR(),
-                       scan.getF4UrinaryBladder(),
-                       scan.getF4UrinaryBladderR(),
-                       scan.getF5GallBladder(),
-                       scan.getF5GallBladderR(),
-                       scan.getF6Stomach(),
-                       scan.getF6StomachR(),
-                       scan.getBodyTemp(),
-                       scan.getBloodPressure(),
-                       scan.getHeartRate(),
-                       scan.getSleepingTime(),
-                       scan.getCurrentWeight(),
-                       scan.getEmotionalState(),
-                       scan.getOverallFeeling(),
-                   }
-            );
+    try {
+        db.execute(
+            "INSERT INTO scan (profile_id, name, h1_lung, h1_lung_r, "
+            "h2_heart_constrictor, h2_heart_constrictor_r, "
+            "h3_heart, h3_heart_r, h4_small_intestine, h4_small_intestine_r, "
+            "h5_triple_heater, h5_triple_heater_r, "
+            "h6_large_intestine, h6_large_intestine_r, f1_spleen, f1_spleen_r, "
+            "f2_liver, f2_liver_r, f3_kidney, "
+            "f3_kidney_r, f4_urinary_bladder, f4_urinary_bladder_r, "
+            "f5_gall_bladder, f5_gall_bladder_r, f6_stomach, "
+            "f6_stomach_r, body_temp, blood_pressure, heart_rate, "
+            "sleeping_time, current_weight, emotional_state, "
+            "overall_feeling) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, "
+            "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+            "?, ?)",
+            {scan.getProfileId(),
+             scan.getName(),
+             scan.getH1Lung(),
+             scan.getH1LungR(),
+             scan.getH2HeartConstrictor(),
+             scan.getH2HeartConstrictorR(),
+             scan.getH3Heart(),
+             scan.getH3HeartR(),
+             scan.getH4SmallIntestine(),
+             scan.getH4SmallIntestineR(),
+             scan.getH5TripleHeater(),
+             scan.getH5TripleHeaterR(),
+             scan.getH6LargeIntestine(),
+             scan.getH6LargeIntestineR(),
+             scan.getF1Spleen(),
+             scan.getF1SpleenR(),
+             scan.getF2Liver(),
+             scan.getF2LiverR(),
+             scan.getF3Kidney(),
+             scan.getF3KidneyR(),
+             scan.getF4UrinaryBladder(),
+             scan.getF4UrinaryBladderR(),
+             scan.getF5GallBladder(),
+             scan.getF5GallBladderR(),
+             scan.getF6Stomach(),
+             scan.getF6StomachR(),
+             scan.getBodyTemp(),
+             scan.getBloodPressure(),
+             scan.getHeartRate(),
+             scan.getSleepingTime(),
+             scan.getCurrentWeight(),
+             scan.getEmotionalState(),
+             scan.getOverallFeeling()});
         return true;
     } catch (const std::exception& e) {
         qCritical() << "Failed to upload scan: " << e.what();

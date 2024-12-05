@@ -1,4 +1,4 @@
--- Insert test user if it doesn't exist 
+-- Insert test user if it doesn't exist
 INSERT INTO users (first_name, last_name, email, password_hash)
 SELECT 'Test', 'User', 'test@mail.com', 'password'
 WHERE NOT EXISTS (SELECT 1 FROM users);
@@ -25,16 +25,16 @@ SELECT 1, 'Test Profile 5', 'Test profile 5 desc', 'male', 45, 100, '1901-03-03'
 WHERE NOT EXISTS (SELECT 1 FROM profile WHERE user_id = 1 AND name = 'Test Profile 5');
 
 -- Insert scan records only if they don't already exist for the given profile
-INSERT INTO scan (profile_id, name, 
-    h1_lung, h2_heart_constrictor, h3_heart, h4_small_intestine, h5_triple_heater, h6_large_intestine, 
-    f1_spleen, f2_liver, f3_kidney, f4_urinary_bladder, f5_gull_bladder, f6_stomach, 
+INSERT INTO scan (profile_id, name,
+    h1_lung, h2_heart_constrictor, h3_heart, h4_small_intestine, h5_triple_heater, h6_large_intestine,
+    f1_spleen, f2_liver, f3_kidney, f4_urinary_bladder, f5_gall_bladder, f6_stomach,
 
-    h1_lung_r, h2_heart_constrictor_r, h3_heart_r, h4_small_intestine_r, h5_triple_heater_r, h6_large_intestine_r, 
-    f1_spleen_r, f2_liver_r, f3_kidney_r, f4_urinary_bladder_r, f5_gull_bladder_r, f6_stomach_r,
+    h1_lung_r, h2_heart_constrictor_r, h3_heart_r, h4_small_intestine_r, h5_triple_heater_r, h6_large_intestine_r,
+    f1_spleen_r, f2_liver_r, f3_kidney_r, f4_urinary_bladder_r, f5_gall_bladder_r, f6_stomach_r,
 
     body_temp, blood_pressure, heart_rate, sleeping_time, current_weight, emotional_state, overall_feeling, notes
 )
-SELECT 1, 'Afternoon Scan', 
+SELECT 1, 'Afternoon Scan',
     125.0, 135.3, 112.25, 102.22, 118.33, 108.1, -- h1-h6
     128.2, 138.4, 133.12, 123.3, 118.3, 113.1, --f1-f6
 
