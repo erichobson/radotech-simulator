@@ -12,6 +12,7 @@
 #include "ClickableLabel.h"
 #include "DatabaseManager.h"
 #include "DeviceController.h"
+#include "UserController.h"
 #include "UserProfileController.h"
 
 class QStackedWidget;
@@ -73,6 +74,7 @@ class MainWindow : public QMainWindow {
     DatabaseManager *databaseManager;
     DeviceController *deviceController;
     UserProfileController *userProfileController;
+    UserController *userController;
     int loggedInUserId;
 
     QStackedWidget *stackedWidget;

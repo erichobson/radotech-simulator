@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     databaseManager = new DatabaseManager();
     deviceController = new DeviceController(this);
     userProfileController = new UserProfileController(*databaseManager);
+    userController = new UserController(*databaseManager);
     // ...
     // ...
     // Initialize other controllers
@@ -326,23 +327,62 @@ void MainWindow::onLoginRequested(const QString &username,
     //     // Show error message on LoginWidget
     //     loginWidget->setStatusMessage("Invalid username or password");
     // }
+    //
+    
+    UserModel user;
+    if(!userController->validateUser(username, password, user)){
+        // Successful login: switch to mainWidget
+        sidebarMenu->setCurrentRow(1);
+        contentStackedWidget->setCurrentIndex(1);
+        stackedWidget->setCurrentWidget(mainWidget);
+        loginWidget->clearFields();
+        loggedInUserId = user.getId();    
+    } else {
+        loginWidget->setStatusMessage("Invalid username or password");
+    }
 
     // -------- REMOVE AFTER TESTING --------
+    //sidebarMenu->setCurrentRow(1);
+    //contentStackedWidget->setCurrentIndex(1);
+    //stackedWidget->setCurrentWidget(mainWidget);
+    //loginWidget->clearFields();
+    // --------------------------------------
+}
+
+void MainWindow::onRegisterRequested(const QString& fName, const QString& lName, const QString& sex,
+                                     const QString& weight, const QString& height, const QString& dob,
+                                     const QString& email, const QString& password, const QString& confirmPassword) {
+    UserModel user;
+    if(password != confirmPassword){
+        loginWidget->setStatusMessage("Passwords don't match");
+        return;
+    }
+    if(userController->validateUser(email, password, user)){
+        loginWidget->setStatusMessage("User with that username/email already exists");
+        return;
+    }
+    if(!userController->createUser(fName, lName, email, password, user)) {
+        loginWidget->setStatusMessage("Error registering the user");
+        return;
+    }
+    if(!userProfileController->createProfile(loggedInUserId, fName + " " + lName, "", sex, weight.toInt(), height.toInt(), QDate::fromString(dob, "dd/MM/yyyy"))) {
+        loginWidget->setStatusMessage("Error creating profile");
+        return;
+    }
+
+    // Successful login & profile creation: switch to mainWidget
     sidebarMenu->setCurrentRow(1);
     contentStackedWidget->setCurrentIndex(1);
     stackedWidget->setCurrentWidget(mainWidget);
     loginWidget->clearFields();
-    // --------------------------------------
-}
-
-void MainWindow::onRegisterRequested() {
-    // TODO: Implement registration logic
+    loggedInUserId = user.getId();    
 }
 
 void MainWindow::logout() {
     // Reset the selection to "Home"
     sidebarMenu->setCurrentRow(1);
     contentStackedWidget->setCurrentIndex(1);
+    loggedInUserId = -1;
 
     // Return to login page
     stackedWidget->setCurrentWidget(loginWidget);

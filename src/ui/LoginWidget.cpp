@@ -23,6 +23,7 @@
 #include <QRadioButton>
 #include <QStackedLayout>
 #include <QVBoxLayout>
+#include <qabstractbutton.h>
 
 /**
  * @brief Constructor for the LoginWidget class.
@@ -589,8 +590,22 @@ void LoginWidget::onSaveContinueButtonClicked() {
     // TODO: Implement connection to database manager
     // NOTE: This should be initialized from the MainWindow
 
+    QString fName = firstNameLineEdit->text();
+    QString lName = lastNameLineEdit->text();
+    QAbstractButton* selected = sexButtonGroup->checkedButton();
+    QString sex = selected == nullptr ? "Unknown" : selected->text();
+    QString weight = weightLineEdit->text();
+    QString height = heightLineEdit->text();
+    QString dob = dobDateEdit->text();
+    QString email = emailRegLineEdit->text();
+    QString password = passwordRegLineEdit->text();
+    QString passwordConfirm = confirmPasswordLineEdit->text();
+
+
+    emit registerRequested(fName, lName, sex, weight, height, dob, email, password, passwordConfirm);
+
     // Emit the profileCreated signal
-    emit profileCreated();
+    //emit profileCreated();
 }
 
 /**

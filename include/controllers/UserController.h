@@ -25,10 +25,10 @@ public:
     bool getUserByEmail(const QString&, UserModel&) const;
     bool getUserById(int, UserModel&) const;
     
-    bool validateUser(const QString& email, QString& password, UserModel& user);
-    bool createUser(const QString&, const QString&, const QString&, QString&, UserModel&);
+    bool validateUser(const QString& email, const QString& password, UserModel& user);
+    bool createUser(const QString&, const QString&, const QString&, const QString&, UserModel&);
     bool createUser(UserModel*);
-    bool updateUser(int, const QString&, const QString&, const QString&, QString&, UserModel&);
+    bool updateUser(int, const QString&, const QString&, const QString&, const QString&, UserModel&);
     bool updateUser(UserModel*);
     bool deleteUser(int);
     bool deleteUser(UserModel*);

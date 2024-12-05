@@ -35,7 +35,10 @@ class LoginWidget : public QWidget {
    signals:
     void loginRequested(const QString &email, const QString &password);
     void registerRequested();
-    void remindPasswordRequested();
+    //void remindPasswordRequested();
+    void registerRequested(const QString&, const QString&, const QString&, 
+                           const QString& weight, const QString &, const QString&, 
+                           const QString&, const QString&, const QString&);
     void profileCreated();
 
    private slots:
