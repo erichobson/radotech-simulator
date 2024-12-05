@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     deviceController = new DeviceController(this);
     userProfileController = new UserProfileController(*databaseManager);
     scanController = new ScanController(*databaseManager);
+    userController = new UserController(*databaseManager);
 
     // Create the main stacked widget
     stackedWidget = new QStackedWidget;
@@ -327,33 +328,78 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
  */
 void MainWindow::onLoginRequested(const QString &username,
                                   const QString &password) {
-    // TODO: Replace this with proper authentication logic
-    // if (username == "user@domain.tld" && password == "password") {
-    //     // Successful login: switch to mainWidget
-    //     sidebarMenu->setCurrentRow(1);
-    //     contentStackedWidget->setCurrentIndex(1);
-    //     stackedWidget->setCurrentWidget(mainWidget);
-    //
-    //     // Clear login fields
-    //     loginWidget->clearFields();
-    // } else {
-    //     // Show error message on LoginWidget
-    //     loginWidget->setStatusMessage("Invalid username or password");
-    // }
+    UserModel user;
+    if(userController->validateUser(username, password, user)){
+        DEBUG(QString("User Logged In: ID=%1, First Name=%2, Last Name=%3, Email=%4")
+              .arg(user.getId())
+              .arg(user.getFirstName())
+              .arg(user.getLastName())
+              .arg(user.getEmail())
+        );
+
+        // Successful login: switch to mainWidget
+        sidebarMenu->setCurrentRow(1);
+        contentStackedWidget->setCurrentIndex(1);
+        stackedWidget->setCurrentWidget(mainWidget);
+        loginWidget->clearFields();
+        loggedInUserId = user.getId();
+        DEBUG(QString("User Logged In: ID=%1, First Name=%2, Last Name=%3, Email=%4")
+              .arg(user.getId())
+              .arg(user.getFirstName())
+              .arg(user.getLastName())
+              .arg(user.getEmail())
+          );
+
+    } else {
+        loginWidget->setStatusMessage("Invalid username or password");
+    }
 
     // -------- REMOVE AFTER TESTING --------
-    sidebarMenu->setCurrentRow(1);
-    contentStackedWidget->setCurrentIndex(1);
-    stackedWidget->setCurrentWidget(mainWidget);
-    loginWidget->clearFields();
+    //sidebarMenu->setCurrentRow(1);
+    //contentStackedWidget->setCurrentIndex(1);
+    //stackedWidget->setCurrentWidget(mainWidget);
+    //loginWidget->clearFields();
     // --------------------------------------
 }
 
 /**
  * @brief
  */
-void MainWindow::onRegisterRequested() {
-    // TODO: Implement registration logic
+void MainWindow::onRegisterRequested(const QString &firstName, const QString &lastName, const QString &sex, const QString &weight, 
+                           const QString &height, const QDate &dob, const QString &email, const QString& password, 
+                           const QString &confirmPassword){
+
+    UserModel user;
+    if(password != confirmPassword){
+        loginWidget->setStatusMessage("Passwords do not match");
+        return;
+    }
+    if(userController->validateUser(email, password, user)){
+        loginWidget->setStatusMessage("User with that username/email already exists");
+        return;
+    }
+    if(!userController->createUser(firstName, lastName, email, password, user)) {
+        loginWidget->setStatusMessage("Error registering the user");
+        return;
+    }
+    if(!userProfileController->createProfile(loggedInUserId, firstName+ " " + lastName, "", sex, weight.toInt(), height.toInt(), dob)) {
+        loginWidget->setStatusMessage("Error creating profile");
+        return;
+    }
+
+    // Successful login & profile creation: switch to mainWidget
+    sidebarMenu->setCurrentRow(1);
+    contentStackedWidget->setCurrentIndex(1);
+    stackedWidget->setCurrentWidget(mainWidget);
+    loginWidget->clearFields();
+    loggedInUserId = user.getId();
+
+    DEBUG(QString("User Logged In: ID=%1, First Name=%2, Last Name=%3, Email=%4")
+              .arg(user.getId())
+              .arg(user.getFirstName())
+              .arg(user.getLastName())
+              .arg(user.getEmail())
+          );
 }
 
 /**
