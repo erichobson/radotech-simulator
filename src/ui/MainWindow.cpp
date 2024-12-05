@@ -323,8 +323,22 @@ void MainWindow::onLoginRequested(const QString &username,
     // --------------------------------------
 }
 
-void MainWindow::onRegisterRequested() {
+void MainWindow::onRegisterRequested(const QString &firstName, const QString &lastName,
+                         const QString &gender, const QString &weight,
+                         const QString &height, const QDate &dob,
+                         const QString &email, const QString &password,
+                         const QString &confirmPassword) {
     // TODO: Implement registration logic
+    qDebug() << "Main Windw handling emit:";
+    qDebug() << "First Name:" << firstName;
+    qDebug() << "Last Name:" << lastName;
+    qDebug() << "Gender:" << gender;
+    qDebug() << "Weight:" << weight;
+    qDebug() << "Height:" << height;
+    qDebug() << "Date of Birth:" << dob.toString("yyyy-MM-dd");
+    qDebug() << "Email:" << email;
+    qDebug() << "Password:" << password;
+    qDebug() << "Confirm Password:" << confirmPassword;
 }
 
 void MainWindow::logout() {

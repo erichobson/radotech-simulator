@@ -38,7 +38,12 @@ class MainWindow : public QMainWindow {
     /**
      * @brief Slot called when a registration is requested.
      */
-    void onRegisterRequested();
+    void onRegisterRequested(const QString &firstName, const QString &lastName,
+                         const QString &gender, const QString &weight,
+                         const QString &height, const QDate &dob,
+                         const QString &email, const QString &password,
+                         const QString &confirmPassword);
+
 
     /**
      * @brief Logs out the current user and returns to the login page.

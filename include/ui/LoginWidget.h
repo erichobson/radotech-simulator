@@ -34,7 +34,12 @@ class LoginWidget : public QWidget {
 
    signals:
     void loginRequested(const QString &email, const QString &password);
-    void registerRequested();
+    void registerRequested(const QString &firstName, const QString &lastName,
+                           const QString &gender, const QString &weight,
+                           const QString &height, const QDate &dob,
+                           const QString &email, const QString &password,
+                           const QString &confirmPassword);
+
     void remindPasswordRequested();
     void profileCreated();
 

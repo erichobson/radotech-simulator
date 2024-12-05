@@ -588,10 +588,31 @@ void LoginWidget::onCreateProfileButtonClicked() {
 void LoginWidget::onSaveContinueButtonClicked() {
     // TODO: Implement connection to database manager
     // NOTE: This should be initialized from the MainWindow
+    QString firstName = firstNameLineEdit->text();
+    QString lastName = lastNameLineEdit->text();
+    QString gender;
+    if (maleRadioButton->isChecked()) {
+        gender = "Male";
+    } else if (femaleRadioButton->isChecked()) {
+        gender = "Female";
+    } else {
+        gender = "Not Selected";
+    }
+    QString weight = weightLineEdit->text();
+    QString height = heightLineEdit->text();
+    QDate dob = dobDateEdit->date();
+    QString email = emailRegLineEdit->text();
+    //emailverification done here
+    QString password = passwordRegLineEdit->text();
+    QString confirmPassword = confirmPasswordLineEdit->text();
+    //password1 and password 2 verification here
+
+    emit registerRequested(firstName, lastName, gender, weight, height, dob, email, password, confirmPassword);
 
     // Emit the profileCreated signal
     emit profileCreated();
 }
+
 
 /**
  * @brief Slot called when the "Start" button is clicked.
