@@ -24,12 +24,12 @@
  */
 ProfilesWidget::ProfilesWidget(QWidget *parent)
     : QWidget(parent),
+      currentUserId(-1),
       stackedWidget(nullptr),
       listWidget(nullptr),
       editWidget(nullptr),
       profilesLayout(nullptr),
       profileController(nullptr),
-      currentUserId(-1),
       profiles() {
     INFO("Initializing ProfilesWidget");
 
