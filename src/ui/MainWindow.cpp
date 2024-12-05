@@ -20,16 +20,11 @@
 #include "DeviceImageWidget.h"
 #include "HistoryWidget.h"
 #include "HomeWidget.h"
-#include "LearningMaterialsWidget.h"
+#include "Logging.h"
 #include "LoginWidget.h"
 #include "MeasureNowWidget.h"
 #include "ProfileWidget.h"
 #include "ProfilesWidget.h"
-
-/* Logging Macros */
-#define DEBUG(msg) qDebug() << "[DEBUG]" << __FUNCTION__ << ":" << msg
-#define INFO(msg) qInfo() << "[INFO]" << __FUNCTION__ << ":" << msg
-#define ERROR(msg) qCritical() << "[ERROR]" << __FUNCTION__ << ":" << msg
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("RaDoTech");
@@ -37,14 +32,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Initialize the database
     loggedInUserId = 1;
+    currentProfileId = -1;
+    currentProfileName = "";
 
     // Initialize controllers
     databaseManager = new DatabaseManager();
     deviceController = new DeviceController(this);
     userProfileController = new UserProfileController(*databaseManager);
-    // ...
-    // ...
-    // Initialize other controllers
+    scanController = new ScanController(*databaseManager);
 
     // Create the main stacked widget
     stackedWidget = new QStackedWidget;
@@ -142,9 +137,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
         {":/icons/profiles_unselected.png", ":/icons/profiles_selected.png",
          "Profiles"},
         {":/icons/history_unselected.png", ":/icons/history_selected.png",
-         "History"},
-        {":/icons/learning_unselected.png", ":/icons/learning_selected.png",
-         "Learning Materials"}};
+         "History"}};
 
     // Set font size for sidebar items
     QFont normalFont;
@@ -196,8 +189,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     contentCardLayout->addWidget(contentStackedWidget);
 
     // Create the content widgets
-    MeasureNowWidget *measureNowWidget = new MeasureNowWidget(
-        this, deviceController, userProfileController, loggedInUserId);
+    MeasureNowWidget *measureNowWidget =
+        new MeasureNowWidget(this, deviceController, userProfileController,
+                             scanController, loggedInUserId);
 
     HomeWidget *homeWidget = new HomeWidget;
 
@@ -206,22 +200,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     profilesWidget->setStyleSheet("background-color: transparent;");
     profilesWidget->setUserId(loggedInUserId);
 
-    HistoryWidget *historyWidget = new HistoryWidget;
-
-    LearningMaterialsWidget *learningMaterialsWidget =
-        new LearningMaterialsWidget;
+    HistoryWidget *historyWidget =
+        new HistoryWidget(this, userProfileController);
+    historyWidget->setStyleSheet("background-color: transparent;");
 
     // Add the widgets to the contentStackedWidget
-    contentStackedWidget->addWidget(measureNowWidget);         // Index 0
-    contentStackedWidget->addWidget(homeWidget);               // Index 1
-    contentStackedWidget->addWidget(profilesWidget);           // Index 2
-    contentStackedWidget->addWidget(historyWidget);            // Index 3
-    contentStackedWidget->addWidget(learningMaterialsWidget);  // Index 4
+    contentStackedWidget->addWidget(measureNowWidget);  // Index 0
+    contentStackedWidget->addWidget(homeWidget);        // Index 1
+    contentStackedWidget->addWidget(profilesWidget);    // Index 2
+    contentStackedWidget->addWidget(historyWidget);     // Index 3
 
-    // Connect the stacked widget's current changed signal
     connect(contentStackedWidget, &QStackedWidget::currentChanged,
             [contentCardWidget](int index) {
-                if (index == 2) {  // ProfilesWidget
+                if (index == 2 || index == 3) {
                     contentCardWidget->setStyleSheet(
                         "background-color: transparent; border-radius: 10px;");
                 } else {
@@ -253,30 +244,23 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     mainLayout->addWidget(sidebarWidget);
     mainLayout->addWidget(contentCardWidget);
     mainLayout->addWidget(deviceCardWidget);
-
-    // Set stretch factors to control the sizes
     mainLayout->setStretch(0, 0);
     mainLayout->setStretch(1, 1);
     mainLayout->setStretch(2, 0);
 
-    // Add loginWidget and mainWidget to stackedWidget
     stackedWidget->addWidget(loginWidget);
     stackedWidget->addWidget(mainWidget);
 
     // Set the default selected item in the sidebar menu
     sidebarMenu->setCurrentRow(1);
     contentStackedWidget->setCurrentIndex(1);
-
-    // Show the login page initially
     stackedWidget->setCurrentIndex(0);
 
-    // Connect signals from LoginWidget to MainWindow slots
     connect(loginWidget, &LoginWidget::loginRequested, this,
             &MainWindow::onLoginRequested);
     connect(loginWidget, &LoginWidget::registerRequested, this,
             &MainWindow::onRegisterRequested);
 
-    // Connect signals for navigation
     connect(sidebarMenu, &QListWidget::currentRowChanged, this,
             [this](int currentRow) {
                 if (currentRow >= 0 && currentRow < items.size()) {
@@ -286,7 +270,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
                 }
             });
 
-    // Connect device state changed signal
+    connect(profilesWidget, &ProfilesWidget::profilesChanged, this,
+            [profilesWidget, this]() {
+                if (ProfileModel *firstProfile =
+                        profilesWidget->getFirstProfile()) {
+                    setCurrentProfile(firstProfile->getId(),
+                                      firstProfile->getName());
+                }
+            });
+
     connect(deviceController, &DeviceController::deviceStateChanged, this,
             [](bool isOn) { DEBUG("Device turned" << (isOn ? "on" : "off")); });
 
@@ -296,12 +288,28 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
             measureNowWidget, &MeasureNowWidget::onImageReleased);
     connect(profilesWidget, &ProfilesWidget::profilesChanged, measureNowWidget,
             &MeasureNowWidget::refreshProfiles);
+
+    connect(measureNowWidget, &MeasureNowWidget::profileSelected, this,
+            &MainWindow::setCurrentProfile);
+
+    connect(this, &MainWindow::currentProfileChanged, historyWidget,
+            [historyWidget](int profileId, const QString &) {
+                historyWidget->setCurrentProfile(profileId);
+            });
+
+    if (ProfileModel *firstProfile = profilesWidget->getFirstProfile()) {
+        setCurrentProfile(firstProfile->getId(), firstProfile->getName());
+    }
 }
 
+/**
+ * @brief
+ *
+ * @param event
+ */
 void MainWindow::resizeEvent(QResizeEvent *event) {
     QMainWindow::resizeEvent(event);
 
-    // Update the background gradient to match the new size
     QLinearGradient gradient(0, 0, 0, height());
     gradient.setColorAt(0, QColor("#FF7009"));
     gradient.setColorAt(1, QColor("#FD2747"));
@@ -311,6 +319,12 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
     setPalette(pal);
 }
 
+/**
+ * @brief
+ *
+ * @param username
+ * @param password
+ */
 void MainWindow::onLoginRequested(const QString &username,
                                   const QString &password) {
     // TODO: Replace this with proper authentication logic
@@ -335,10 +349,16 @@ void MainWindow::onLoginRequested(const QString &username,
     // --------------------------------------
 }
 
+/**
+ * @brief
+ */
 void MainWindow::onRegisterRequested() {
     // TODO: Implement registration logic
 }
 
+/**
+ * @brief
+ */
 void MainWindow::logout() {
     // Reset the selection to "Home"
     sidebarMenu->setCurrentRow(1);
@@ -348,6 +368,9 @@ void MainWindow::logout() {
     stackedWidget->setCurrentWidget(loginWidget);
 }
 
+/**
+ * @brief
+ */
 void MainWindow::setupBatteryInfoWidget() {
     // Create the container widget
     QFrame *batteryInfoFrame = new QFrame;
@@ -398,6 +421,11 @@ void MainWindow::setupBatteryInfoWidget() {
     updateBatteryPercentage(deviceController->getBatteryLevel());
 }
 
+/**
+ * @brief
+ *
+ * @param isConnected
+ */
 void MainWindow::updateConnectionStatus(bool isConnected) {
     // Update the connection status label
     if (isConnected) {
@@ -412,6 +440,11 @@ void MainWindow::updateConnectionStatus(bool isConnected) {
     }
 }
 
+/**
+ * @brief
+ *
+ * @param batteryLevel
+ */
 void MainWindow::updateBatteryPercentage(int batteryLevel) {
     // Update the battery percentage text
     QString percentageText = QString("%1%").arg(batteryLevel);
@@ -445,6 +478,9 @@ void MainWindow::updateBatteryPercentage(int batteryLevel) {
             .arg(color));
 }
 
+/**
+ * @brief
+ */
 void MainWindow::onBatteryPercentageClicked() {
     // Change the charging state
     if (deviceController->isCharging()) {
@@ -452,4 +488,20 @@ void MainWindow::onBatteryPercentageClicked() {
     } else {
         deviceController->startCharging();
     }
+}
+
+/**
+ * @brief
+ *
+ * @param profileId
+ * @param profileName
+ */
+void MainWindow::setCurrentProfile(int profileId, const QString &profileName) {
+    DEBUG(QString("Setting current profile: ID=%1, Name=%2")
+              .arg(profileId)
+              .arg(profileName));
+
+    currentProfileId = profileId;
+    currentProfileName = profileName;
+    emit currentProfileChanged(profileId, profileName);
 }

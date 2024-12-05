@@ -9,7 +9,6 @@
 #include <QStyledItemDelegate>
 #include <QWidget>
 
-// Forward declarations
 class QStackedWidget;
 class QLabel;
 class QPushButton;
@@ -20,9 +19,13 @@ class QComboBox;
 class QVBoxLayout;
 class QFormLayout;
 class DeviceController;
-
+class ResultsWidget;
+class ScanController;
 class UserProfileController;
 class ProfileModel;
+class QSpinBox;
+class QDoubleSpinBox;
+class QComboBox;
 
 /**
  * @brief Custom delegate for styling background in combo boxes
@@ -36,14 +39,6 @@ class BackgroundDelegate : public QStyledItemDelegate {
                const QModelIndex& index) const override;
 };
 
-/**
- * @brief Widget for managing the measurement process and results display
- *
- * This widget handles the complete measurement workflow including:
- * - Device connection and control
- * - Measurement process for left and right sides
- * - Results calculation and display
- */
 class MeasureNowWidget : public QWidget {
     Q_OBJECT
 
@@ -51,9 +46,15 @@ class MeasureNowWidget : public QWidget {
     explicit MeasureNowWidget(
         QWidget* parent = nullptr, DeviceController* deviceController = nullptr,
         UserProfileController* userProfileController = nullptr,
-        int userId = -1);
+        ScanController* scanController = nullptr, int userId = -1);
     void setUserId(int userId);
     void refreshProfiles();
+
+   protected:
+    void resizeEvent(QResizeEvent* event) override;
+
+   signals:
+    void profileSelected(int profileId, const QString& profileName);
 
    public slots:
     void startCountdown();
@@ -64,11 +65,11 @@ class MeasureNowWidget : public QWidget {
 
    private:
     UserProfileController* profileController;
+    ScanController* scanController;
     QComboBox* profileComboBox;
     int selectedProfileId;
     int currentUserId;
 
-    // Constants and Types
     static const int TOTAL_SCAN_PAGES = 24;
     static const int MEASUREMENTS_PER_SIDE = 12;
 
@@ -77,7 +78,6 @@ class MeasureNowWidget : public QWidget {
         int rawValue;
     };
 
-    // Measurement Data
     const QStringList measurementLabels = {"Lungs",
                                            "Pericardium",
                                            "Heart",
@@ -93,8 +93,9 @@ class MeasureNowWidget : public QWidget {
     QStringList imagePaths;
     QVector<ScanPoint> rawMeasurements;
     QMap<QString, int> calculatedResults;
+    ResultsWidget* resultsWidget;
+    QMap<int, QPixmap> originalPixmaps;
 
-    // UI Components
     QStackedWidget* stackedWidget{nullptr};
     QList<QLabel*> countdownLabels;
     QPushButton* startStopButton{nullptr};
@@ -102,7 +103,6 @@ class MeasureNowWidget : public QWidget {
     QDateEdit* dateEdit{nullptr};
     QTimeEdit* timeEdit{nullptr};
 
-    // Device and State
     DeviceController* deviceController{nullptr};
     QTimer* countdownTimer{nullptr};
     QTimer* connectionTimer{nullptr};
@@ -111,30 +111,45 @@ class MeasureNowWidget : public QWidget {
     bool measurementDone{false};
     bool scanInProgress{false};
 
-    // Initialization
+    QDoubleSpinBox* bodyTempEdit;
+    QSpinBox* bloodPressureEdit;
+    QSpinBox* heartRateEdit;
+    QDoubleSpinBox* sleepingTimeEdit;
+    QDoubleSpinBox* currentWeightEdit;
+    QComboBox* emotionalStateEdit;
+    QComboBox* overallFeelingEdit;
+
+    double bodyTemp;
+    int bloodPressure;
+    int heartRate;
+    double sleepingTime;
+    double currentWeight;
+    int emotionalState;
+    int overallFeeling;
+
+    void collectUserInputs();
+    void adjustImageSize(int pageIndex);
+
     void initializeUIComponents(QVBoxLayout* mainLayout);
     void initImagePaths();
     void setupPages();
 
-    // Page Management
     void createIntroPage();
     void createScanPage(int pageNum);
+    void createPostScanInputPage();
     void createResultsPage();
     void nextPage();
 
-    // Measurement Processing
     void processMeasurements();
     bool areAllMeasurementsComplete() const;
     void showMeasurementResult(int value);
     void displayResults();
 
-    // State Management
     void resetMeasurement();
     void resetState();
     void updateButtonState();
     void updateCountdown();
 
-    // UI Helpers
     void populateProfileList(QComboBox* profileComboBox);
     void setErrorState(QLabel* label);
     void handleScanError();

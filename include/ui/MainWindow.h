@@ -12,6 +12,7 @@
 #include "ClickableLabel.h"
 #include "DatabaseManager.h"
 #include "DeviceController.h"
+#include "ScanController.h"
 #include "UserProfileController.h"
 
 class QStackedWidget;
@@ -28,6 +29,14 @@ class MainWindow : public QMainWindow {
 
    protected:
     void resizeEvent(QResizeEvent *event) override;
+
+   public slots:
+    void setCurrentProfile(int profileId, const QString &profileName);
+    int getCurrentProfileId() const { return currentProfileId; }
+    QString getCurrentProfileName() const { return currentProfileName; }
+
+   signals:
+    void currentProfileChanged(int profileId, const QString &profileName);
 
    private slots:
     /**
@@ -73,7 +82,10 @@ class MainWindow : public QMainWindow {
     DatabaseManager *databaseManager;
     DeviceController *deviceController;
     UserProfileController *userProfileController;
+    ScanController *scanController;
     int loggedInUserId;
+    int currentProfileId;
+    QString currentProfileName;
 
     QStackedWidget *stackedWidget;
     LoginWidget *loginWidget;

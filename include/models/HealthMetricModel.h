@@ -8,31 +8,30 @@
 
 #include <QString>
 class HealthMetricModel {
+   public:
+    HealthMetricModel();
+    HealthMetricModel(QString, float, QString, int);
+    ~HealthMetricModel();
 
-    public:
-        HealthMetricModel();
-        HealthMetricModel(QString, float, QString, int);
-        ~HealthMetricModel();
+    QString getName() const;
+    void setName(QString);
 
-        QString getName() const;
-        void setName(QString);
+    float getValue() const;
+    void setValue(float);
 
-        float getValue() const;
-        void setValue(float);
+    QString getDesc() const;
+    void setDesc(QString);
 
-        QString getDesc() const;
-        void setDesc(QString);
+    int getLevel() const;
+    void setLevel(int);
 
-        int getLevel() const;
-        void setLevel(int);
+    QString toString();
 
-        QString toString();
-
-    private:
-        QString name;
-        float value;
-        QString desc;
-        int level; // -1 below normal, 0 if normal, +1 if above normal
+   private:
+    QString name;
+    float value;
+    QString desc;
+    int level;  // -1 below normal, 0 if normal, +1 if above normal
 };
 
 #endif

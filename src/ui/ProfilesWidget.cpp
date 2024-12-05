@@ -33,12 +33,10 @@ ProfilesWidget::ProfilesWidget(QWidget *parent)
       profiles() {
     INFO("Initializing ProfilesWidget");
 
-    // Set up the main layout for the widget
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
 
-    // Initialize the stacked widget
     stackedWidget = new QStackedWidget;
     if (!stackedWidget) {
         ERROR("Failed to create stackedWidget");
@@ -46,7 +44,6 @@ ProfilesWidget::ProfilesWidget(QWidget *parent)
     }
     mainLayout->addWidget(stackedWidget);
 
-    // Create the list widget for displaying profiles
     listWidget = new QWidget;
     if (!listWidget) {
         ERROR("Failed to create listWidget");
@@ -54,18 +51,15 @@ ProfilesWidget::ProfilesWidget(QWidget *parent)
     }
     createListView();
 
-    // Create the edit widget for editing profiles
     editWidget = new ProfileEditWidget;
     if (!editWidget) {
         ERROR("Failed to create ProfileEditWidget");
         return;
     }
 
-    // Add widgets to the stacked widget
     stackedWidget->addWidget(listWidget);
     stackedWidget->addWidget(editWidget);
 
-    // Connect signals to slots
     connect(editWidget, &ProfileEditWidget::backRequested, this,
             &ProfilesWidget::handleBackFromEdit);
     connect(editWidget, &ProfileEditWidget::saveRequested, this,
@@ -81,7 +75,6 @@ ProfilesWidget::ProfilesWidget(QWidget *parent)
  */
 ProfilesWidget::~ProfilesWidget() {
     DEBUG("ProfilesWidget destructor called");
-    // Clean up the profiles vector
     qDeleteAll(profiles);
     profiles.clear();
 }
@@ -126,10 +119,8 @@ void ProfilesWidget::clearProfiles() {
     }
     DEBUG(QString("Removed %1 profile cards").arg(removedCount));
 
-    // Clear the profiles vector
     qDeleteAll(profiles);
     profiles.clear();
-
     profilesLayout->blockSignals(false);
 
     // Restore or create the "New Profile" card
@@ -161,20 +152,16 @@ void ProfilesWidget::createNewProfileCard() {
         return;
     }
 
-    // Set properties and styles for the card
     card->setProperty("isNewProfileCard", true);
     card->setFixedHeight(80);
     card->setStyleSheet(
         "QWidget { background-color: white; border-radius: 10px; }");
 
-    // Layout for the card
     QHBoxLayout *cardLayout = new QHBoxLayout(card);
 
-    // Profile icon
     QLabel *iconLabel = new QLabel;
     int picSize = 50;
 
-    // Load the profile picture for the new profile card
     QPixmap profilePicPixmap(":/icons/add_profile.png");
 
     if (!profilePicPixmap.isNull()) {
@@ -205,20 +192,16 @@ void ProfilesWidget::createNewProfileCard() {
                 .arg(picSize / 2));
     }
 
-    // Label for the card
     QLabel *nameLabel = new QLabel("New Profile");
     nameLabel->setStyleSheet("color: #333333; font-size: 16px;");
 
-    // Add widgets to the card layout
     cardLayout->addWidget(iconLabel);
     cardLayout->addWidget(nameLabel);
     cardLayout->addStretch();
 
-    // Set cursor and event filter for interaction
     card->setCursor(Qt::PointingHandCursor);
     card->installEventFilter(this);
 
-    // Add the card to the profiles layout
     profilesLayout->addWidget(card);
     DEBUG("New profile card created successfully");
 }
@@ -240,29 +223,23 @@ void ProfilesWidget::addProfile(ProfileModel *profile) {
         return;
     }
 
-    // Create the card widget for the profile
     QWidget *card = new QWidget;
     if (!card) {
         ERROR("Failed to create profile card widget");
         return;
     }
 
-    // Set properties and styles for the card
     card->setProperty("isProfileCard", true);
     card->setFixedHeight(80);
     card->setStyleSheet(
         "QWidget { background-color: white; border-radius: 10px; }");
 
-    // Layout for the card
     QHBoxLayout *cardLayout = new QHBoxLayout(card);
 
-    // Profile icon
     QLabel *iconLabel = new QLabel;
     int picSize = 50;
 
-    // Load the profile picture
     QPixmap profilePicPixmap(":/images/default_profile.png");
-
     if (!profilePicPixmap.isNull()) {
         // Scale the pixmap to desired size
         profilePicPixmap = profilePicPixmap.scaled(
@@ -290,21 +267,17 @@ void ProfilesWidget::addProfile(ProfileModel *profile) {
                 .arg(picSize / 2));
     }
 
-    // Label displaying the profile name
     QLabel *nameLabel = new QLabel(profile->getName());
     nameLabel->setStyleSheet("color: #333333; font-size: 16px;");
 
-    // Add widgets to the card layout
     cardLayout->addWidget(iconLabel);
     cardLayout->addWidget(nameLabel);
     cardLayout->addStretch();
 
-    // Set cursor and event filter for interaction
     card->setCursor(Qt::PointingHandCursor);
     card->installEventFilter(this);
     card->setProperty("profile_id", QVariant(profile->getId()));
 
-    // Determine the position to insert the card in the layout
     int insertPosition = 1;
     if (profilesLayout->count() > 0 && !profilesLayout->itemAt(0)
                                             ->widget()
@@ -313,7 +286,6 @@ void ProfilesWidget::addProfile(ProfileModel *profile) {
         insertPosition = 0;
     }
     profilesLayout->insertWidget(insertPosition, card);
-
     DEBUG("Profile card added successfully");
 }
 
@@ -328,11 +300,9 @@ void ProfilesWidget::createListView() {
         return;
     }
 
-    // Layout for the list widget
     QVBoxLayout *listLayout = new QVBoxLayout(listWidget);
     listLayout->setContentsMargins(0, 0, 0, 0);
 
-    // Create a scroll area for profiles
     QScrollArea *scrollArea = new QScrollArea;
     if (!scrollArea) {
         ERROR("Failed to create scrollArea");
@@ -346,20 +316,16 @@ void ProfilesWidget::createListView() {
         "QScrollArea { background: transparent; }"
         "QScrollArea > QWidget > QWidget { background: transparent; }");
 
-    // Container widget for profile cards
     QWidget *containerWidget = new QWidget;
     containerWidget->setStyleSheet("background: transparent;");
 
-    // Layout for the profiles
     profilesLayout = new QVBoxLayout(containerWidget);
     profilesLayout->setSpacing(10);
     profilesLayout->setContentsMargins(0, 0, 0, 0);
 
-    // Create the "New Profile" card
     createNewProfileCard();
     profilesLayout->addStretch();
 
-    // Set the container widget for the scroll area
     scrollArea->setWidget(containerWidget);
     listLayout->addWidget(scrollArea);
 
@@ -407,7 +373,6 @@ void ProfilesWidget::loadProfiles() {
         return;
     }
 
-    // Clear existing profiles before loading new ones
     clearProfiles();
 
     QVector<ProfileModel *> loadedProfiles;
@@ -415,7 +380,6 @@ void ProfilesWidget::loadProfiles() {
         DEBUG(QString("Successfully loaded %1 profiles")
                   .arg(loadedProfiles.size()));
 
-        // Copy loaded profiles into the profiles vector
         for (const ProfileModel *profile : loadedProfiles) {
             if (profile) {
                 profiles.append(new ProfileModel(
@@ -425,11 +389,9 @@ void ProfilesWidget::loadProfiles() {
             }
         }
 
-        // Clean up the temporary loaded profiles
         qDeleteAll(loadedProfiles);
         loadedProfiles.clear();
 
-        // Refresh the display of profiles
         refreshProfiles();
         INFO("Profiles loaded successfully");
     } else {
@@ -448,14 +410,12 @@ void ProfilesWidget::refreshProfiles() {
         return;
     }
 
-    // Remove the stretch at the end of the layout
     if (profilesLayout->count() > 0) {
         QLayoutItem *lastItem =
             profilesLayout->takeAt(profilesLayout->count() - 1);
         delete lastItem;
     }
 
-    // Add profile cards for each profile
     for (ProfileModel *profile : profiles) {
         if (profile) {
             addProfile(profile);
@@ -502,11 +462,9 @@ void ProfilesWidget::showProfileEdit(int profileId) {
         return;
     }
 
-    // Clear previous data in the edit widget
     editWidget->clearFields();
 
     if (profileId != -1) {
-        // Edit existing profile
         for (ProfileModel *profile : profiles) {
             if (profile && profile->getId() == profileId) {
                 DEBUG(QString("Editing profile: %1").arg(profile->getName()));
@@ -516,12 +474,10 @@ void ProfilesWidget::showProfileEdit(int profileId) {
             }
         }
     } else {
-        // Create a new profile
         DEBUG("Creating new profile");
         editWidget->setProperty("editing_profile_id", QVariant());
     }
 
-    // Switch to the edit widget in the stacked widget
     stackedWidget->setCurrentWidget(editWidget);
 }
 
@@ -535,7 +491,6 @@ void ProfilesWidget::handleBackFromEdit() {
         return;
     }
 
-    // Switch back to the list widget in the stacked widget
     stackedWidget->setCurrentWidget(listWidget);
 }
 
@@ -563,13 +518,11 @@ void ProfilesWidget::handleProfileSave(QString name, QString sex, int weight,
     QVariant profileIdVar = editWidget->property("editing_profile_id");
 
     if (profileIdVar.isValid()) {
-        // Update existing profile
         int profileId = profileIdVar.toInt();
         DEBUG(QString("Updating existing profile ID: %1").arg(profileId));
         success = profileController->updateProfile(
             profileId, currentUserId, name, desc, sex, weight, height, dob);
     } else {
-        // Create new profile
         DEBUG("Creating new profile");
         success = profileController->createProfile(currentUserId, name, desc,
                                                    sex, weight, height, dob);
@@ -590,16 +543,12 @@ void ProfilesWidget::handleProfileSave(QString name, QString sex, int weight,
  * @param profileId The ID of the profile to delete.
  */
 void ProfilesWidget::handleProfileDelete(int profileId) {
-    // Check if there is more than one profile before deleting
     if (profiles.size() <= 1) {
         WARNING("Cannot delete the last profile");
-
-        // Return to the profiles list view
         handleBackFromEdit();
         return;
     }
 
-    // Proceed if there are multiple profiles
     if (profileController->deleteProfile(profileId)) {
         INFO(QString("Profile %1 deleted successfully").arg(profileId));
         loadProfiles();
@@ -608,4 +557,16 @@ void ProfilesWidget::handleProfileDelete(int profileId) {
     } else {
         WARNING(QString("Failed to delete profile %1").arg(profileId));
     }
+}
+
+/**
+ * @brief
+ *
+ * @return
+ */
+ProfileModel *ProfilesWidget::getFirstProfile() const {
+    if (profiles.isEmpty()) {
+        return nullptr;
+    }
+    return profiles.first();
 }

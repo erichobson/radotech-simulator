@@ -8,10 +8,7 @@
 #include <QDebug>
 #include <QRandomGenerator>
 
-/* Logging Macros */
-#define DEBUG(msg) qDebug() << "[DEBUG]" << __FUNCTION__ << ":" << msg
-#define INFO(msg) qInfo() << "[INFO]" << __FUNCTION__ << ":" << msg
-#define ERROR(msg) qCritical() << "[ERROR]" << __FUNCTION__ << ":" << msg
+#include "Logging.h"
 
 DeviceController::DeviceController(QObject *parent)
     : QObject(parent),
@@ -111,7 +108,7 @@ void DeviceController::updateBatteryLevel() {
     emit batteryLevelChanged(batteryLevel);
 }
 
-// TODO: Update this to transmit proper data
+// TODO: Verify data is in correct range
 void DeviceController::transmitData() {
-    emit dataReceived(QRandomGenerator::global()->bounded(0, 100));
+    emit dataReceived(QRandomGenerator::global()->bounded(75, 125));
 }
