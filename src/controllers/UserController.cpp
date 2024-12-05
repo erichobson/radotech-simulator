@@ -67,23 +67,24 @@ bool UserController::createUser(UserModel* user) {
  */
 
 bool UserController::getUserById(int userId, UserModel& user) const {
-
-    QList<QMap<QString, QVariant>> results;
-
     try {
-        db.query("SELECT * from users WHERE user_id = ?;", {userId}, results);
-        
-        if (results.isEmpty()) return false;
-        const auto& result = results.first();
+        QString queryString = "SELECT * from users WHERE user_id = ?;";
+        QList<QVariant> params = { userId };
+        QList<QMap<QString, QVariant>> results;
 
-        user.setId(result.value("user_id").toInt());
-        user.setFirstName(result.value("first_name").toString());
-        user.setLastName(result.value("last_name").toString());
-        user.setEmail(result.value("email").toString());
-        user.setPasswordHash(result.value("password_hash").toString());
-
-        return true;
-
+        db.query(queryString, params, results);
+        if (!results.isEmpty()) {
+            const auto& result = results.first();
+            user.setId(result.value("user_id").toInt());
+            user.setFirstName(result.value("first_name").toString());
+            user.setLastName(result.value("last_name").toString());
+            user.setEmail(result.value("email").toString());
+            user.setPasswordHash(result.value("password_hash").toString());
+            return true;
+        } else {
+            qDebug() << "No user found with given id:" << userId;
+            return false; 
+        }
     } catch(const std::exception& e) {
         qCritical() << "Failed to get user: " << e.what();
         return false;
@@ -141,7 +142,8 @@ bool UserController::getUserProfiles(int userId, QVector<ProfileModel*>& profile
         QList<QMap<QString, QVariant>> results;
         db.query(queryString, params, results);
         profiles.clear();
-        for(const auto& result : results) {
+        if (!results.isEmpty()) {
+            for(const auto& result : results) {
             ProfileModel* profile = new ProfileModel(
                 result.value("profile_id").toInt(),
                 result.value("user_id").toInt(),
@@ -153,6 +155,10 @@ bool UserController::getUserProfiles(int userId, QVector<ProfileModel*>& profile
                 result.value("date_of_birth").toDate()
             );
             profiles.append(profile);
+        }
+        } else {
+            qDebug() << "User has no profiles assigned";
+            return false;
         }
         return true;
     } catch(const std::exception& e) {
@@ -167,7 +173,7 @@ bool UserController::getUserProfiles(int userId, QVector<ProfileModel*>& profile
  */
 int UserController::getUserId(const QString &email){
     try {
-        QString queryString = "SELECT user_id FROM users WHERE email = ?";
+        QString queryString = "SELECT user_id FROM users WHERE email = ?;";
         QList<QVariant> params = { email };
         QList<QMap<QString, QVariant>> results;
 
@@ -180,8 +186,7 @@ int UserController::getUserId(const QString &email){
             return -1; // Return -1 if no user is found
         }
     } catch (const std::exception &e) {
-        // Handle exceptions and log the error
-        qDebug() << "Exception occurred while fetching user ID:" << e.what();
-        return -1; // Return -1 to indicate an error
+        qCritical() << "Exception occurred while fetching user ID:" << e.what();
+        return -1; 
     }
 }
