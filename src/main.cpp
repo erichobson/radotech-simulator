@@ -5,6 +5,7 @@
 
 #include <QApplication>
 
+#include "UserControllerTest.h"
 #include "ui/MainWindow.h"
 
 #include "Test.h"
@@ -36,7 +37,8 @@ int main(int argc, char *argv[]) {
         new ProfileModelTest(),
         new ScanModelTest(),
         new HealthMetricCalculatorTest(),
-        new UserProfileControllerTest(db)
+        new UserProfileControllerTest(db),
+        new UserControllerTest(db),
     };
 
     // Run & delete tests
