@@ -48,9 +48,10 @@ class MeasureNowWidget : public QWidget {
     Q_OBJECT
 
    public:
-    explicit MeasureNowWidget(QWidget* parent = nullptr);
-    void setDeviceController(DeviceController* controller);
-    void setUserProfileController(UserProfileController* controller);
+    explicit MeasureNowWidget(
+        QWidget* parent = nullptr, DeviceController* deviceController = nullptr,
+        UserProfileController* userProfileController = nullptr,
+        int userId = -1);
     void setUserId(int userId);
     void refreshProfiles();
 

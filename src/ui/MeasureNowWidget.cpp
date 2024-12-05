@@ -128,9 +128,14 @@ void BackgroundDelegate::paint(QPainter* painter,
  * @brief Constructs and initializes the MeasureNowWidget
  * @param parent The parent widget
  */
-MeasureNowWidget::MeasureNowWidget(QWidget* parent)
+MeasureNowWidget::MeasureNowWidget(QWidget* parent,
+                                   DeviceController* deviceController,
+                                   UserProfileController* userProfileController,
+                                   int userId)
     : QWidget(parent),
-      deviceController(nullptr),
+      profileController(userProfileController),
+      currentUserId(userId),
+      deviceController(deviceController),
       countdownTimer(nullptr),
       remainingTime(0),
       currentScanPage(1),
@@ -166,6 +171,15 @@ MeasureNowWidget::MeasureNowWidget(QWidget* parent)
         connect(countdownTimer, &QTimer::timeout, this,
                 &MeasureNowWidget::updateCountdown);
 
+        // Connect to the device controller
+        if (this->deviceController) {
+            connect(this->deviceController, &DeviceController::dataReceived,
+                    this, &MeasureNowWidget::receiveData);
+            DEBUG("DeviceController connected successfully");
+        } else {
+            ERROR("DeviceController is null in setDeviceController");
+        }
+
         // Initialize and configure connection check timer
         connectionTimer = new QTimer(this);
         if (!connectionTimer) {
@@ -173,7 +187,7 @@ MeasureNowWidget::MeasureNowWidget(QWidget* parent)
         }
         connectionTimer->setInterval(1000);
         connect(connectionTimer, &QTimer::timeout, this, [this]() {
-            if (!deviceController->isConnected() &&
+            if (!this->deviceController->isConnected() &&
                 stackedWidget->currentIndex() != 0) {
                 DEBUG("Device disconnected - resetting measurement");
                 showAlert("Device disconnected - measurement cancelled");
@@ -185,32 +199,14 @@ MeasureNowWidget::MeasureNowWidget(QWidget* parent)
         initImagePaths();
         setupPages();
 
+        // Populate profile list if controllers and userId are available
+        if (profileComboBox && this->profileController && currentUserId != -1) {
+            populateProfileList(profileComboBox);
+        }
+
         DEBUG("MeasureNowWidget initialization completed successfully");
     } catch (const std::exception& e) {
         ERROR("Failed to initialize MeasureNowWidget:" << e.what());
-    }
-}
-
-/**
- * @brief Sets and connects the device controller
- * @param controller Pointer to the device controller
- */
-void MeasureNowWidget::setDeviceController(DeviceController* controller) {
-    deviceController = controller;
-    if (deviceController) {
-        connect(deviceController, &DeviceController::dataReceived, this,
-                &MeasureNowWidget::receiveData);
-        DEBUG("DeviceController connected successfully");
-    } else {
-        ERROR("DeviceController is null in setDeviceController");
-    }
-}
-
-void MeasureNowWidget::setUserId(int userId) {
-    DEBUG(QString("Setting user ID: %1").arg(userId));
-    currentUserId = userId;
-    if (profileComboBox && profileController) {
-        populateProfileList(profileComboBox);
     }
 }
 
@@ -330,11 +326,6 @@ void MeasureNowWidget::setupPages() {
     } catch (const std::exception& e) {
         ERROR("Failed to setup pages: " << e.what());
     }
-}
-
-void MeasureNowWidget::setUserProfileController(
-    UserProfileController* controller) {
-    profileController = controller;
 }
 
 /**
@@ -1121,9 +1112,23 @@ void MeasureNowWidget::showAlert(const QString& message, bool autoHide) {
     }
 }
 
+/**
+ * @brief Refresh the profiles
+ */
 void MeasureNowWidget::refreshProfiles() {
     if (profileComboBox && profileController) {
         DEBUG("Refreshing profile list");
+        populateProfileList(profileComboBox);
+    }
+}
+
+/**
+ * @brief Update the user id
+ */
+void MeasureNowWidget::setUserId(int userId) {
+    DEBUG(QString("Setting user ID: %1").arg(userId));
+    currentUserId = userId;
+    if (profileComboBox && profileController) {
         populateProfileList(profileComboBox);
     }
 }

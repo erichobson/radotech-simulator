@@ -196,10 +196,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     contentCardLayout->addWidget(contentStackedWidget);
 
     // Create the content widgets
-    MeasureNowWidget *measureNowWidget = new MeasureNowWidget;
-    measureNowWidget->setDeviceController(deviceController);
-    measureNowWidget->setUserProfileController(userProfileController);
-    measureNowWidget->setUserId(loggedInUserId);
+    MeasureNowWidget *measureNowWidget = new MeasureNowWidget(
+        this, deviceController, userProfileController, loggedInUserId);
 
     HomeWidget *homeWidget = new HomeWidget;
 
