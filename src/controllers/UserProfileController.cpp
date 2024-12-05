@@ -261,3 +261,7 @@ bool UserProfileController::getProfileScans(int profileId, QVector<ScanModel*>& 
     }
 }
 
+void UserProfileController::onCreateProfile(int userId, const QString& name, const QString& desc, const QString& sex, int weight, int height, const QDate& dob){
+    this->createProfile(userId, name, desc, sex, weight, height, dob)
+}
+

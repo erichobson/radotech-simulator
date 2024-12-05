@@ -598,8 +598,8 @@ void LoginWidget::onSaveContinueButtonClicked() {
     } else {
         gender = "Not Selected";
     }
-    QString weight = weightLineEdit->text();
-    QString height = heightLineEdit->text();
+    int weight = weightLineEdit->text().toInt(); // Convert to int
+    int height = heightLineEdit->text().toInt(); // Convert to int
     QDate dob = dobDateEdit->date();
     QString email = emailRegLineEdit->text();
     //emailverification done here

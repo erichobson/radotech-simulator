@@ -18,6 +18,9 @@
 
 class UserProfileController {
 
+private slots:
+    void onCreateProfile(int, const QString&, const QString&, const QString&, int, int, const QDate&);
+
 public:
     UserProfileController(DatabaseManager&);
     ~UserProfileController();
