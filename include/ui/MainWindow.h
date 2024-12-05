@@ -10,7 +10,9 @@
 #include <QVector>
 
 #include "ClickableLabel.h"
+#include "DatabaseManager.h"
 #include "DeviceController.h"
+#include "UserProfileController.h"
 
 class QStackedWidget;
 class QVBoxLayout;
@@ -68,7 +70,10 @@ class MainWindow : public QMainWindow {
      */
     void setupBatteryInfoWidget();
 
+    DatabaseManager *databaseManager;
     DeviceController *deviceController;
+    UserProfileController *userProfileController;
+    int loggedInUserId;
 
     QStackedWidget *stackedWidget;
     LoginWidget *loginWidget;
