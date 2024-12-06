@@ -34,7 +34,6 @@ LoginWidget::LoginWidget(QWidget *parent)
           // Style template for buttons using placeholders for color and radius
           "QPushButton {"
           "    background-color: %1;"
-select * from profile;
           "    color: %2;"
           "    border-radius: %3px;"
           "    padding: 5px;"
