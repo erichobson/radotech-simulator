@@ -16,6 +16,8 @@ class ProfileWidget : public QWidget {
     explicit ProfileWidget(const QString &imagePath, const QString &userName,
                            QWidget *parent = nullptr);
 
+    void setUserName(const QString& username);
+
    private:
     QLabel *profilePicLabel;
     QLabel *userNameLabel;

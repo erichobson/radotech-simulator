@@ -136,7 +136,7 @@ bool UserController::createUser(const QString& firstName, const QString& lastNam
         if (results.isEmpty()) return false;
         const auto& result = results.first();
         
-        user.setId(result.value("profile_id").toInt());
+        user.setId(result.value("user_id").toInt());
         user.setFirstName(result.value("first_name").toString());
         user.setLastName(result.value("last_name").toString());
         user.setEmail(result.value("email").toString());

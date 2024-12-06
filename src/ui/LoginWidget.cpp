@@ -34,6 +34,7 @@ LoginWidget::LoginWidget(QWidget *parent)
           // Style template for buttons using placeholders for color and radius
           "QPushButton {"
           "    background-color: %1;"
+select * from profile;
           "    color: %2;"
           "    border-radius: %3px;"
           "    padding: 5px;"
@@ -445,6 +446,11 @@ void LoginWidget::createRegistrationPage() {
     passwordRegLineEdit = new QLineEdit;
     confirmPasswordLineEdit = new QLineEdit;
 
+    // Status label for error messages
+    registrationStatusLabel= new QLabel;
+    registrationStatusLabel->setStyleSheet("QLabel { color: blue; }");
+    registrationStatusLabel->setAlignment(Qt::AlignCenter);
+
     // Set placeholder text
     weightLineEdit->setPlaceholderText("Your weight");
     heightLineEdit->setPlaceholderText("Your height");
@@ -482,6 +488,7 @@ void LoginWidget::createRegistrationPage() {
     passwordRegLineEdit->setStyleSheet(inputFieldStyle);
     confirmPasswordLineEdit->setStyleSheet(inputFieldStyle);
 
+    
     // Arrange widgets in the grid layout
     // Left column (1/5 width)
     formLayout->addWidget(profilePicLabel, 0, 0, 3, 1, Qt::AlignTop);
@@ -530,8 +537,9 @@ void LoginWidget::createRegistrationPage() {
     connect(saveContinueButton, &QPushButton::clicked, this,
             &LoginWidget::onSaveContinueButtonClicked);
 
-    // Add form and button to card layout
+    // Add form and button and status label to card layout
     cardLayout->addWidget(formWidget);
+    cardLayout->addWidget(registrationStatusLabel);
     cardLayout->addWidget(saveContinueButton, 0, Qt::AlignCenter);
 
     // Add card to registration layout
@@ -583,7 +591,7 @@ void LoginWidget::onCreateProfileButtonClicked() {
 
 /**
  * @brief Slot called when the "Save and continue" button is clicked.
- *        Emits a signal indicating the profile has been created.
+ *        Emits a signal indicating the registration request.
  */
 void LoginWidget::onSaveContinueButtonClicked() {
 

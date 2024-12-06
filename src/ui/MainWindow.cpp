@@ -321,49 +321,61 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
 }
 
 /**
- * @brief
+ * @brief Verifies and logs in a user. Sets the logged in user id.
  *
- * @param username
- * @param password
+ * @param username the username (email) to verify
+ * @param password the password to verify
  */
 void MainWindow::onLoginRequested(const QString &username,
                                   const QString &password) {
     UserModel user;
     if(userController->validateUser(username, password, user)){
-        DEBUG(QString("User Logged In: ID=%1, First Name=%2, Last Name=%3, Email=%4")
-              .arg(user.getId())
-              .arg(user.getFirstName())
-              .arg(user.getLastName())
-              .arg(user.getEmail())
-        );
-
         // Successful login: switch to mainWidget
         sidebarMenu->setCurrentRow(1);
         contentStackedWidget->setCurrentIndex(1);
         stackedWidget->setCurrentWidget(mainWidget);
         loginWidget->clearFields();
         loggedInUserId = user.getId();
-        DEBUG(QString("User Logged In: ID=%1, First Name=%2, Last Name=%3, Email=%4")
-              .arg(user.getId())
-              .arg(user.getFirstName())
-              .arg(user.getLastName())
-              .arg(user.getEmail())
-          );
+        DEBUG(QString("User Logged in: ID=%1, First Name=%2, Email=%3")
+                  .arg(user.getId())
+                  .arg(user.getFirstName())
+                  .arg(user.getEmail())
+        );
+
+        // Get user's default profile
+        QVector<ProfileModel*> profiles;
+        if(userController->getUserProfiles(user.getId(), profiles)) {
+            if(!profiles.isEmpty()) {
+                ProfileModel *profile = profiles.at(0);
+                DEBUG(QString("User Profile found: ID=%1, UserId=%2, Name=%3")
+                  .arg(profile->getId())
+                  .arg(profile->getUserId())
+                  .arg(profile->getName())
+                );
+                if(profile != nullptr) {
+                    setCurrentProfile(profile->getId(), profile->getName());
+                }
+            }
+        }
+        for(auto* p : profiles) delete p;
 
     } else {
+
         loginWidget->setStatusMessage("Invalid username or password");
     }
-
-    // -------- REMOVE AFTER TESTING --------
-    //sidebarMenu->setCurrentRow(1);
-    //contentStackedWidget->setCurrentIndex(1);
-    //stackedWidget->setCurrentWidget(mainWidget);
-    //loginWidget->clearFields();
-    // --------------------------------------
 }
 
 /**
- * @brief
+ * @brief Verifies and creates a new user and default profile.
+ * @param firstName the first name of the user
+ * @param lastName the last name of the user
+ * @param sex the sex of the user
+ * @param weight the weight of the user
+ * @param height the height of the user
+ * @param dob the date of birth of the user
+ * @param email the email of the user
+ * @param password the password of the user
+ * @param confirmPassword the confirmed password of the user
  */
 void MainWindow::onRegisterRequested(const QString &firstName, const QString &lastName, const QString &sex, const QString &weight, 
                            const QString &height, const QDate &dob, const QString &email, const QString& password, 
@@ -371,19 +383,26 @@ void MainWindow::onRegisterRequested(const QString &firstName, const QString &la
 
     UserModel user;
     if(password != confirmPassword){
-        loginWidget->setStatusMessage("Passwords do not match");
+        loginWidget->setRegistrationStatusMessage("Passwords do not match");
         return;
     }
     if(userController->validateUser(email, password, user)){
-        loginWidget->setStatusMessage("User with that username/email already exists");
+        loginWidget->setRegistrationStatusMessage("User with that username/email already exists");
         return;
     }
     if(!userController->createUser(firstName, lastName, email, password, user)) {
-        loginWidget->setStatusMessage("Error registering the user");
+        loginWidget->setRegistrationStatusMessage("Error registering the user");
         return;
     }
-    if(!userProfileController->createProfile(loggedInUserId, firstName+ " " + lastName, "", sex, weight.toInt(), height.toInt(), dob)) {
-        loginWidget->setStatusMessage("Error creating profile");
+    
+    DEBUG(QString("User Logged in: ID=%1, First Name=%2, Email=%3")
+                  .arg(user.getId())
+                  .arg(user.getFirstName())
+                  .arg(user.getEmail())
+    );
+
+    if(!userProfileController->createProfile(user.getId(), firstName+ " " + lastName, "", sex, weight.toInt(), height.toInt(), dob)) {
+        loginWidget->setRegistrationStatusMessage("Error creating profile");
         return;
     }
 
@@ -392,14 +411,29 @@ void MainWindow::onRegisterRequested(const QString &firstName, const QString &la
     contentStackedWidget->setCurrentIndex(1);
     stackedWidget->setCurrentWidget(mainWidget);
     loginWidget->clearFields();
-    loggedInUserId = user.getId();
-
-    DEBUG(QString("User Logged In: ID=%1, First Name=%2, Last Name=%3, Email=%4")
-              .arg(user.getId())
-              .arg(user.getFirstName())
-              .arg(user.getLastName())
-              .arg(user.getEmail())
-          );
+    loggedInUserId = user.getId(); 
+    DEBUG(QString("User Logged in: ID=%1, First Name=%2, Email=%3")
+                  .arg(user.getId())
+                  .arg(user.getFirstName())
+                  .arg(user.getEmail())
+    );
+    
+    // Get user's default profile
+    QVector<ProfileModel*> profiles;
+    if(userController->getUserProfiles(user.getId(), profiles)) {
+        if(!profiles.isEmpty()) {
+            ProfileModel *profile = profiles.at(0);
+            if(profile != nullptr) {
+                DEBUG(QString("User Profile found: ID=%1, UserId=%2, Name=%3")
+                  .arg(profile->getId())
+                  .arg(profile->getUserId())
+                  .arg(profile->getName())
+                );
+                setCurrentProfile(profile->getId(), profile->getName());
+            }
+        }
+    }
+    for(auto* p : profiles) delete p;
 }
 
 /**
