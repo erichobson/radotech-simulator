@@ -118,7 +118,7 @@ bool UserController::getUserProfiles(int userId, QVector<ProfileModel*>& profile
  * @param user the user model to populate with the created user 
  * @return true if the operation was successful
  */
-bool UserController::createUser(const QString& firstName, const QString& lastName, const QString& email, QString& password, UserModel& user) {
+bool UserController::createUser(const QString& firstName, const QString& lastName, const QString& email, const QString& password, UserModel& user) {
     try {
         QString hashedPass = hash(password);
         db.execute(
@@ -136,7 +136,7 @@ bool UserController::createUser(const QString& firstName, const QString& lastNam
         if (results.isEmpty()) return false;
         const auto& result = results.first();
         
-        user.setId(result.value("profile_id").toInt());
+        user.setId(result.value("user_id").toInt());
         user.setFirstName(result.value("first_name").toString());
         user.setLastName(result.value("last_name").toString());
         user.setEmail(result.value("email").toString());
@@ -157,7 +157,7 @@ bool UserController::createUser(const QString& firstName, const QString& lastNam
  * @param user the user model that will get updated with the result if validated
  * @return true if the operation was successful and the user was validated
  */
-bool UserController::validateUser(const QString& email, QString& password, UserModel& user) {
+bool UserController::validateUser(const QString& email, const QString& password, UserModel& user) {
     try{
         QString hashedPass = hash(password);
 
@@ -197,7 +197,7 @@ bool UserController::validateUser(const QString& email, QString& password, UserM
  * @param user the user model that will get updated with the result 
  * @return true if the operation was successful
  */
-bool UserController::updateUser(int id, const QString& firstName, const QString& lastname, const QString& email, QString& password, UserModel& user) {
+bool UserController::updateUser(int id, const QString& firstName, const QString& lastname, const QString& email, const QString& password, UserModel& user) {
     try {
         QString hashedPass = hash(password);
         db.execute(

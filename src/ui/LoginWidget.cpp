@@ -445,6 +445,11 @@ void LoginWidget::createRegistrationPage() {
     passwordRegLineEdit = new QLineEdit;
     confirmPasswordLineEdit = new QLineEdit;
 
+    // Status label for error messages
+    registrationStatusLabel= new QLabel;
+    registrationStatusLabel->setStyleSheet("QLabel { color: blue; }");
+    registrationStatusLabel->setAlignment(Qt::AlignCenter);
+
     // Set placeholder text
     weightLineEdit->setPlaceholderText("Your weight");
     heightLineEdit->setPlaceholderText("Your height");
@@ -482,6 +487,7 @@ void LoginWidget::createRegistrationPage() {
     passwordRegLineEdit->setStyleSheet(inputFieldStyle);
     confirmPasswordLineEdit->setStyleSheet(inputFieldStyle);
 
+    
     // Arrange widgets in the grid layout
     // Left column (1/5 width)
     formLayout->addWidget(profilePicLabel, 0, 0, 3, 1, Qt::AlignTop);
@@ -530,8 +536,9 @@ void LoginWidget::createRegistrationPage() {
     connect(saveContinueButton, &QPushButton::clicked, this,
             &LoginWidget::onSaveContinueButtonClicked);
 
-    // Add form and button to card layout
+    // Add form and button and status label to card layout
     cardLayout->addWidget(formWidget);
+    cardLayout->addWidget(registrationStatusLabel);
     cardLayout->addWidget(saveContinueButton, 0, Qt::AlignCenter);
 
     // Add card to registration layout
@@ -583,14 +590,72 @@ void LoginWidget::onCreateProfileButtonClicked() {
 
 /**
  * @brief Slot called when the "Save and continue" button is clicked.
- *        Emits a signal indicating the profile has been created.
+ *        Emits a signal indicating the registration request.
  */
 void LoginWidget::onSaveContinueButtonClicked() {
-    // TODO: Implement connection to database manager
-    // NOTE: This should be initialized from the MainWindow
+
+    QString firstName = firstNameLineEdit->text();
+    QString lastName = lastNameLineEdit->text();
+    QAbstractButton* selected = sexButtonGroup->checkedButton();
+    QString sex = selected == nullptr ? "" : selected->text();
+    QString weight = weightLineEdit->text();
+    QString height = heightLineEdit->text();
+    QDate dob = dobDateEdit == nullptr ? QDate() : dobDateEdit->date();
+    QString email = emailRegLineEdit->text();
+    QString password = passwordRegLineEdit->text();
+    QString confirmPassword = confirmPasswordLineEdit->text();
+
+    // Verify name
+    if(firstName.isEmpty() || lastName.isEmpty()) {
+        registrationStatusLabel->setText("Enter first and last name");
+        return;
+    }
+
+    // Verify sex, weight, and height
+    if(sex.isEmpty() || weight.isEmpty() || height.isEmpty()) {
+        registrationStatusLabel->setText("Enter sex, weight, and height");
+        return;
+    }
+
+    // Verify weight and height only contain numbers
+    if(!(weight.contains(QRegularExpression("^[0-9]+$"))) || !(height.contains(QRegularExpression("^[0-9]+$")))) {
+        registrationStatusLabel->setText("Weight and height can only contain numbers");
+        return;
+    } 
+
+    // Verfiy dob
+    if(dob.isNull()){
+        registrationStatusLabel->setText("Enter your date of birth (MM-dd-yyyy)");
+        return;
+    }
+
+    // Verify the format of the email
+    const QRegularExpression regex(R"(^[^\s@]+@[^\s@]+\.[^\s@]+$)");
+    QRegularExpressionMatch match = regex.match(email.trimmed());
+    if (email.isEmpty() || !match.hasMatch()) {
+         registrationStatusLabel->setText("Enter email");
+         return;
+    }
+
+    // Verify password
+    if(password.isEmpty()) {
+        registrationStatusLabel->setText("Enter password");
+    }
+
+    // Verify confirm passowrd
+    if(confirmPassword.isEmpty()) {
+        registrationStatusLabel->setText("Confirm password");
+    }
+
+    // Verify passwords match
+    if(!(confirmPassword == password)){
+        registrationStatusLabel->setText("Passwords do not match");
+    }
+
+    emit registerRequested(firstName, lastName, sex, weight, height, dob, email, password, confirmPassword);
 
     // Emit the profileCreated signal
-    emit profileCreated();
+    //emit profileCreated();
 }
 
 /**
@@ -602,20 +667,18 @@ void LoginWidget::onStartButtonClicked() {
     QString password = passwordLineEdit->text();
 
     // Verify the format of the email
-    // --------- UNCOMMENT AFTER IMPLEMENTATION ---------
-    // const QRegularExpression regex(R"(^[^\s@]+@[^\s@]+\.[^\s@]+$)");
-    // QRegularExpressionMatch match = regex.match(email.trimmed());
-    // if (email.isEmpty() || !match.hasMatch()) {
-    //     statusLabel->setText("Enter email");
-    //     return;
-    // }
-    //
-    // // Verify password is not empty
-    // if (password.isEmpty()) {
-    //     statusLabel->setText("Enter password");
-    //     return;
-    // }
-    // --------------------------------------------------
+    const QRegularExpression regex(R"(^[^\s@]+@[^\s@]+\.[^\s@]+$)");
+    QRegularExpressionMatch match = regex.match(email.trimmed());
+    if (email.isEmpty() || !match.hasMatch()) {
+         statusLabel->setText("Enter email");
+         return;
+    }
+    
+    // Verify password is not empty
+    if (password.isEmpty()) {
+        statusLabel->setText("Enter password");
+        return;
+    }
 
     // Emit the loginRequested signal
     emit loginRequested(email, password);
@@ -679,6 +742,9 @@ void LoginWidget::clearFields() {
     if (confirmPasswordLineEdit) {
         confirmPasswordLineEdit->clear();
     }
+    if (registrationStatusLabel) {
+        registrationStatusLabel->clear();
+    }
 }
 
 /**
@@ -687,4 +753,12 @@ void LoginWidget::clearFields() {
  */
 void LoginWidget::setStatusMessage(const QString &message) {
     statusLabel->setText(message);
+}
+
+/**
+ * @brief Sets the status message displayed on the registration page.
+ * @param message The message to display.
+ */
+void LoginWidget::setRegistrationStatusMessage(const QString &message) {
+    registrationStatusLabel->setText(message);
 }

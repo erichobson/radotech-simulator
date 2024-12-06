@@ -32,11 +32,20 @@ class LoginWidget : public QWidget {
      */
     void setStatusMessage(const QString &message);
 
+    /**
+     * @brief Sets the status message displayed on the registration page.
+     * @param message The message to display.
+     */
+    void setRegistrationStatusMessage(const QString &message);
+
    signals:
     void loginRequested(const QString &email, const QString &password);
-    void registerRequested();
+    //void registerRequested();
     void remindPasswordRequested();
     void profileCreated();
+    void registerRequested(const QString &firstName, const QString &lastName, const QString &sex, const QString &weight, 
+                           const QString &height, const QDate &dob, const QString &email, const QString& password, 
+                           const QString &confirmPassword);
 
    private slots:
     void onEnterButtonClicked();
@@ -81,6 +90,7 @@ class LoginWidget : public QWidget {
     QLineEdit *emailRegLineEdit;
     QLineEdit *passwordRegLineEdit;
     QLineEdit *confirmPasswordLineEdit;
+    QLabel *registrationStatusLabel;
 
     // Common Styles
     QString buttonStyle;

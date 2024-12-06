@@ -61,3 +61,10 @@ ProfileWidget::ProfileWidget(const QString &imagePath, const QString &userName,
     layout->setAlignment(Qt::AlignCenter);
     layout->setContentsMargins(0, 20, 0, 20);
 }
+
+void ProfileWidget::setUserName(const QString& username) {
+    if(userNameLabel != nullptr){
+        userNameLabel->setText(username);
+    }
+}
+

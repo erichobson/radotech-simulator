@@ -16,6 +16,9 @@
 #include "MeasureNowWidget.h"
 #include "ScanController.h"
 #include "UserProfileController.h"
+#include "UserController.h"
+#include "ProfilesWidget.h"
+#include "HistoryWidget.h"
 
 class QStackedWidget;
 class QVBoxLayout;
@@ -40,7 +43,7 @@ class MainWindow : public QMainWindow {
    signals:
     void currentProfileChanged(int profileId, const QString &profileName);
 
-   private slots:
+   public slots:
     /**
      * @brief Slot called when a login is requested.
      * @param username The username entered.
@@ -51,7 +54,10 @@ class MainWindow : public QMainWindow {
     /**
      * @brief Slot called when a registration is requested.
      */
-    void onRegisterRequested();
+    void onRegisterRequested(const QString &firstName, const QString &lastName, const QString &sex, const QString &weight, 
+                           const QString &height, const QDate &dob, const QString &email, const QString& password, 
+                           const QString &confirmPassword);
+
 
     /**
      * @brief Logs out the current user and returns to the login page.
@@ -85,7 +91,9 @@ class MainWindow : public QMainWindow {
     DeviceController *deviceController;
     UserProfileController *userProfileController;
     ScanController *scanController;
-
+    UserController *userController;
+    ProfilesWidget *profilesWidget;
+    HistoryWidget *historyWidget;
     HomeWidget *homeWidget;
     MeasureNowWidget *measureNowWidget;
 
