@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setMinimumSize(1200, 800);
 
     // Initialize the database
-    loggedInUserId = 1;
+    loggedInUserId = -1;
     currentProfileId = -1;
     currentProfileName = "";
 
@@ -197,12 +197,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     homeWidget = new HomeWidget(this, userProfileController);
     homeWidget->setUserId(loggedInUserId);
 
-    ProfilesWidget *profilesWidget = new ProfilesWidget;
+    profilesWidget = new ProfilesWidget;
     profilesWidget->setUserProfileController(userProfileController);
     profilesWidget->setStyleSheet("background-color: transparent;");
     profilesWidget->setUserId(loggedInUserId);
 
-    HistoryWidget *historyWidget =
+    historyWidget =
         new HistoryWidget(this, userProfileController);
     historyWidget->setStyleSheet("background-color: transparent;");
 
@@ -272,14 +272,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
                 }
             });
 
-    connect(profilesWidget, &ProfilesWidget::profilesChanged, this,
-            [profilesWidget, this]() {
-                if (ProfileModel *firstProfile =
-                        profilesWidget->getFirstProfile()) {
-                    setCurrentProfile(firstProfile->getId(),
-                                      firstProfile->getName());
-                }
-            });
+    connect(profilesWidget, &ProfilesWidget::profilesChanged, this, [this]() {
+        if (ProfileModel *firstProfile = profilesWidget->getFirstProfile()) {
+            setCurrentProfile(firstProfile->getId(), firstProfile->getName());
+        }
+    });
 
     connect(profilesWidget, &ProfilesWidget::profilesChanged, homeWidget,
             &HomeWidget::refreshProfiles);
@@ -301,7 +298,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
             &MainWindow::setCurrentProfile);
 
     connect(this, &MainWindow::currentProfileChanged, historyWidget,
-            [historyWidget](int profileId, const QString &) {
+            [this](int profileId, const QString &) {
                 historyWidget->setCurrentProfile(profileId);
             });
 
@@ -343,6 +340,9 @@ void MainWindow::onLoginRequested(const QString &username,
         stackedWidget->setCurrentWidget(mainWidget);
         loginWidget->clearFields();
         loggedInUserId = user.getId();
+        homeWidget->setUserId(loggedInUserId);
+        measureNowWidget->setUserId(loggedInUserId);
+        profilesWidget->setUserId(loggedInUserId);
         DEBUG(QString("User Logged in: ID=%1, First Name=%2, Email=%3")
                   .arg(user.getId())
                   .arg(user.getFirstName())
@@ -419,6 +419,10 @@ void MainWindow::onRegisterRequested(const QString &firstName, const QString &la
     stackedWidget->setCurrentWidget(mainWidget);
     loginWidget->clearFields();
     loggedInUserId = user.getId(); 
+    homeWidget->setUserId(loggedInUserId);
+    measureNowWidget->setUserId(loggedInUserId);
+    profilesWidget->setUserId(loggedInUserId);
+
     DEBUG(QString("User Logged in: ID=%1, First Name=%2, Email=%3")
                   .arg(user.getId())
                   .arg(user.getFirstName())

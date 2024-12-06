@@ -17,6 +17,8 @@
 #include "ScanController.h"
 #include "UserProfileController.h"
 #include "UserController.h"
+#include "ProfilesWidget.h"
+#include "HistoryWidget.h"
 
 class QStackedWidget;
 class QVBoxLayout;
@@ -90,6 +92,8 @@ class MainWindow : public QMainWindow {
     UserProfileController *userProfileController;
     ScanController *scanController;
     UserController *userController;
+    ProfilesWidget *profilesWidget;
+    HistoryWidget *historyWidget;
     HomeWidget *homeWidget;
     MeasureNowWidget *measureNowWidget;
 
