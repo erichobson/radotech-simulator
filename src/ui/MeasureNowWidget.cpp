@@ -8,120 +8,13 @@
 #include <QPainter>
 #include <QtWidgets>
 
+#include "BackgroundDelegate.h"
 #include "DeviceController.h"
 #include "Logging.h"
 #include "ProfileModel.h"
 #include "ResultsWidget.h"
 #include "ScanController.h"
 #include "UserProfileController.h"
-
-namespace {
-/**
- * @brief Style definitions for UI components
- *
- * These constants define the CSS-style formatting for various UI elements
- * including buttons, input fields, and combo boxes.
- */
-const QString BUTTON_STYLE = R"(
-        QPushButton {
-            background-color: #FF7009;
-            color: white;
-            border-radius: 10px;
-            padding: 5px 20px;
-            font-size: 16px;
-        }
-        QPushButton:hover {
-            background-color: #E66008;
-        }
-        QPushButton:pressed {
-            background-color: #CC5A07;
-        }
-    )";
-
-const QString INPUT_STYLE =
-    "QDateEdit, QTimeEdit, QDoubleSpinBox, QSpinBox {"
-    "    background-color: white;"
-    "    color: #333333;"
-    "    border: 2px solid #E0E0E0;"
-    "    border-radius: 6px;"
-    "    padding: 8px;"
-    "    font-size: 14px;"
-    "    min-width: 100px;"
-    "}"
-    "QDateEdit:hover, QTimeEdit:hover, QDoubleSpinBox:hover, QSpinBox:hover {"
-    "    border-color: #FF7009;"
-    "}"
-    "QDateEdit::up-button, QDateEdit::down-button,"
-    "QTimeEdit::up-button, QTimeEdit::down-button,"
-    "QDoubleSpinBox::up-button, QDoubleSpinBox::down-button,"
-    "QSpinBox::up-button, QSpinBox::down-button {"
-    "    width: 0px;"
-    "    height: 0px;"
-    "    border: none;"
-    "    image: none;"
-    "}";
-
-const QString COMBOBOX_STYLE =
-    "QComboBox {"
-    "    background-color: white;"
-    "    border: 2px solid #E0E0E0;"
-    "    border-radius: 6px;"
-    "    padding: 8px;"
-    "    font-size: 14px;"
-    "    min-width: 200px;"
-    "    color: #333333;"
-    "}"
-    "QComboBox:hover {"
-    "    border-color: #FF7009;"
-    "}"
-    "QComboBox::drop-down {"
-    "    border: none;"
-    "    background: none;"
-    "}"
-    "QComboBox::down-arrow {"
-    "    image: none;"
-    "}"
-    "QComboBox QAbstractItemView {"
-    "    background-color: white;"
-    "    border: 1px solid #E0E0E0;"
-    "    selection-background-color: #FF7009;"
-    "    selection-color: white;"
-    "}";
-}  // namespace
-
-/**
- * @brief BackgroundDelegate implementation for custom item styling
- */
-BackgroundDelegate::BackgroundDelegate(QObject* parent)
-    : QStyledItemDelegate(parent) {}
-
-/**
- * @brief Custom paint implementation for combo box items
- *
- * Handles the painting of combo box items with custom colors for
- * hover and selection states.
- *
- * @param painter The painter to use for drawing
- * @param option The style options for the item
- * @param index The model index of the item being painted
- */
-void BackgroundDelegate::paint(QPainter* painter,
-                               const QStyleOptionViewItem& option,
-                               const QModelIndex& index) const {
-    QStyleOptionViewItem opt = option;
-    initStyleOption(&opt, index);
-
-    if (opt.state & QStyle::State_MouseOver ||
-        opt.state & QStyle::State_Selected) {
-        opt.backgroundBrush = QBrush(QColor("#FF7009"));
-        opt.palette.setColor(QPalette::Text, QColor("white"));
-    } else {
-        opt.backgroundBrush = QBrush(QColor("white"));
-        opt.palette.setColor(QPalette::Text, QColor("#333333"));
-    }
-
-    QStyledItemDelegate::paint(painter, opt, index);
-}
 
 /**
  * @brief Constructs and initializes the MeasureNowWidget
