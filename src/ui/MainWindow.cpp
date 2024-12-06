@@ -190,11 +190,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     contentCardLayout->addWidget(contentStackedWidget);
 
     // Create the content widgets
-    MeasureNowWidget *measureNowWidget =
+    measureNowWidget =
         new MeasureNowWidget(this, deviceController, userProfileController,
                              scanController, loggedInUserId);
 
-    HomeWidget *homeWidget = new HomeWidget;
+    homeWidget = new HomeWidget(this, userProfileController);
+    homeWidget->setUserId(loggedInUserId);
 
     ProfilesWidget *profilesWidget = new ProfilesWidget;
     profilesWidget->setUserProfileController(userProfileController);
@@ -279,6 +280,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
                                       firstProfile->getName());
                 }
             });
+
+    connect(profilesWidget, &ProfilesWidget::profilesChanged, homeWidget,
+            &HomeWidget::refreshProfiles);
+
+    connect(homeWidget, &HomeWidget::profileSelected, this,
+            &MainWindow::setCurrentProfile);
 
     connect(deviceController, &DeviceController::deviceStateChanged, this,
             [](bool isOn) { DEBUG("Device turned" << (isOn ? "on" : "off")); });
@@ -583,5 +590,19 @@ void MainWindow::setCurrentProfile(int profileId, const QString &profileName) {
 
     currentProfileId = profileId;
     currentProfileName = profileName;
+
+    QComboBox *homeCombo = homeWidget->getProfileSelector();
+    QComboBox *measureCombo = measureNowWidget->getProfileSelector();
+
+    if (homeCombo) {
+        int index = homeCombo->findData(profileId);
+        if (index >= 0) homeCombo->setCurrentIndex(index);
+    }
+
+    if (measureCombo) {
+        int index = measureCombo->findData(profileId);
+        if (index >= 0) measureCombo->setCurrentIndex(index);
+    }
+
     emit currentProfileChanged(profileId, profileName);
 }

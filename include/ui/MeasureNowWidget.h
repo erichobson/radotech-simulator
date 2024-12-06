@@ -6,7 +6,7 @@
 #ifndef MEASURENOWWIDGET_H
 #define MEASURENOWWIDGET_H
 
-#include <QStyledItemDelegate>
+#include <QMap>
 #include <QWidget>
 
 class QStackedWidget;
@@ -27,18 +27,6 @@ class QSpinBox;
 class QDoubleSpinBox;
 class QComboBox;
 
-/**
- * @brief Custom delegate for styling background in combo boxes
- */
-class BackgroundDelegate : public QStyledItemDelegate {
-    Q_OBJECT
-
-   public:
-    explicit BackgroundDelegate(QObject* parent = nullptr);
-    void paint(QPainter* painter, const QStyleOptionViewItem& option,
-               const QModelIndex& index) const override;
-};
-
 class MeasureNowWidget : public QWidget {
     Q_OBJECT
 
@@ -49,6 +37,7 @@ class MeasureNowWidget : public QWidget {
         ScanController* scanController = nullptr, int userId = -1);
     void setUserId(int userId);
     void refreshProfiles();
+    QComboBox* getProfileSelector() const { return profileComboBox; }
 
    protected:
     void resizeEvent(QResizeEvent* event) override;

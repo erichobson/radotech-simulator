@@ -12,6 +12,8 @@
 #include "ClickableLabel.h"
 #include "DatabaseManager.h"
 #include "DeviceController.h"
+#include "HomeWidget.h"
+#include "MeasureNowWidget.h"
 #include "ScanController.h"
 #include "UserProfileController.h"
 #include "UserController.h"
@@ -88,6 +90,9 @@ class MainWindow : public QMainWindow {
     UserProfileController *userProfileController;
     ScanController *scanController;
     UserController *userController;
+    HomeWidget *homeWidget;
+    MeasureNowWidget *measureNowWidget;
+
     int loggedInUserId;
     int currentProfileId;
     QString currentProfileName;
