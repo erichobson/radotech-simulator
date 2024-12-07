@@ -595,21 +595,64 @@ RaDoTech system → handles the error of device malfunction
 Below is the use case diagram covering the two major actors and their interactions with the use cases.
 
 <div style="text-align: left;">
-    <img src="[https://github.com/user-attachments/assets/8ed4eafd-2477-4bf3-9234-19d9ee3e7ba1](https://github.com/user-attachments/assets/0d0ecbc9-bf9f-4768-966d-fd4e24cc5618)" />
+    <img src="https://github.com/user-attachments/assets/0d0ecbc9-bf9f-4768-966d-fd4e24cc5618" />
     <p><em>Figure 2: Use Case Diagram</em></p>
 </div>
 
 ## Sequence Diagrams
+// TODO: Write ups and images for each.
+
+### Sequence Diagram: Profile Creation
+Below is the sequence of creating a profile.
+<div style="text-align: left;">
+    <img src="https://github.com/user-attachments/assets/af1f224e-7ea7-47ac-8aa7-4f2c666dfa90" />
+    <p><em>Figure 3: Sequence Diagram - Profile Creation</em></p>
+</div>
+<br>
+
+### Sequence Diagram: Scan Measurement & Creation
+Below is the sequence of running and creating a scan.
+<div style="text-align: left;">
+    <img src="https://github.com/user-attachments/assets/5d8af61d-d112-4a30-8415-712b7cf15cc5" />
+    <p><em>Figure 4: Sequence Diagram - Scan Measurements & Creation</em></p>
+</div>
+
 
 ## Class Diagram
 Below is the class diagram for the application. We used the model view controller architecture for this system. The main controllers (`UserController`, `ScanController`, and `UserProfileController`) all use the `DatabaseManager` to do create, read, update, and delete operations with the database. The controllers are used throughout the application to retrieve user information, create profiles, store scans, etc.
 
 The main models (`ScanModel`, `ProfileModel`, and `UserModel`) are used to organize the data going in and coming out of the database. It allows the controllers to more easily create their corresponding records in the database, and allows the ui to better interact with the data passed to it. 
 
-The view (ui) utilizes the observer pattern that Qt provides through it's slots and signals functionality. The `MainWindow` is responsible for initializing and connecting the core functionality and control flow throughout the application. It is responsible for initializing and controlling the other widgets that the user will interact with. The following widgets provide the core user interaction: 
-1. LoginWidget
+The view (ui) utilizes the observer pattern that Qt provides through it's slots and signals functionality. The `MainWindow` is responsible for initializing, connecting the core functionality and control flow, and handling the core logic throughout the application. It is responsible for initializing and controlling the other widgets that the user will interact with. The following widgets have the most user interaction: 
+1. LoginWidget: Provides the user with login and register capabilities, utilizing the user controller
+2. ProfilesWidget: Provides the user a list of their profiles
+3. ProfileEditWidget: Provides the user edit capabilities on a particular profile
+4. HomeWidget: Provides the user a landing page and the ability to select their profile
+5. MeasureNowWidget: Provides the user the ability to start and complete a scan
+6. HistoryWidget: Provides the user a list of their past scans
+7. ResultsWidget: Provides the user the result of a selected scan
+
+Lastly, we have the two main utility classes `DatabaseManager` and `HealthMetricCalculator`. The database manager serves as the main database connection, while the health metric calculator provides utility functions for calculating organ health metrics and health indicators as discussed in the Ryodoraku Calculation sections.
+
+<div style="text-align: left;">
+    <img src="https://github.com/user-attachments/assets/826cc794-1bca-4cf4-9274-13c40d015e07" />
+    <p><em>Figure x: Class Diagram</em></p>
+</div>
 
 ## Database Schema
+Below is the database schema used in the application. It is a simple sqlite database with three tables (users, profile, and scan). The users has a one-to-many relationship with the profile, and the profile has a zero-to-many relationship with the scan.
+
+<div style="text-align: left;">
+    <img src="https://github.com/user-attachments/assets/09d7d94b-f2c6-4b96-9f31-f437024bbfd5" />
+    <p><em>Figure x: Database Schema</em></p>
+</div>
+
+## State Machine Diagram
+// TODO
+
+## Traceability Matrix
+// TODO
+
 
 ## References
 <a id="1">[1]</a> 
