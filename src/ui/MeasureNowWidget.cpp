@@ -79,7 +79,8 @@ MeasureNowWidget::MeasureNowWidget(QWidget* parent,
         connectionTimer->setInterval(1000);
         connect(connectionTimer, &QTimer::timeout, this, [this]() {
             if (!this->deviceController->isConnected() &&
-                stackedWidget->currentIndex() != 0) {
+                stackedWidget->currentIndex() != 0 &&
+                !areAllMeasurementsComplete()) {
                 DEBUG("Device disconnected - resetting measurement");
                 showAlert("Device disconnected - measurement cancelled");
                 resetMeasurement();
@@ -603,8 +604,6 @@ void MeasureNowWidget::processMeasurements() {
     scanModel.setF5GallBladderR(measurements[22]);     // Gallbladder (Right)
     scanModel.setF6StomachR(measurements[23]);         // Stomach (Right)
 
-    scanModel.setMeasurements(measurements);
-
     scanModel.setBodyTemp(bodyTemp);
     scanModel.setBloodPressure(bloodPressure);
     scanModel.setHeartRate(heartRate);
@@ -613,10 +612,14 @@ void MeasureNowWidget::processMeasurements() {
     scanModel.setEmotionalState(emotionalState);
     scanModel.setOverallFeeling(overallFeeling);
 
+    scanModel.setMeasurements(measurements);
+
     if (!scanController->storeScan(scanModel)) {
         ERROR("Failed to store the scan");
         return;
     }
+
+    emit scanStored(scanModel);
 
     if (!resultsWidget) {
         resultsWidget = new ResultsWidget(this);

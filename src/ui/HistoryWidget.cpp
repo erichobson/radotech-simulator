@@ -321,3 +321,15 @@ bool HistoryWidget::eventFilter(QObject* obj, QEvent* event) {
     }
     return QWidget::eventFilter(obj, event);
 }
+
+/**
+ * @brief
+ *
+ * @param scan
+ */
+void HistoryWidget::onNewScanStored(const ScanModel& scan) {
+    if (scan.getProfileId() == currentProfileId) {
+        loadScansForProfile();
+        showHistoryView();
+    }
+}

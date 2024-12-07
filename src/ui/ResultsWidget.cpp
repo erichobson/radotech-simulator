@@ -46,14 +46,14 @@ void ResultsWidget::setupUI() {
 void ResultsWidget::displayResults() {
     DEBUG("Displaying results");
 
-    // Clear existing widgets from card layout
+    // Clear existing widgets
     QLayoutItem* child;
     while ((child = cardLayout->takeAt(0)) != nullptr) {
         delete child->widget();
         delete child;
     }
 
-    // Add back button only if needed (for history view)
+    // Back button (if needed)
     if (showBackButton) {
         QPushButton* backButton = new QPushButton("Back");
         backButton->setFixedSize(60, 30);
@@ -68,45 +68,35 @@ void ResultsWidget::displayResults() {
             "    color: #666666;"
             "}");
         cardLayout->addWidget(backButton, 0, Qt::AlignLeft);
-
         connect(backButton, &QPushButton::clicked, this,
                 &ResultsWidget::backButtonClicked);
     }
 
-    // Create header section
+    // Header section
     QWidget* headerWidget = new QWidget;
     QHBoxLayout* headerLayout = new QHBoxLayout(headerWidget);
     headerLayout->setContentsMargins(0, 0, 0, 0);
 
-    // Title and Date
     QVBoxLayout* titleLayout = new QVBoxLayout;
-
     QLabel* titleLabel = new QLabel("Scan Results");
     titleLabel->setStyleSheet(
         "font-size: 24px; font-weight: bold; color: #333333;");
-
     QLabel* dateLabel =
         new QLabel(currentScan.getCreatedOn().toString("MMMM d, yyyy"));
     dateLabel->setStyleSheet("font-size: 16px; color: #666666;");
-
     titleLayout->addWidget(titleLabel);
     titleLayout->addWidget(dateLabel);
     headerLayout->addLayout(titleLayout);
     headerLayout->addStretch();
-
-    // Add header to card layout
     cardLayout->addWidget(headerWidget);
 
-    // Create vital signs section
+    // Vitals section
     QWidget* vitalsWidget = new QWidget;
     vitalsWidget->setStyleSheet(
-        "background-color: #F8F8F8; "
-        "border-radius: 10px;");
-
+        "background-color: #F8F8F8; border-radius: 10px;");
     QHBoxLayout* vitalsLayout = new QHBoxLayout(vitalsWidget);
     vitalsLayout->setSpacing(40);
 
-    // Create vital sign items
     QList<QPair<QString, QString>> vitals = {
         {"Temperature",
          QString("%1°C").arg(static_cast<double>(currentScan.getBodyTemp()), 0,
@@ -120,96 +110,157 @@ void ResultsWidget::displayResults() {
 
     for (const auto& vital : vitals) {
         QVBoxLayout* vitalItemLayout = new QVBoxLayout;
-
         QLabel* valueLabel = new QLabel(vital.second);
         valueLabel->setStyleSheet(
             "font-size: 22px; font-weight: bold; color: #333333;");
-
         QLabel* nameLabel = new QLabel(vital.first);
         nameLabel->setStyleSheet("font-size: 14px; color: #666666;");
-
         vitalItemLayout->addWidget(valueLabel);
         vitalItemLayout->addWidget(nameLabel);
         vitalsLayout->addLayout(vitalItemLayout);
     }
-
     vitalsLayout->addStretch();
     cardLayout->addWidget(vitalsWidget);
 
-    // Create metrics section
-    QWidget* metricsWidget = new QWidget;
-    QVBoxLayout* metricsLayout = new QVBoxLayout(metricsWidget);
-    metricsLayout->setSpacing(10);
+    // Metrics Container
+    QWidget* metricsContainer = new QWidget;
+    QHBoxLayout* metricsContainerLayout = new QHBoxLayout(metricsContainer);
+    metricsContainerLayout->setSpacing(20);
 
-    // Calculate metrics
+    // Organ Health Section
+    QWidget* organWidget = new QWidget;
+    organWidget->setStyleSheet(
+        "background-color: #F8F8F8; border-radius: 10px;");
+    organWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    QVBoxLayout* organLayout = new QVBoxLayout(organWidget);
+
+    QLabel* organTitle = new QLabel("Organ Health");
+    organTitle->setStyleSheet(
+        "font-size: 20px; font-weight: bold; color: #333333;");
+    organLayout->addWidget(organTitle);
+    int row = 0, col = 0;
+
     healthMetrics.clear();
-    if (!calculator.calculateOrganHealth(&currentScan, healthMetrics)) {
-        ERROR("Failed to calculate organ health metrics");
-        return;
-    }
+    if (calculator.calculateOrganHealth(&currentScan, healthMetrics)) {
+        QGridLayout* organGrid = new QGridLayout;
+        organGrid->setSpacing(10);
+        for (const auto& metric : healthMetrics) {
+            QWidget* metricCard = new QWidget;
+            metricCard->setSizePolicy(QSizePolicy::Expanding,
+                                      QSizePolicy::Preferred);
+            QHBoxLayout* cardLayout = new QHBoxLayout(metricCard);
+            cardLayout->setContentsMargins(0, 0, 0, 0);
 
-    QGridLayout* metricsGrid = new QGridLayout;
-    metricsGrid->setSpacing(20);
-    int row = 0;
-    int col = 0;
-    const int COLS = 2;
+            QString statusColor = metric->getLevel() > 0   ? "#FF8001"
+                                  : metric->getLevel() < 0 ? "#D32F2F"
+                                                           : "#4CAF50";
 
-    for (const auto& metric : healthMetrics) {
-        // Create metric card
-        QWidget* metricCard = new QWidget;
-        metricCard->setFixedHeight(35);  // Compact height
+            QLabel* nameLabel = new QLabel(metric->getName());
+            nameLabel->setStyleSheet("font-size: 15px; color: #333333;");
+            nameLabel->setSizePolicy(QSizePolicy::Expanding,
+                                     QSizePolicy::Preferred);
+            nameLabel->setMinimumWidth(200);
 
-        // TODO: Fix colours
-        QString statusColor = metric->getLevel() > 0   ? "#FF8001"
-                              : metric->getLevel() < 0 ? "#D32F2F"
-                                                       : "#4CAF50";
-        // Create layout for the card
-        QHBoxLayout* cardLayout = new QHBoxLayout(metricCard);
-        cardLayout->setContentsMargins(0, 0, 0, 0);
-        cardLayout->setSpacing(10);  // Consistent spacing
+            QLabel* valueLabel =
+                new QLabel(QString::number(metric->getValue(), 'f', 1));
+            valueLabel->setStyleSheet(
+                QString("font-size: 15px; font-weight: bold; color: %1;")
+                    .arg(statusColor));
+            valueLabel->setMinimumWidth(50);
+            valueLabel->setAlignment(Qt::AlignRight);
 
-        // Create labels
-        QLabel* nameLabel = new QLabel(metric->getName());
-        nameLabel->setStyleSheet(
-            "font-size: 15px; "
-            "color: #333333;");
+            cardLayout->addWidget(nameLabel);
+            cardLayout->addSpacing(20);
+            cardLayout->addWidget(valueLabel);
 
-        QLabel* valueLabel =
-            new QLabel(QString::number(metric->getValue(), 'f', 1));
-        valueLabel->setStyleSheet(QString("font-size: 15px; "
-                                          "font-weight: bold; "
-                                          "color: %1;")
-                                      .arg(statusColor));
-
-        // Set alignment
-        nameLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-        valueLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-
-        // Set size policies
-        nameLabel->setSizePolicy(QSizePolicy::Expanding,
-                                 QSizePolicy::Preferred);
-        valueLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-        valueLabel->setMinimumWidth(50);
-
-        // Add labels to layout
-        cardLayout->addWidget(nameLabel);
-        cardLayout->addWidget(valueLabel);
-
-        // Add to grid layout
-        metricsGrid->addWidget(metricCard, row, col);
-
-        // Update position
-        col++;
-        if (col >= COLS) {
-            col = 0;
-            row++;
+            organGrid->addWidget(metricCard, row, col);
+            if (++col >= 2) {
+                col = 0;
+                row++;
+            }
         }
+        organLayout->addLayout(organGrid);
     }
 
-    // Add the grid to the metrics layout
-    metricsLayout->addLayout(metricsGrid);
-    cardLayout->addWidget(metricsWidget);
+    // Indicator Health Section
+    QWidget* indicatorWidget = new QWidget;
+    indicatorWidget->setStyleSheet(
+        "background-color: #F8F8F8; border-radius: 10px;");
+    indicatorWidget->setSizePolicy(QSizePolicy::Expanding,
+                                   QSizePolicy::Preferred);
+    QVBoxLayout* indicatorLayout = new QVBoxLayout(indicatorWidget);
 
+    QLabel* indicatorTitle = new QLabel("Indicator Health");
+    indicatorTitle->setStyleSheet(
+        "font-size: 20px; font-weight: bold; color: #333333;");
+    indicatorLayout->addWidget(indicatorTitle);
+
+    QVector<HealthMetricModel*> indicatorMetrics;
+    if (calculator.calculateIndicatorHealth(&currentScan, indicatorMetrics)) {
+        QGridLayout* indicatorGrid = new QGridLayout;
+        indicatorGrid->setSpacing(10);
+        row = 0;
+        col = 0;
+        for (const auto& metric : indicatorMetrics) {
+            QWidget* metricCard = new QWidget;
+            metricCard->setSizePolicy(QSizePolicy::Expanding,
+                                      QSizePolicy::Preferred);
+            QHBoxLayout* cardLayout = new QHBoxLayout(metricCard);
+            cardLayout->setContentsMargins(0, 0, 0, 0);
+
+            QString statusColor = metric->getLevel() > 0   ? "#FF8001"
+                                  : metric->getLevel() < 0 ? "#D32F2F"
+                                                           : "#4CAF50";
+
+            QLabel* nameLabel = new QLabel(metric->getName());
+            nameLabel->setStyleSheet("font-size: 15px; color: #333333;");
+            nameLabel->setSizePolicy(QSizePolicy::Expanding,
+                                     QSizePolicy::Preferred);
+
+            QLabel* valueLabel =
+                new QLabel(QString::number(metric->getValue(), 'f', 1));
+            valueLabel->setStyleSheet(
+                QString("font-size: 15px; font-weight: bold; color: %1;")
+                    .arg(statusColor));
+            valueLabel->setMinimumWidth(50);
+            valueLabel->setAlignment(Qt::AlignRight);
+
+            cardLayout->addWidget(nameLabel);
+            cardLayout->addSpacing(20);
+            cardLayout->addWidget(valueLabel);
+
+            indicatorGrid->addWidget(metricCard, row, col);
+            if (++col >= 1) {
+                col = 0;
+                row++;
+            }
+        }
+        indicatorLayout->addLayout(indicatorGrid);
+    }
+
+    metricsContainerLayout->addWidget(organWidget);
+    metricsContainerLayout->addWidget(indicatorWidget);
+    cardLayout->addWidget(metricsContainer);
+
+    // Recommendations section
+    QWidget* recommendationsWidget = new QWidget;
+    recommendationsWidget->setStyleSheet(
+        "background-color: #F8F8F8; border-radius: 10px; padding: 15px;");
+    QHBoxLayout* recommendationsLayout = new QHBoxLayout(recommendationsWidget);
+
+    QLabel* recommendationsTitle = new QLabel("Specialist Recommendations:");
+    recommendationsTitle->setStyleSheet(
+        "font-size: 16px; font-weight: bold; color: #333333;");
+    QLabel* recommendationsText = new QLabel(
+        "Please consult with your healthcare provider for personalized advice "
+        "based on these results.");
+    recommendationsText->setStyleSheet("font-size: 14px; color: #666666;");
+    recommendationsText->setWordWrap(true);
+
+    recommendationsLayout->addWidget(recommendationsTitle);
+    recommendationsLayout->addWidget(recommendationsText, 1);
+
+    cardLayout->addWidget(recommendationsWidget);
     cardLayout->addStretch();
 }
 
