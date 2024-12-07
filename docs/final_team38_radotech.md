@@ -700,5 +700,6 @@ Below is the requirements traceability matrix for the project. <br>
 ## References
 <a id="1">[1]</a> 
 Yoshio NAKATANI MD,PhD, Tetsuo OISO MD,PhD. 2018. A Guide for Application of Ryodoraku Autonomous Nerve Regulatory Therapy. *Ryodoraku Medicine and Stimulus Therapy*, http://iarms.org/journal/rmst_v1_1_20.pdf
+<br/>
 <a id="2">[2]</a> 
 Althof, S. E., McMahon, C. G., Waldinger, M. D., Serefoglu, E. C., Shindel, A. W., Adaikan, P. G., Becher, E. F., Dean, J., Giuliano, F., Hellstrom, W. J. G., Incrocci, L., & Jannini, E. A. (2014). An update on the treatment of premature ejaculation: A systematic review and meta-analysis. The Journal of Sexual Medicine, 11(6), 1506-1529. https://doi.org/10.1111/jsm.12560
