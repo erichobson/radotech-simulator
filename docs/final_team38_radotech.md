@@ -600,12 +600,11 @@ Below is the use case diagram covering the two major actors and their interactio
 </div>
 
 ## Sequence Diagrams
-// TODO: Write ups and images for each.
 
 ### Sequence Diagram: Profile Creation
 Below is the sequence of creating a profile.
 <div style="text-align: left;">
-    <img src="https://github.com/user-attachments/assets/af1f224e-7ea7-47ac-8aa7-4f2c666dfa90" />
+    <img src="https://github.com/user-attachments/assets/6f96a5c5-1e4b-424c-a2e4-a2b55fcdcfcc" />
     <p><em>Figure 3: Sequence Diagram - Profile Creation</em></p>
 </div>
 <br>
@@ -613,10 +612,30 @@ Below is the sequence of creating a profile.
 ### Sequence Diagram: Scan Measurement & Creation
 Below is the sequence of running and creating a scan.
 <div style="text-align: left;">
-    <img src="https://github.com/user-attachments/assets/5d8af61d-d112-4a30-8415-712b7cf15cc5" />
+    <img src="https://github.com/user-attachments/assets/0a92cccf-6c93-42e1-b782-cf5d667bbc7c" />
     <p><em>Figure 4: Sequence Diagram - Scan Measurements & Creation</em></p>
 </div>
 
+### Sequence Diagram: Device Not on Skin Long Enough
+Below is the sequence of the device not being on skin long enough during a scan.
+<div style="text-align: left;">
+    <img src="https://github.com/user-attachments/assets/9a458eca-06a2-49dd-9997-c3eeb99b5fe9" />
+    <p><em>Figure 5: Sequence Diagram - Device Not on Skin Long Enough</em></p>
+</div>
+
+### Sequence Diagram: Device Shutdown Due to Low Battery
+Below is the sequence of the device shutting down due to low battery.
+<div style="text-align: left;">
+    <img src="https://github.com/user-attachments/assets/ded78382-1e4c-4218-9a85-9f580d643827" />
+    <p><em>Figure 6: Sequence Diagram - Device Shutdown Due to Low Battery</em></p>
+</div>
+
+### Sequence Diagram: Scan Results - Organ Health
+Below is the sequence of the scan results for organ health.
+<div style="text-align: left;">
+    <img src="https://github.com/user-attachments/assets/eb279f1a-99fb-472d-924c-942a9c9a4240" />
+    <p><em>Figure 6: Sequence Diagram - Scan Results: Organ Health</em></p>
+</div>
 
 ## Class Diagram
 Below is the class diagram for the application. We used the model view controller architecture for this system. The main controllers (`UserController`, `ScanController`, and `UserProfileController`) all use the `DatabaseManager` to do create, read, update, and delete operations with the database. The controllers are used throughout the application to retrieve user information, create profiles, store scans, etc.
