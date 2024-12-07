@@ -655,7 +655,7 @@ Lastly, we have the two main utility classes `DatabaseManager` and `HealthMetric
 
 <div style="text-align: left;">
     <img src="https://github.com/user-attachments/assets/826cc794-1bca-4cf4-9274-13c40d015e07" />
-    <p><em>Figure x: Class Diagram</em></p>
+    <p><em>Figure 7: Class Diagram</em></p>
 </div>
 
 ## Database Schema
@@ -663,7 +663,7 @@ Below is the database schema used in the application. It is a simple sqlite data
 
 <div style="text-align: left;">
     <img src="https://github.com/user-attachments/assets/09d7d94b-f2c6-4b96-9f31-f437024bbfd5" />
-    <p><em>Figure x: Database Schema</em></p>
+    <p><em>Figure 8: Database Schema</em></p>
 </div>
 
 ## State Machine Diagram
@@ -671,8 +671,16 @@ Below is the database schema used in the application. It is a simple sqlite data
 Below is the state machine diagram of the RaDoTech device.
 <div style="text-align: left;">
     <img src="https://github.com/user-attachments/assets/eebdfbaa-485e-4c92-a918-bfc6bec7822d" />
-    <p><em>Figure x: State Machine Diagram - RaDoTech Device</em></p>
+    <p><em>Figure 9: State Machine Diagram - RaDoTech Device</em></p>
 </div>
+
+### State Machine Diagram: Scan 
+Below is the state machine diagram of the scan process.
+<div style="text-align: left;">
+    <img src="https://github.com/user-attachments/assets/8cd5b9fc-c2e2-45ef-a8e2-c1e4db4a1bef" />
+    <p><em>Figure 10: State Machine Diagram - RaDoTech Device</em></p>
+</div>
+
 
 ## Traceability Matrix
 Below is the requirements traceability matrix for the project. <br>
@@ -687,7 +695,7 @@ Below is the requirements traceability matrix for the project. <br>
 | 7 | A user can collect health data | ScanController, MeasureNowWidget | Start and complete the scan in the “measure now” section | The measure now widget loads pages for each scan. The user uses the device to complete the scan. Once all pages have been run through and the results page is about to be reached, it utilizes the ScanController to create the scan. | Start and complete the scan, verify the scan has been created in the database |
 | 8 | The system processes raw data using algorithms based on ryodoraku technology to generate health metrics | HealthMetricCalculator | Unit testing on the HealthMetric Calculator | n/a | Unit testing the individual functions in the HealthMetricCalculator, ensuring results are as expected |
 | 9 | A user can view their health metrics in an easy to understand visual format | HealthMetricCalculator, ResultsWidget | Complete a scan and view the results in the results widget | After completing a scan, the results page utilizes the health metric calculator to generate the calculations from the scan | Viewing the results page and verifying that the calculations are correct. |
-| 10 | The system provides placeholders for specialists’ recommendations | TODO |  |  |  |
+| 10 | The system provides placeholders for specialists’ recommendations | ResultsWidget | Complete or load a scan and view the results in the results widget | After completing or loading a scan, the results page displays a placeholder for recommendations | Viewing the results page and verifying that the recommendations placeholder is visible |
 | 11 | A user can access historical health data  | UserProfileController, HistoryWidget | Navigate to the history section and view history of scans | History widget loads the scans for a given user profile (by using the user profile controller) | Viewing the history page and verifying that the previous scans  are correctly being displayed |
 | 12 | The device’s charge depletes | DeviceController,  DeviceImageWidget | Turn on the device by clicking the power button and observe the battery level | Device image widget utilizes the device controller to turn on/off the device and emits signal to main window to update battery percentage ui | Turning on the device by clicking the power button and observing that the battery level decreases in the ui. |
 | 13 | The device notifies when there is lower power | DeviceController,  DeviceImageWidget | Turn on the device by clicking the power button and observe the battery level reaching a low level | Device image widget utilizes the device controller to turn on/off the device and emits signal to main window to update battery percentage ui | Turning on the device by clicking the power button and observing that the battery level decreases until zero in the ui. Verifying that the battery changes color when low. |
