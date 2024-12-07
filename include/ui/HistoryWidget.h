@@ -37,6 +37,7 @@ class HistoryWidget : public QWidget {
 
    public slots:
     void setCurrentProfile(int profileId);
+    void onNewScanStored(const ScanModel& scan);
 
    private slots:
     void onScanSelected(ScanModel* scan);

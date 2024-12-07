@@ -25,6 +25,7 @@ class UserProfileController;
 class ProfileModel;
 class QSpinBox;
 class QDoubleSpinBox;
+class ScanModel;
 class QComboBox;
 
 class MeasureNowWidget : public QWidget {
@@ -44,6 +45,7 @@ class MeasureNowWidget : public QWidget {
 
    signals:
     void profileSelected(int profileId, const QString& profileName);
+    void scanStored(const ScanModel& scan);
 
    public slots:
     void startCountdown();

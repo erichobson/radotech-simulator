@@ -12,13 +12,14 @@
 #include "ClickableLabel.h"
 #include "DatabaseManager.h"
 #include "DeviceController.h"
+#include "HistoryWidget.h"
 #include "HomeWidget.h"
 #include "MeasureNowWidget.h"
-#include "ScanController.h"
-#include "UserProfileController.h"
-#include "UserController.h"
+#include "ProfileWidget.h"
 #include "ProfilesWidget.h"
-#include "HistoryWidget.h"
+#include "ScanController.h"
+#include "UserController.h"
+#include "UserProfileController.h"
 
 class QStackedWidget;
 class QVBoxLayout;
@@ -54,10 +55,11 @@ class MainWindow : public QMainWindow {
     /**
      * @brief Slot called when a registration is requested.
      */
-    void onRegisterRequested(const QString &firstName, const QString &lastName, const QString &sex, const QString &weight, 
-                           const QString &height, const QDate &dob, const QString &email, const QString& password, 
-                           const QString &confirmPassword);
-
+    void onRegisterRequested(const QString &firstName, const QString &lastName,
+                             const QString &sex, const QString &weight,
+                             const QString &height, const QDate &dob,
+                             const QString &email, const QString &password,
+                             const QString &confirmPassword);
 
     /**
      * @brief Logs out the current user and returns to the login page.
@@ -90,6 +92,7 @@ class MainWindow : public QMainWindow {
     DatabaseManager *databaseManager;
     DeviceController *deviceController;
     UserProfileController *userProfileController;
+    ProfileWidget *profileWidget;
     ScanController *scanController;
     UserController *userController;
     ProfilesWidget *profilesWidget;
