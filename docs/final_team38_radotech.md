@@ -678,7 +678,7 @@ Below is the state machine diagram of the RaDoTech device.
 Below is the state machine diagram of the scan process.
 <div style="text-align: left;">
     <img src="https://github.com/user-attachments/assets/8cd5b9fc-c2e2-45ef-a8e2-c1e4db4a1bef" />
-    <p><em>Figure 10: State Machine Diagram - RaDoTech Device</em></p>
+    <p><em>Figure 10: State Machine Diagram - Scan</em></p>
 </div>
 
 
