@@ -667,7 +667,12 @@ Below is the database schema used in the application. It is a simple sqlite data
 </div>
 
 ## State Machine Diagram
-// TODO
+### State Machine Diagram: RaDoTech Device
+Below is the state machine diagram of the RaDoTech device.
+<div style="text-align: left;">
+    <img src="https://github.com/user-attachments/assets/eebdfbaa-485e-4c92-a918-bfc6bec7822d" />
+    <p><em>Figure x: State Machine Diagram - RaDoTech Device</em></p>
+</div>
 
 ## Traceability Matrix
 Below is the requirements traceability matrix for the project. <br>
