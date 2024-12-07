@@ -607,34 +607,48 @@ Below is the sequence of creating a profile.
     <img src="https://github.com/user-attachments/assets/6f96a5c5-1e4b-424c-a2e4-a2b55fcdcfcc" />
     <p><em>Figure 3: Sequence Diagram - Profile Creation</em></p>
 </div>
+
+### Sequence Diagram: Profile Update
+Below is the sequence of updating a profile.
+<div style="text-align: left;">
+    <img src="https://github.com/user-attachments/assets/b3b2b398-c188-4ab5-a7e6-037abaeceb10"/>
+    <p><em>Figure 4: Sequence Diagram - Profile Update</em></p>
+</div>
+
+### Sequence Diagram: Profile Delete
+Below is the sequence of deleting a profile.
+<div style="text-align: left;">
+    <img src="https://github.com/user-attachments/assets/ad5483c7-19d2-442b-b5d7-08743e27116a" />
+    <p><em>Figure 5: Sequence Diagram - Profile Delete</em></p>
+</div>
 <br>
 
 ### Sequence Diagram: Scan Measurement & Creation
 Below is the sequence of running and creating a scan.
 <div style="text-align: left;">
     <img src="https://github.com/user-attachments/assets/0a92cccf-6c93-42e1-b782-cf5d667bbc7c" />
-    <p><em>Figure 4: Sequence Diagram - Scan Measurements & Creation</em></p>
+    <p><em>Figure 6: Sequence Diagram - Scan Measurements & Creation</em></p>
 </div>
 
 ### Sequence Diagram: Device Not on Skin Long Enough
 Below is the sequence of the device not being on skin long enough during a scan.
 <div style="text-align: left;">
     <img src="https://github.com/user-attachments/assets/9a458eca-06a2-49dd-9997-c3eeb99b5fe9" />
-    <p><em>Figure 5: Sequence Diagram - Device Not on Skin Long Enough</em></p>
+    <p><em>Figure 7: Sequence Diagram - Device Not on Skin Long Enough</em></p>
 </div>
 
 ### Sequence Diagram: Device Shutdown Due to Low Battery
 Below is the sequence of the device shutting down due to low battery.
 <div style="text-align: left;">
     <img src="https://github.com/user-attachments/assets/ded78382-1e4c-4218-9a85-9f580d643827" />
-    <p><em>Figure 6: Sequence Diagram - Device Shutdown Due to Low Battery</em></p>
+    <p><em>Figure 8: Sequence Diagram - Device Shutdown Due to Low Battery</em></p>
 </div>
 
 ### Sequence Diagram: Scan Results - Organ Health
 Below is the sequence of the scan results for organ health.
 <div style="text-align: left;">
     <img src="https://github.com/user-attachments/assets/eb279f1a-99fb-472d-924c-942a9c9a4240" />
-    <p><em>Figure 6: Sequence Diagram - Scan Results: Organ Health</em></p>
+    <p><em>Figure 9: Sequence Diagram - Scan Results: Organ Health</em></p>
 </div>
 
 ## Class Diagram
